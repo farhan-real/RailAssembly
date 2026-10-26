@@ -69,7 +69,6 @@ class BuilderView {
 
     container.innerHTML = `
       <div class="cad-container">
-        <!-- Top Toolbar -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:300px;">
             <div class="type-segmented-control">
@@ -101,7 +100,6 @@ class BuilderView {
           </div>
         ` : ""}
 
-        <!-- Physical Telemetry Grid -->
         <div class="view-grid-four" style="margin-bottom:12px;">
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
@@ -136,7 +134,6 @@ class BuilderView {
           </div>
         </div>
 
-        <!-- Electrical Chain & Physical Limit Diagnostics Panel -->
         <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:var(--radius-xs); padding:8px 12px; margin-bottom:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
             <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-secondary);">Electrical Chain &amp; System Limits Diagnostic</span>
@@ -242,13 +239,17 @@ class BuilderView {
 
         <div class="menu-trigger-box">
           <div class="menu-trigger-info">
-            <span class="menu-trigger-label">${cat.required ? "Mandatory System" : "Configurable Option"}</span>
-            <span class="menu-trigger-value">${comp ? comp.name : "None (Unequipped)"}</span>
-            <span class="text-muted" style="font-size:10px;">${comp && comp.weight ? `${comp.supplier} &bull; ${comp.weight} kg` : "Zero Weight &bull; No Cost"}</span>
+            <div class="menu-trigger-row">
+              <span class="menu-trigger-value">${comp ? comp.name : "None (Unequipped)"}</span>
+              <button class="c-btn btn-ghost btn-sm btn-open-comp-menu" data-cat="${cat.key}">
+                ${isNone ? "Equip Module..." : "Change Module..."}
+              </button>
+            </div>
+            <div class="menu-trigger-sub">
+              <span class="menu-trigger-label">${cat.required ? "Mandatory System" : "Configurable Option"}</span>
+              <span class="text-muted" style="font-size:10px;">${comp && comp.weight ? `${comp.supplier} &bull; ${comp.weight} kg` : "Zero Weight &bull; No Cost"}</span>
+            </div>
           </div>
-          <button class="c-btn btn-ghost btn-sm btn-open-comp-menu" data-cat="${cat.key}">
-            ${isNone ? "Equip Module..." : "Change Module..."}
-          </button>
         </div>
       `;
 
@@ -294,21 +295,21 @@ class BuilderView {
       if (item.disabled) el.style.opacity = "0.55";
 
       el.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:2px; max-width:75%;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <strong style="font-size:12px;">${item.name}</strong>
+        <div class="catalog-item-header">
+          <div class="catalog-item-title-group">
+            <strong class="catalog-item-name">${item.name}</strong>
             ${isSelected ? `<span class="c-badge badge-blue">Selected</span>` : ""}
             ${item.badge ? `<span class="c-badge badge-amber">${item.badge}</span>` : ""}
           </div>
-          ${item.specs ? `<div class="text-muted" style="font-size:10px;">${item.specs}</div>` : ""}
-          <div style="font-size:11px; line-height:1.3; color:var(--text-secondary); margin-top:2px;">${item.desc}</div>
+          <div class="catalog-item-actions">
+            <span class="catalog-item-price font-mono text-blue">${item.priceLabel || `$${item.cost.toLocaleString()}`}</span>
+            <button class="c-btn ${isSelected ? "btn-ghost" : "btn-primary"} btn-sm" ${item.disabled ? "disabled" : ""}>
+              ${isSelected ? "Active" : "Select"}
+            </button>
+          </div>
         </div>
-        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-          <span class="font-mono text-blue">${item.priceLabel || `$${item.cost.toLocaleString()}`}</span>
-          <button class="c-btn ${isSelected ? "btn-ghost" : "btn-primary"} btn-sm" ${item.disabled ? "disabled" : ""}>
-            ${isSelected ? "Active" : "Select"}
-          </button>
-        </div>
+        ${item.specs ? `<div class="catalog-item-specs text-muted">${item.specs}</div>` : ""}
+        <div class="catalog-item-desc">${item.desc}</div>
       `;
 
       el.onclick = () => {

@@ -73,7 +73,7 @@
   background-color: rgba(37, 99, 235, 0.15);
 }
 
-/* Component Acquisition Alternative Cards */
+/* Component Acquisition Cards */
 .component-buy-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -163,29 +163,23 @@
   color: var(--text-secondary);
 }
 
-/* Menu Trigger Rows */
+/* Menu Trigger Rows with Horizontal Part & Button Alignment */
 .menu-trigger-box {
   background-color: rgba(0, 0, 0, 0.22);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  padding: 7px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
+  padding: 8px 10px;
 }
 .menu-trigger-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
+  gap: 4px;
 }
-.menu-trigger-label {
-  font-size: 9px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.4px;
+.menu-trigger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 .menu-trigger-value {
   font-size: 11px;
@@ -194,11 +188,90 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
 }
-.menu-trigger-deltas {
+.menu-trigger-sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.menu-trigger-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+/* Component Selection Catalog Modal Items */
+.catalog-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.catalog-menu-item {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color var(--trans-fast), background-color var(--trans-fast);
+  cursor: pointer;
+}
+.catalog-menu-item:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-surface-hover);
+}
+.catalog-menu-item.active {
+  border-color: var(--color-blue);
+  background-color: rgba(37, 99, 235, 0.08);
+}
+.catalog-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+.catalog-item-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.catalog-item-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+.catalog-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.catalog-item-price {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.catalog-item-specs {
   font-size: 10px;
-  color: var(--color-blue);
-  font-family: var(--font-mono);
+  line-height: 1.3;
+}
+.catalog-item-desc {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-secondary);
 }
 
 /* Data Tables */
@@ -224,49 +297,6 @@
   background-color: rgba(255, 255, 255, 0.015);
 }
 
-/* R&D Tree */
-.tech-tree-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-.tech-tier-col {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.tech-node {
-  background-color: var(--bg-panel);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  padding: 10px;
-  cursor: pointer;
-  transition: all var(--trans-fast);
-}
-.tech-node:hover {
-  border-color: var(--border-strong);
-}
-.tech-node.researched {
-  border-color: rgba(16, 185, 129, 0.4);
-  background-color: rgba(16, 185, 129, 0.04);
-}
-.tech-node.active-research {
-  border-color: var(--color-blue);
-}
-.tech-progress-bar {
-  width: 100%;
-  height: 3px;
-  background-color: var(--bg-surface);
-  border-radius: 2px;
-  margin-top: 6px;
-  overflow: hidden;
-}
-.tech-progress-fill {
-  height: 100%;
-  background-color: var(--color-blue);
-  transition: width 0.2s ease;
-}
-
 /* Stat Rows */
 .stat-gauge-row {
   display: flex;
@@ -290,8 +320,5 @@
 @media (max-width: 1024px) {
   .view-grid-two, .view-grid-three, .view-grid-four {
     grid-template-columns: 1fr;
-  }
-  .tech-tree-grid {
-    grid-template-columns: 1fr 1fr;
   }
 }
