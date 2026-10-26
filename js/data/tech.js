@@ -1,9 +1,8 @@
-// Research Tree Graph Structure & Single-Source Hierarchy
-// Every single component maps to a dedicated research node stemming from tech_core
+// Single-Source Research Tree with Highly Descriptive Industrial Engineering Specifications
 const TREE_STRUCTURE = {
   core: {
     id: "tech_core",
-    name: "Foundational Electric Traction Core",
+    name: "Baseline 25kV Industrial Electric Traction Infrastructure",
     branch: "core",
     x: 1400,
     y: 1000,

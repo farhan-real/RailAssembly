@@ -11,10 +11,6 @@ class TreeCanvas {
     this.panX = -500;
     this.panY = -450;
     this.scale = 0.85;
-    this.isDragging = false;
-    this.dragDistance = 0;
-    this.startX = 0;
-    this.startY = 0;
 
     this.init();
   }
@@ -38,53 +34,66 @@ class TreeCanvas {
   }
 
   bindGestures() {
-    this.viewport.onpointerdown = (e) => {
-      this.isDragging = true;
-      this.dragDistance = 0;
-      this.startX = e.clientX - this.panX;
-      this.startY = e.clientY - this.panY;
-      this.viewport.setPointerCapture(e.pointerId);
-      this.viewport.style.cursor = "grabbing";
-    };
+    let isDown = false;
+    let startX = 0;
+    let startY = 0;
+    let initialPanX = 0;
+    let initialPanY = 0;
+    this.hasMoved = false;
 
-    this.viewport.onpointermove = (e) => {
-      if (!this.isDragging) return;
-      this.dragDistance += Math.hypot(e.movementX || 0, e.movementY || 0);
-      this.panX = e.clientX - this.startX;
-      this.panY = e.clientY - this.startY;
-      this.updateTransform();
-    };
+    this.viewport.addEventListener("pointerdown", (e) => {
+      // Ignore if clicking floating overlays
+      if (e.target.closest(".tree-hud-controls") || e.target.closest(".tree-inspector-panel")) return;
+      isDown = true;
+      this.hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      initialPanX = this.panX;
+      initialPanY = this.panY;
+    });
 
-    const stopDrag = (e) => {
-      this.isDragging = false;
+    window.addEventListener("pointermove", (e) => {
+      if (!isDown) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      // Only engage panning drag if pointer moves past threshold
+      if (Math.hypot(dx, dy) > 4) {
+        this.hasMoved = true;
+        this.panX = initialPanX + dx;
+        this.panY = initialPanY + dy;
+        this.updateTransform();
+        this.viewport.style.cursor = "grabbing";
+      }
+    });
+
+    const stopGesture = () => {
+      if (!isDown) return;
+      isDown = false;
       this.viewport.style.cursor = "grab";
-      try { this.viewport.releasePointerCapture(e.pointerId); } catch (_) {}
     };
-    this.viewport.onpointerup = stopDrag;
-    this.viewport.onpointercancel = stopDrag;
+    window.addEventListener("pointerup", stopGesture);
+    window.addEventListener("pointercancel", stopGesture);
 
     // Zoom anchored directly to the mouse cursor position
-    this.viewport.onwheel = (e) => {
+    this.viewport.addEventListener("wheel", (e) => {
       e.preventDefault();
       const rect = this.viewport.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      // Calculate world coordinate directly under the mouse pointer
       const worldX = (mouseX - this.panX) / this.scale;
       const worldY = (mouseY - this.panY) / this.scale;
 
-      // Smooth geometric scaling step
       const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
       const newScale = Math.min(2.0, Math.max(0.35, this.scale * zoomFactor));
 
-      // Adjust pan offsets so world coordinate remains anchored under the cursor
       this.panX = mouseX - worldX * newScale;
       this.panY = mouseY - worldY * newScale;
       this.scale = newScale;
 
       this.updateTransform();
-    };
+    }, { passive: false });
   }
 
   updateTransform() {
@@ -103,11 +112,15 @@ class TreeCanvas {
     this.updateTransform();
   }
 
-  setSelectedNode(nodeId) {
-    this.selectedNodeId = nodeId;
+  selectNode(node) {
+    if (!node) return;
+    this.selectedNodeId = node.id;
     this.surface.querySelectorAll(".tree-node-glyph").forEach(el => {
-      el.classList.toggle("is-selected", el.getAttribute("data-id") === nodeId);
+      el.classList.toggle("is-selected", el.getAttribute("data-id") === node.id);
     });
+    if (this.onNodeSelect) {
+      this.onNodeSelect(node);
+    }
   }
 
   zoomBy(factor) {
@@ -186,12 +199,17 @@ class TreeCanvas {
         <span class="tree-node-label">${node.name.length > 20 ? node.name.substring(0, 18) + "…" : node.name}</span>
       `;
 
-      // Distinguish genuine click/tap from pan dragging
-      glyph.addEventListener("pointerup", (e) => {
-        if (this.dragDistance > 6) return;
+      // Reliable click & tap selection
+      glyph.addEventListener("click", (e) => {
         e.stopPropagation();
-        this.setSelectedNode(node.id);
-        if (this.onNodeSelect) this.onNodeSelect(node);
+        if (this.hasMoved) return;
+        this.selectNode(node);
+      });
+
+      glyph.addEventListener("pointerup", (e) => {
+        if (this.hasMoved) return;
+        e.stopPropagation();
+        this.selectNode(node);
       });
 
       this.surface.appendChild(glyph);
