@@ -7,11 +7,12 @@ class TreeCanvas {
     this.svgLayer = null;
     this.selectedNodeId = "tech_core";
 
-    // Viewport transform coordinates centered on core
+    // Viewport coordinates
     this.panX = -500;
     this.panY = -450;
     this.scale = 0.85;
     this.isDragging = false;
+    this.dragDistance = 0;
     this.startX = 0;
     this.startY = 0;
 
@@ -38,15 +39,17 @@ class TreeCanvas {
 
   bindGestures() {
     this.viewport.onpointerdown = (e) => {
-      if (e.target.closest(".tree-node-glyph")) return;
       this.isDragging = true;
+      this.dragDistance = 0;
       this.startX = e.clientX - this.panX;
       this.startY = e.clientY - this.panY;
       this.viewport.setPointerCapture(e.pointerId);
+      this.viewport.style.cursor = "grabbing";
     };
 
     this.viewport.onpointermove = (e) => {
       if (!this.isDragging) return;
+      this.dragDistance += Math.hypot(e.movementX || 0, e.movementY || 0);
       this.panX = e.clientX - this.startX;
       this.panY = e.clientY - this.startY;
       this.updateTransform();
@@ -54,15 +57,32 @@ class TreeCanvas {
 
     const stopDrag = (e) => {
       this.isDragging = false;
+      this.viewport.style.cursor = "grab";
       try { this.viewport.releasePointerCapture(e.pointerId); } catch (_) {}
     };
     this.viewport.onpointerup = stopDrag;
     this.viewport.onpointercancel = stopDrag;
 
+    // Zoom anchored directly to the mouse cursor position
     this.viewport.onwheel = (e) => {
       e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-      this.scale = Math.min(1.8, Math.max(0.35, this.scale * zoomFactor));
+      const rect = this.viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // Calculate world coordinate directly under the mouse pointer
+      const worldX = (mouseX - this.panX) / this.scale;
+      const worldY = (mouseY - this.panY) / this.scale;
+
+      // Smooth geometric scaling step
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+      const newScale = Math.min(2.0, Math.max(0.35, this.scale * zoomFactor));
+
+      // Adjust pan offsets so world coordinate remains anchored under the cursor
+      this.panX = mouseX - worldX * newScale;
+      this.panY = mouseY - worldY * newScale;
+      this.scale = newScale;
+
       this.updateTransform();
     };
   }
@@ -91,7 +111,18 @@ class TreeCanvas {
   }
 
   zoomBy(factor) {
-    this.scale = Math.min(1.8, Math.max(0.35, this.scale * factor));
+    const rect = this.viewport.getBoundingClientRect();
+    const centerX = (rect.width || 800) / 2;
+    const centerY = (rect.height || 600) / 2;
+
+    const worldX = (centerX - this.panX) / this.scale;
+    const worldY = (centerY - this.panY) / this.scale;
+
+    const newScale = Math.min(2.0, Math.max(0.35, this.scale * factor));
+    this.panX = centerX - worldX * newScale;
+    this.panY = centerY - worldY * newScale;
+    this.scale = newScale;
+
     this.updateTransform();
   }
 
@@ -155,11 +186,13 @@ class TreeCanvas {
         <span class="tree-node-label">${node.name.length > 20 ? node.name.substring(0, 18) + "…" : node.name}</span>
       `;
 
-      glyph.onclick = (e) => {
+      // Distinguish genuine click/tap from pan dragging
+      glyph.addEventListener("pointerup", (e) => {
+        if (this.dragDistance > 6) return;
         e.stopPropagation();
         this.setSelectedNode(node.id);
         if (this.onNodeSelect) this.onNodeSelect(node);
-      };
+      });
 
       this.surface.appendChild(glyph);
     });

@@ -30,8 +30,11 @@ class ResearchView {
         ` : ""}
       </div>
 
-      <!-- Mindustry Visual Tree Viewport -->
-      <div class="visual-tree-container" id="visual-tree-viewport">
+      <!-- Mindustry Visual Tree Viewport Container -->
+      <div class="visual-tree-container">
+        <!-- Dedicated canvas viewport element -->
+        <div class="tree-viewport" id="visual-tree-viewport"></div>
+
         <!-- Floating HUD Zoom & Center Controls -->
         <div class="tree-hud-controls">
           <button class="tree-hud-btn" id="hud-zoom-in" title="Zoom In">+</button>
@@ -55,7 +58,7 @@ class ResearchView {
       this.inspectNode(TREE_STRUCTURE.core, container);
     };
 
-    // Default inspection to selected node or active research or core
+    // Default inspection to active research node, previously selected node, or the central core
     const initialNode = activeTech || this.selectedNode || TREE_STRUCTURE.core;
     this.inspectNode(initialNode, container);
   }
@@ -73,7 +76,6 @@ class ResearchView {
     const isActive = state.activeResearchId === node.id;
     const prereqsMet = !node.prereq || node.prereq.every(p => state.unlockedTechs.has(p));
     const isLocked = !prereqsMet && !isResearched;
-    const isCore = node.id === "tech_core";
 
     const prereqNames = (node.prereq || []).map(pId => {
       const pNode = TECH_DATA.find(n => n.id === pId);
@@ -87,7 +89,7 @@ class ResearchView {
           <span class="text-blue" style="font-size:9px; text-transform:uppercase; font-weight:700;">Track: ${node.branch.toUpperCase()}</span>
         </div>
         <span class="c-badge ${isResearched ? "badge-green" : (isActive ? "badge-blue" : (isLocked ? "badge-amber" : "badge-blue"))}">
-          ${isResearched ? "Mastered" : (isActive ? "Developing" : (isLocked ? "Locked" : "Ready"))}
+          ${isResearched ? "Mastered" : (isActive ? "Developing" : (isLocked ? "Locked" : "Available"))}
         </span>
       </div>
 
@@ -123,12 +125,12 @@ class ResearchView {
       ` : ""}
 
       <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:8px;">
-        <button class="c-btn btn-ghost btn-sm" id="btn-center-on-node" style="font-size:10px;">Focus Node</button>
+        <button class="c-btn btn-ghost btn-sm" id="btn-center-on-node" style="font-size:10px;">Focus on Map</button>
         ${!isResearched && !isLocked && !isActive ? `
           <button class="c-btn btn-primary btn-sm" id="btn-fund-inspected-node">
             Initiate R&amp;D ($${node.costMoney.toLocaleString()})
           </button>
-        ` : (isResearched ? `<span class="text-positive font-mono" style="font-size:10px;">✓ Technology Mastered</span>` : (isActive ? `<span class="text-blue font-mono" style="font-size:10px;">⚡ ${state.researchDaysLeft} Days Remaining</span>` : `<span class="text-negative" style="font-size:10px;">Locked: Complete Prerequisite</span>`))}
+        ` : (isResearched ? `<span class="text-positive font-mono" style="font-size:10px;">✓ Technology Developed</span>` : (isActive ? `<span class="text-blue font-mono" style="font-size:10px;">⚡ ${state.researchDaysLeft} Days Remaining</span>` : `<span class="text-negative" style="font-size:10px;">Locked: Complete Prerequisite</span>`))}
       </div>
     `;
 
