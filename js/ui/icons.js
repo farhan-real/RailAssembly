@@ -28,7 +28,7 @@ class TrainSVGBuilder {
         <!-- Main Carbody Chassis -->
         <path d="${nosePath}" fill="#16202e" stroke="#3b82f6" stroke-width="1.4"/>
 
-        <!-- Windows / Cab -->
+        <!-- Windows and Crew Cabins -->
         ${isFreight
           ? `<rect x="75" y="47" width="26" height="13" rx="1" fill="#29394f"/>
              <rect x="120" y="49" width="300" height="5" fill="#1b2535"/>`
@@ -41,20 +41,20 @@ class TrainSVGBuilder {
              <rect x="340" y="48" width="32" height="10" rx="1" fill="#29394f"/>`
         }
 
-        <!-- Underfloor Power Subsystems -->
-        <rect x="175" y="79" width="46" height="9" rx="1" fill="#d97706"/>
-        <text x="180" y="86" fill="#0b0f17" font-size="6" font-weight="700">TRAFO</text>
+        <!-- Underfloor Power Subsystems with Full Professional Nomenclature -->
+        <rect x="165" y="79" width="62" height="9" rx="1" fill="#d97706"/>
+        <text x="168" y="86" fill="#0b0f17" font-size="5.5" font-weight="700">TRANSFORMER</text>
 
-        <rect x="228" y="79" width="44" height="9" rx="1" fill="#2563eb"/>
-        <text x="233" y="86" fill="#ffffff" font-size="6" font-weight="700">INVERT</text>
+        <rect x="232" y="79" width="52" height="9" rx="1" fill="#2563eb"/>
+        <text x="237" y="86" fill="#ffffff" font-size="5.5" font-weight="700">INVERTER</text>
 
         ${hasBattery
-          ? `<rect x="279" y="79" width="42" height="9" rx="1" fill="#059669"/>
-             <text x="283" y="86" fill="#ffffff" font-size="6" font-weight="700">BATTERY</text>`
+          ? `<rect x="288" y="79" width="48" height="9" rx="1" fill="#059669"/>
+             <text x="292" y="86" fill="#ffffff" font-size="5.5" font-weight="700">BATTERY</text>`
           : ""
         }
 
-        <!-- Running Gear / Bogies -->
+        <!-- Running Gear Bogie Assemblies -->
         <g fill="#111827" stroke="#64748b" stroke-width="1.2">
           <circle cx="100" cy="94" r="7.5"/>
           <circle cx="132" cy="94" r="7.5"/>
@@ -69,7 +69,7 @@ class TrainSVGBuilder {
           <line x1="353" y1="88" x2="409" y2="88" stroke-width="2" stroke="#475569"/>
         </g>
 
-        <!-- Track Rail Line -->
+        <!-- Track Line -->
         <line x1="10" y1="102" x2="490" y2="102" stroke="#334155" stroke-width="1.5"/>
       </svg>
     `;

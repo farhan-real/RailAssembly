@@ -45,33 +45,44 @@ class SimulationRunner {
       const tech = TECH_DATA.find(t => t.id === state.activeResearchId);
       if (tech && state.researchProgress >= tech.costScience) {
         state.unlockedTechs.add(tech.id);
-        UI.toast(`R&D COMPLETE: "${tech.name}" is now unlocked!`, "success");
+        UI.toast(`Research Completed: "${tech.name}" is now operational for in-house manufacturing.`, "success");
         state.activeResearchId = null;
         state.researchProgress = 0;
         Events.emit("techUnlocked");
       }
     }
 
-    // Process Supplier Deliveries
+    // Process External Supplier Deliveries
     state.pendingDeliveries.forEach(del => {
       del.daysLeft -= 1;
       if (del.daysLeft <= 0) {
         state.addToWarehouse(del.componentId, del.count);
         const comp = state.findComponentById(del.componentId);
-        UI.toast(`DELIVERY ARRIVED: ${del.count}x ${comp ? comp.name : "components"} delivered to active warehouse.`, "normal");
+        UI.toast(`Supplier Delivery Arrived: ${del.count} units of ${comp ? comp.name : "components"} received into active warehouse.`, "normal");
         del.finished = true;
       }
     });
     state.pendingDeliveries = state.pendingDeliveries.filter(d => !d.finished);
 
-    // Process Assembly Lines
+    // Process In-House Manufacturing Production Jobs
+    state.inHouseQueue.forEach(job => {
+      job.daysRemaining -= 1;
+      if (job.daysRemaining <= 0) {
+        state.addToWarehouse(job.componentId, job.quantity);
+        const comp = state.findComponentById(job.componentId);
+        UI.toast(`In-House Fabrication Complete: ${job.quantity} units of ${comp ? comp.name : "components"} manufactured and stored.`, "success");
+        job.finished = true;
+      }
+    });
+    state.inHouseQueue = state.inHouseQueue.filter(j => !j.finished);
+
+    // Process Train Assembly Lines
     state.productionLines.forEach(line => {
       line.dailyProgress += line.laborRate;
       if (line.dailyProgress >= 100) {
         line.dailyProgress = 0;
         line.unitsCompleted += 1;
 
-        // Fulfill government contract if linked
         const targetContract = state.activeContracts.find(c => c.variantId === line.variantId && c.totalDelivered < c.totalUnits);
         if (targetContract) {
           targetContract.totalDelivered += 1;
@@ -84,7 +95,7 @@ class SimulationRunner {
 
         if (line.unitsCompleted >= line.batchSize) {
           line.done = true;
-          UI.toast(`Assembly batch completed for ${line.variantName}!`, "success");
+          UI.toast(`Assembly Complete: 1 unit of ${line.variantName} ready for service.`, "success");
         }
       }
     });
@@ -95,7 +106,6 @@ class SimulationRunner {
       state.quarter = (state.quarter % 4) + 1;
       if (state.quarter === 1) state.year += 1;
 
-      // Reset quarter counts on active contracts
       state.activeContracts.forEach(c => {
         c.quarterStartDay = state.day;
         c.deliveredThisQuarter = 0;

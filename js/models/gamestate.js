@@ -1,19 +1,19 @@
-// Central Game State Singleton with Rare Procurement Lifecycle Tracking
+// Central Game State Singleton with In-House and Supplier Sourcing Support
 class GameState {
   constructor() {
     this.funds = 14500000;
-    this.reputation = 72; // 0 - 100
+    this.reputation = 72;
     this.day = 1;
     this.quarter = 1;
     this.year = 1;
-    this.simSpeed = 1; // 0 = pause, 1 = normal, 3 = fast
+    this.simSpeed = 1;
     this.sciencePoints = 80;
-    this.dailyResearchBudget = 10000; // $ per day invested into science
+    this.dailyResearchBudget = 10000;
     this.activeResearchId = "tech_aluminum_extrusion";
-    this.researchProgress = 0; // science points accrued on active tech
+    this.researchProgress = 0;
     this.unlockedTechs = new Set(["tech_aluminum_extrusion"]);
 
-    // Inventory: Component ID -> quantity in active warehouse
+    // Active Warehouse Storage
     this.warehouse = {
       panto_std: 8,
       trans_heavy: 4,
@@ -27,29 +27,29 @@ class GameState {
     };
     this.warehouseCapacity = 200;
 
-    // Long Storage: Component ID -> quantity (unlimited capacity)
+    // Long Storage (Inactive Reserve Depot)
     this.longStorage = {};
 
-    // Pending supplier procurement orders
+    // Pending Deliveries from External Suppliers
     this.pendingDeliveries = [];
 
-    // In-house manufacturing queue
+    // Active In-House Manufacturing Production Jobs
     this.inHouseQueue = [];
 
-    // User-created train variants (blueprints)
+    // Commissioned Fleet Blueprints
     this.variants = [];
 
-    // Active production lines: { variantId, batchSize, unitsCompleted, dailyProgress }
+    // Active Assembly Lines
     this.productionLines = [];
 
-    // Awarded government contracts
+    // Awarded Government Rolling Stock Contracts
     this.activeContracts = [];
 
-    // Scarce Government Market Tenders (max 1 active tender at a time)
+    // Scarce Government Tenders
     this.marketTenders = [];
-    this.nextTenderCountdown = 14; // Days until Ministry publishes the next mega-tender
+    this.nextTenderCountdown = 14;
 
-    // Financial logs
+    // Financial Tracking
     this.quarterlyRevenue = 0;
     this.quarterlyExpenses = 0;
     this.lastQuarterProfit = 0;
@@ -87,15 +87,31 @@ class GameState {
     return true;
   }
 
+  isInHouseAvailable(component) {
+    if (!component.inHouseTech) return true;
+    return this.unlockedTechs.has(component.inHouseTech);
+  }
+
+  getInHouseUnitCost(component) {
+    // In-house raw materials and direct labor cost: 58% of external supplier price
+    return Math.round(component.cost * 0.58);
+  }
+
+  getInHouseFabricationDays(component, quantity) {
+    // In-house fabrication time scales with batch quantity
+    const baseDays = Math.max(3, Math.round(component.leadDays * 0.65));
+    return baseDays + Math.floor(quantity * 0.5);
+  }
+
   getDateString() {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const monthIndex = Math.floor(((this.day - 1) % 360) / 30);
     const dayInMonth = ((this.day - 1) % 30) + 1;
-    return `${months[monthIndex]} ${dayInMonth}, Y${this.year}`;
+    return `${months[monthIndex]} ${dayInMonth}, Year ${this.year}`;
   }
 
   getQuarterString() {
-    return `Q${this.quarter} Year ${this.year}`;
+    return `Quarter ${this.quarter} Year ${this.year}`;
   }
 
   findComponentById(id) {
@@ -104,6 +120,10 @@ class GameState {
       if (match) return match;
     }
     return null;
+  }
+
+  findTechById(techId) {
+    return TECH_DATA.find(t => t.id === techId) || null;
   }
 }
 

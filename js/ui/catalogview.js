@@ -1,11 +1,11 @@
-// Fleet Catalog, Profit Margins, Dynamic Testing, and Batch Allocation
+// Commissioned Fleet Catalog, Pricing Margins, and Production Allocation
 class CatalogView {
   static render(container) {
     if (state.variants.length === 0) {
       container.innerHTML = `
         <div class="c-card" style="text-align:center; padding:36px;">
           <h3 style="margin-bottom:6px; font-size:14px; font-weight:700;">NO COMMISSIONED FLEET BLUEPRINTS</h3>
-          <p class="text-muted" style="margin-bottom:14px;">Use the Engineering CAD workspace to design and certify electric trainsets.</p>
+          <p class="text-muted" style="margin-bottom:14px;">Utilize the Engineering CAD workspace to configure and commission electric rolling stock models.</p>
           <button class="c-btn btn-primary" onclick="Events.emit('navTo', 'builder')">Open Engineering CAD</button>
         </div>
       `;
@@ -16,7 +16,7 @@ class CatalogView {
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <div>
           <h2 style="font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Commissioned Fleet Catalog</h2>
-          <span class="text-muted" style="font-size:11px;">Manage margins, run dynamic certification runs, and allocate batch assembly lines</span>
+          <span class="text-muted" style="font-size:11px;">Manage margins, execute dynamic certification runs, and allocate batch assembly lines</span>
         </div>
         <button class="c-btn btn-ghost btn-sm" onclick="Events.emit('navTo', 'builder')">+ New Blueprint</button>
       </div>
@@ -32,7 +32,7 @@ class CatalogView {
 
       const certBadge = variant.certified
         ? `<span class="c-badge badge-green">Dynamic Certified</span>`
-        : `<span class="c-badge badge-amber">Uncertified CAD</span>`;
+        : `<span class="c-badge badge-amber">Uncertified Design</span>`;
 
       card.innerHTML = `
         <div class="card-header">
@@ -51,9 +51,9 @@ class CatalogView {
 
         <div class="view-grid-three" style="margin-bottom:10px;">
           <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed Verification</span>
             <div class="font-mono text-blue" style="font-size:14px;">
-              ${variant.certified ? `${variant.testedStats.exactTopSpeed} km/h` : `${variant.stats.roughSpeedMin} ~ ${variant.stats.roughSpeedMax} km/h`}
+              ${variant.certified ? `${variant.testedStats.exactTopSpeed} km/h (Certified)` : `${variant.stats.roughSpeedMin} ~ ${variant.stats.roughSpeedMax} km/h (Estimated)`}
             </div>
           </div>
           <div>
@@ -61,8 +61,8 @@ class CatalogView {
             <div class="font-mono" style="font-size:14px;">$${variant.unitProductionCost.toLocaleString()}</div>
           </div>
           <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Unit Profit Margin</span>
-            <div class="font-mono text-positive" style="font-size:14px;">+$${variant.profitPerUnit.toLocaleString()} (${variant.marginPercent}%)</div>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Target Unit Profit</span>
+            <div class="font-mono text-positive" style="font-size:14px;">+$${variant.profitPerUnit.toLocaleString()} (${variant.marginPercent}% Markup)</div>
           </div>
         </div>
 
@@ -76,7 +76,7 @@ class CatalogView {
         min: 5,
         max: 60,
         value: variant.marginPercent,
-        label: "Target Markup Margin",
+        label: "Commercial Markup Margin",
         unit: "%",
         step: 1,
         onInput: (val) => {
@@ -93,12 +93,12 @@ class CatalogView {
       if (testBtn) {
         testBtn.onclick = () => {
           if (state.funds < 45000) {
-            UI.toast("Insufficient capital for track test fees ($45,000).", "danger");
+            UI.toast("Insufficient Capital: Test facility fee is $45,000.", "danger");
             return;
           }
           state.funds -= 45000;
           TrainModelCalc.certifyVariant(variant);
-          UI.toast(`Certified stats verified on testing bench for ${variant.name}.`, "success");
+          UI.toast(`Test Verification Complete: Certified statistics verified for ${variant.name}.`, "success");
           CatalogView.render(document.getElementById("viewport-root"));
           Events.emit("fundsChanged");
         };
@@ -117,7 +117,7 @@ class CatalogView {
         }
 
         if (missing.length > 0) {
-          UI.toast(`Missing components in warehouse: ${missing.slice(0, 2).join(", ")}`, "danger");
+          UI.toast(`Assembly Halted: Missing active components: ${missing.slice(0, 2).join(", ")}`, "danger");
           return;
         }
 
@@ -137,7 +137,7 @@ class CatalogView {
           laborRate: 15
         });
 
-        UI.toast(`Assembly line started for ${variant.name}.`, "success");
+        UI.toast(`Assembly Line Initiated: 1 unit of ${variant.name} entered into production.`, "success");
         Events.emit("inventoryChanged");
         CatalogView.render(document.getElementById("viewport-root"));
       };
