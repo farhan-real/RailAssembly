@@ -7,6 +7,9 @@ class App {
     this.bindTimeControls();
     this.bindEvents();
 
+    // User gesture handler to resume AudioContext
+    window.addEventListener("pointerdown", () => SoundSystem.init(), { once: true });
+
     // Populate initial procurement cycle wave
     OrderEngine.evaluateGovernmentBids();
     this.switchTab("dashboard");
@@ -17,6 +20,7 @@ class App {
   static bindNavigation() {
     document.querySelectorAll(".nav-tab").forEach(tab => {
       tab.onclick = () => {
+        SoundSystem.playClick();
         const target = tab.getAttribute("data-tab");
         this.switchTab(target);
       };
@@ -39,6 +43,7 @@ class App {
       case "inventory": InventoryView.render(root); break;
       case "research": ResearchView.render(root); break;
       case "market": MarketView.render(root); break;
+      case "settings": SettingsView.render(root); break;
     }
   }
 
@@ -48,14 +53,17 @@ class App {
     const p2 = document.getElementById("btn-play-2");
 
     p.onclick = () => {
+      SoundSystem.playClick();
       state.simSpeed = 0;
       this.refreshSpeedButtons(p, p1, p2, 0);
     };
     p1.onclick = () => {
+      SoundSystem.playClick();
       state.simSpeed = 1;
       this.refreshSpeedButtons(p, p1, p2, 1);
     };
     p2.onclick = () => {
+      SoundSystem.playClick();
       state.simSpeed = 3;
       this.refreshSpeedButtons(p, p1, p2, 3);
     };
@@ -75,7 +83,12 @@ class App {
       }
     });
 
-    Events.on("toast", (data) => UI.toast(data.text, data.type));
+    Events.on("toast", (data) => {
+      if (data.type === "danger") SoundSystem.playWarning();
+      else if (data.type === "success") SoundSystem.playSuccess();
+      UI.toast(data.text, data.type);
+    });
+
     Events.on("navTo", (tab) => this.switchTab(tab));
     Events.on("fundsChanged", () => this.updateHeaderMetrics());
     Events.on("inventoryChanged", () => this.updateHeaderMetrics());

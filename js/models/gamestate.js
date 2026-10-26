@@ -1,4 +1,4 @@
-// Central Game State Singleton with Custom Carriage Types and Presets
+// Central Game State Singleton with Audio Settings, Persistence, and Reset
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -12,6 +12,11 @@ class GameState {
     this.activeResearchId = "tech_aluminum_extrusion";
     this.researchProgress = 0;
     this.unlockedTechs = new Set(["tech_aluminum_extrusion"]);
+
+    // Sound & Audio Settings
+    this.masterVolume = 80;
+    this.sfxVolume = 80;
+    this.audioMuted = false;
 
     this.warehouse = {
       panto_std: 12, trans_heavy: 6, inv_igbt_air: 10,
@@ -74,7 +79,10 @@ class GameState {
         savedDesigns: this.savedDesigns,
         funds: this.funds,
         reputation: this.reputation,
-        day: this.day
+        day: this.day,
+        masterVolume: this.masterVolume,
+        sfxVolume: this.sfxVolume,
+        audioMuted: this.audioMuted
       };
       localStorage.setItem("rail_assembly_save", JSON.stringify(data));
     } catch (e) { /* Safe fallback */ }
@@ -88,7 +96,48 @@ class GameState {
       if (Array.isArray(data.variants)) this.variants = data.variants;
       if (Array.isArray(data.customCarriageTypes)) this.customCarriageTypes = data.customCarriageTypes;
       if (Array.isArray(data.savedDesigns)) this.savedDesigns = data.savedDesigns;
+      if (data.masterVolume !== undefined) this.masterVolume = data.masterVolume;
+      if (data.sfxVolume !== undefined) this.sfxVolume = data.sfxVolume;
+      if (data.audioMuted !== undefined) this.audioMuted = data.audioMuted;
     } catch (e) { /* Safe fallback */ }
+  }
+
+  resetAllData() {
+    try {
+      localStorage.removeItem("rail_assembly_save");
+    } catch (e) { /* Safe fallback */ }
+
+    this.funds = 14500000;
+    this.reputation = 72;
+    this.day = 1;
+    this.quarter = 1;
+    this.year = 1;
+    this.simSpeed = 1;
+    this.sciencePoints = 80;
+    this.dailyResearchBudget = 10000;
+    this.activeResearchId = "tech_aluminum_extrusion";
+    this.researchProgress = 0;
+    this.unlockedTechs = new Set(["tech_aluminum_extrusion"]);
+
+    this.warehouse = {
+      panto_std: 12, trans_heavy: 6, inv_igbt_air: 10,
+      mot_ind_basic: 12, bog_co_co: 8, body_steel: 8,
+      brk_disc_regen: 12, bat_none: 16, tcms_basic: 8
+    };
+    this.longStorage = {};
+    this.pendingDeliveries = [];
+    this.inHouseQueue = [];
+    this.variants = [];
+    this.productionLines = [];
+    this.activeContracts = [];
+    this.marketTenders = [];
+    this.nextTenderCountdown = 0;
+    this.savedDesigns = [];
+
+    this.saveToStorage();
+    Events.emit("fundsChanged");
+    Events.emit("inventoryChanged");
+    Events.emit("variantsChanged");
   }
 
   getWarehouseCount() {
