@@ -31,7 +31,7 @@
   padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 .subsystem-header {
   display: flex;
@@ -47,33 +47,42 @@
   color: var(--text-secondary);
 }
 
-.subcomponent-box {
-  background-color: rgba(0, 0, 0, 0.2);
+/* Menu Trigger Rows (Replacing Dropdowns) */
+.menu-trigger-box {
+  background-color: rgba(0, 0, 0, 0.22);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  padding: 8px 10px;
+  padding: 7px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.menu-trigger-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
+  overflow: hidden;
 }
-.subcomponent-label {
-  font-size: 10px;
+.menu-trigger-label {
+  font-size: 9px;
   color: var(--text-muted);
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.4px;
 }
-.c-select-custom {
-  background-color: var(--bg-panel);
-  color: var(--text-main);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-xs);
-  padding: 4px 8px;
+.menu-trigger-value {
   font-size: 11px;
-  width: 100%;
-  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.c-select-custom:focus {
-  border-color: var(--color-blue);
+.menu-trigger-deltas {
+  font-size: 10px;
+  color: var(--color-blue);
+  font-family: var(--font-mono);
 }
 
 /* Menu Modal Selection Cards */
