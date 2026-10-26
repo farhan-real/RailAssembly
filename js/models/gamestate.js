@@ -45,9 +45,9 @@ class GameState {
     // Awarded Government Rolling Stock Contracts
     this.activeContracts = [];
 
-    // Scarce Government Tenders
+    // Government Tenders (A few active during procurement waves; 0 during hiatus periods)
     this.marketTenders = [];
-    this.nextTenderCountdown = 14;
+    this.nextTenderCountdown = 0;
 
     // Financial Tracking
     this.quarterlyRevenue = 0;

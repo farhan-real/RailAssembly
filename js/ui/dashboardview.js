@@ -2,7 +2,7 @@
 class DashboardView {
   static render(container) {
     const qEst = OrderEngine.calculateQuarterlyEstimate();
-    const hasTender = state.marketTenders.length > 0;
+    const tenderCount = state.marketTenders.length;
 
     container.innerHTML = `
       <div class="view-grid-two">
@@ -28,8 +28,8 @@ class DashboardView {
             </div>
             <div class="stat-gauge-row">
               <span class="text-muted">Ministry Procurement Board</span>
-              <span class="font-mono ${hasTender ? "text-positive" : "text-warning"}">
-                ${hasTender ? "1 Active Government Tender" : `Next Announcement: Approximately ${Math.max(1, state.nextTenderCountdown)} Days`}
+              <span class="font-mono ${tenderCount > 0 ? "text-positive" : "text-warning"}">
+                ${tenderCount > 0 ? `${tenderCount} Active Government Tenders` : `Procurement Hiatus: ~${Math.max(1, state.nextTenderCountdown)} Days`}
               </span>
             </div>
           </div>
@@ -66,7 +66,7 @@ class DashboardView {
         </div>
         ${state.activeContracts.length === 0 
           ? `<div class="text-muted" style="padding:20px; text-align:center;">
-               No active government contracts. ${hasTender ? "An official tender is currently open for proposals in Ministry Tenders." : `Next tender announcement in approximately ${Math.max(1, state.nextTenderCountdown)} days.`}
+               No active government contracts. ${tenderCount > 0 ? `${tenderCount} official tenders are currently open for proposals in Ministry Tenders.` : `Next tender announcement in approximately ${Math.max(1, state.nextTenderCountdown)} days.`}
              </div>`
           : `<div style="overflow-x:auto;">
               <table class="inv-table">

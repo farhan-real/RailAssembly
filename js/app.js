@@ -7,6 +7,7 @@ class App {
     this.bindTimeControls();
     this.bindEvents();
 
+    // Populate initial procurement cycle wave
     OrderEngine.evaluateGovernmentBids();
     this.switchTab("dashboard");
     SimulationRunner.start();

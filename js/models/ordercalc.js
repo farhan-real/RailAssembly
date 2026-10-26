@@ -12,28 +12,59 @@ class OrderEngine {
     });
     state.marketTenders = state.marketTenders.filter(t => !t.expired);
 
-    // Scarce Government Tenders: at most 1 tender active at a time
+    // Dynamic Procurement Waves: "A few" (2 to 4) concurrent tenders, with realistic 0-contract hiatuses
     if (state.marketTenders.length === 0) {
       state.nextTenderCountdown -= 1;
 
       if (state.nextTenderCountdown <= 0) {
-        const template = TENDER_TEMPLATES[Math.floor(Math.random() * TENDER_TEMPLATES.length)];
-        const tender = {
-          id: "tnd_" + Math.random().toString(36).substring(2, 8),
-          ...template,
-          issuedDay: state.day,
-          expiresDay: state.day + 75,
-          awarded: false
-        };
-        state.marketTenders.push(tender);
+        // Gazette a new wave of 2 to 3 concurrent tenders across diverse sectors
+        const waveCount = 2 + Math.floor(Math.random() * 2);
+        const shuffled = [...TENDER_TEMPLATES].sort(() => 0.5 - Math.random());
 
-        state.nextTenderCountdown = 100 + Math.floor(Math.random() * 45);
+        for (let i = 0; i < waveCount && i < shuffled.length; i++) {
+          const template = shuffled[i];
+          state.marketTenders.push({
+            id: "tnd_" + Math.random().toString(36).substring(2, 8),
+            ...template,
+            issuedDay: state.day,
+            expiresDay: state.day + 75 + Math.floor(Math.random() * 25),
+            awarded: false
+          });
+        }
+
+        // Set cooldown before supplementary tenders or next review cycle
+        state.nextTenderCountdown = 60 + Math.floor(Math.random() * 30);
 
         Events.emit("toast", {
-          text: `National Tender Gazetted: "${tender.title}" published with ${tender.strictnessTier} specifications.`,
+          text: `National Procurement Gazette: Ministry published ${state.marketTenders.length} new rolling stock tenders.`,
           type: "success"
         });
         Events.emit("marketChanged");
+      }
+    } else if (state.marketTenders.length < 3) {
+      // Supplementary tender addition during an active cycle if below 3
+      state.nextTenderCountdown -= 1;
+      if (state.nextTenderCountdown <= 0) {
+        const unusedTemplates = TENDER_TEMPLATES.filter(
+          tpl => !state.marketTenders.some(t => t.type === tpl.type)
+        );
+        if (unusedTemplates.length > 0) {
+          const template = unusedTemplates[Math.floor(Math.random() * unusedTemplates.length)];
+          state.marketTenders.push({
+            id: "tnd_" + Math.random().toString(36).substring(2, 8),
+            ...template,
+            issuedDay: state.day,
+            expiresDay: state.day + 80,
+            awarded: false
+          });
+          Events.emit("toast", {
+            text: `Supplementary Tender Gazetted: "${template.title}" published by ${template.agency}.`,
+            type: "success"
+          });
+          Events.emit("marketChanged");
+        }
+        // Hiatus gap once this wave's contracts expire or are awarded
+        state.nextTenderCountdown = 45 + Math.floor(Math.random() * 30);
       }
     }
 
@@ -131,7 +162,6 @@ class OrderEngine {
       return { success: false, reason: `Bid Price Exceeded: Model commercial price ($${variant.salePrice.toLocaleString()}) exceeds the tender budget ($${tender.budgetPerUnit.toLocaleString()}). Adjust markup margin.` };
     }
 
-    // Competitive Evaluation Scoring
     const priceAdvantage = ((tender.budgetPerUnit - variant.salePrice) / tender.budgetPerUnit) * 30;
     const reputationScore = (state.reputation / 100) * 35;
     const strictnessBonus = tender.premiumMarkupFactor * 15;
