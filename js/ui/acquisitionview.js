@@ -15,6 +15,7 @@ class AcquisitionView {
         { id: "transformer", label: "Traction Transformers & DC Chokes" },
         { id: "dclink", label: "DC Intermediate Links & Capacitor Banks" },
         { id: "inverter", label: "Traction Inverters & Converters" },
+        { id: "pwm", label: "PWM Modulation Controllers" },
         { id: "motor", label: "Traction Motors" },
         { id: "cooling", label: "Thermal Cooling Loops" },
         { id: "auxiliary", label: "Auxiliary Power Supplies (APS)" }

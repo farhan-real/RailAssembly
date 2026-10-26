@@ -43,7 +43,7 @@ class TrainModelCalc {
       }
     }
 
-    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms, sander, hvac, transmission } = baseComponents;
+    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms, sander, hvac, transmission, pwm } = baseComponents;
     const isTrainset = rollingStockType === "trainset" && consistConfig?.carriages?.length > 0;
     const carriageCount = isTrainset ? consistConfig.carriages.length : 1;
 
@@ -87,7 +87,7 @@ class TrainModelCalc {
     const axleLoad = Number((totalMassTons / totalAxles).toFixed(2));
     const axleOverloaded = axleLoad > (bogie.maxAxleLoadTons || 25);
 
-    // Diagnostics & Physical Limit Check
+    // Diagnostics & Physical Limit Check (including PWM switching limits)
     const diagnostics = TrainValidator.validateSystemIntegrity(baseComponents, totalMassTons, carriageCount);
 
     const singlePackKw = diagnostics.effectiveMotorPowerKw;
@@ -96,9 +96,10 @@ class TrainModelCalc {
     const netTractionPowerKw = Math.max(500, availablePowerKw - hotelPowerDrawKw);
     const horsepower = Math.round(netTractionPowerKw * 1.341);
 
-    // Mechanical transmission efficiency directly impacts power transfer to rail
+    // Mechanical transmission & PWM inverter modulation efficiencies
     const mechEff = transmission?.mechanicalEfficiency || 0.97;
-    let totalEfficiency = Number((mechEff * 0.94 + efficiencyBonusTotal).toFixed(3));
+    const pwmDelta = pwm?.efficiencyDelta || 0.0;
+    let totalEfficiency = Number((mechEff * (0.94 + pwmDelta) + efficiencyBonusTotal).toFixed(3));
     totalEfficiency = Math.min(0.99, Math.max(0.70, totalEfficiency));
 
     const baseCd = body.dragCd;
@@ -107,13 +108,14 @@ class TrainModelCalc {
       Math.pow((netTractionPowerKw * totalEfficiency * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
     ) + speedBonusTotal;
 
-    // Apply strict speed limits (Pantograph, Bogie, Motor RPM, Transmission unsprung mass dynamics)
+    // Apply strict speed limits (Pantograph, Bogie, Motor RPM, Transmission, PWM Modulator)
     theoreticalSpeed = Math.min(theoreticalSpeed, diagnostics.strictSpeedLimit + speedBonusTotal);
     if (axleOverloaded) theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
 
+    // Dynamic Adhesion: Base Bogie Adhesion + Rail Sanding + PWM Direct Torque Adhesion Response
     const adhesiveMassTons = isTrainset ? Number(((poweredCarCount * motorCarWeightKg) / 1000).toFixed(1)) : totalMassTons;
     const baseAdhesion = bogie.axles === 6 ? 0.38 : 0.32;
-    const totalAdhesionCoeff = baseAdhesion + (sander?.adhesionBonus || 0) + extraAdhesionBonus;
+    const totalAdhesionCoeff = baseAdhesion + (sander?.adhesionBonus || 0) + (pwm?.adhesionBonus || 0) + extraAdhesionBonus;
     const maxAdhesionKn = Math.round(adhesiveMassTons * 9.81 * totalAdhesionCoeff);
 
     const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round((netTractionPowerKw * mechEff) / 8.2));

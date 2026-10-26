@@ -12,12 +12,13 @@ class TrainValidator {
     const vcb = baseComponents.circuitbreaker || { supportedVoltage: "25kV AC" };
     const dclink = baseComponents.dclink || { maxThroughputKw: 6000 };
     const transm = baseComponents.transmission || { maxSpeed: 200 };
+    const pwm = baseComponents.pwm || { maxSpeed: 200, switchingFrequencyKhz: 2.0 };
 
     const bottlenecks = [];
     const speedLimiters = [];
     let isFullySufficient = true;
 
-    // 1. Voltage & Circuit Breaker Compatibility Check
+    // 1. Voltage & Circuit Breaker Compatibility
     const pantoVolt = panto.voltage || "25kV AC";
     const transVolt = trans.supportedVoltage || "25kV AC";
     const vcbVolt = vcb.supportedVoltage || "25kV AC";
@@ -52,30 +53,36 @@ class TrainValidator {
       isFullySufficient = false;
     }
 
-    // 4. Thermal Cooling Loop Capacity
+    // 4. PWM Modulator & Inverter Switching Compatibility
+    if (pwm.switchingFrequencyKhz > 10.0 && !inv.name.includes("Silicon Carbide")) {
+      bottlenecks.push(`PWM Thermal Switching Stress: High-frequency ultrasonic PWM (${pwm.switchingFrequencyKhz} kHz) generates excessive switching heat on silicon IGBT inverters without SiC modules.`);
+    }
+
+    // 5. Thermal Cooling Loop Capacity
     const peakThermalLoadKw = Math.round((inv.maxKw + motor.powerKw) * 0.65);
     if (cool.thermalDissipationKw < peakThermalLoadKw) {
       const diff = peakThermalLoadKw - cool.thermalDissipationKw;
       bottlenecks.push(`Thermal Cooling Deficit: Cooling capacity (${cool.thermalDissipationKw} kW) is below peak thermal load (${peakThermalLoadKw} kW). Continuous runs will derate by ${Math.round(diff / 50)} kW.`);
     }
 
-    // 5. Pneumatic Air Flow vs Consist Size
+    // 6. Pneumatic Air Flow vs Consist Size
     const requiredAirflowLpm = 700 + (carriageCount * 120);
     if (comp.airflowLpm < requiredAirflowLpm) {
       bottlenecks.push(`Pneumatic Capacity Warning: Main compressor output (${comp.airflowLpm} L/min) is insufficient for rapid brake charging of ${carriageCount} carriages (requires ${requiredAirflowLpm} L/min).`);
     }
 
-    // 6. Coupler Tensile Haulage Limit
+    // 7. Coupler Tensile Haulage Limit
     if (totalConsistMassTons > coup.tensileLoadLimitTons) {
       bottlenecks.push(`Coupler Tensile Shear Risk: Consist mass (${totalConsistMassTons} Tons) exceeds coupler load limit (${coup.tensileLoadLimitTons} Tons).`);
       isFullySufficient = false;
     }
 
-    // 7. Component Speed Limits Check (including Transmission unsprung mass dynamics)
+    // 8. Strict Speed Limits (Pantograph, Bogie, Motor RPM, Transmission, PWM Modulator)
     speedLimiters.push({ component: "Pantograph", limit: panto.maxSpeed || 200 });
     speedLimiters.push({ component: "Bogie Wheelsets", limit: bogie.maxSafeSpeed || 180 });
     speedLimiters.push({ component: "Traction Motor RPM", limit: motor.maxRpmSpeed || 200 });
     speedLimiters.push({ component: "Transmission Drive", limit: transm.maxSpeed || 200 });
+    speedLimiters.push({ component: "PWM Modulator", limit: pwm.maxSpeed || 200 });
 
     const strictSpeedLimit = Math.min(...speedLimiters.map(s => s.limit));
     const primarySpeedLimiter = speedLimiters.find(s => s.limit === strictSpeedLimit);
