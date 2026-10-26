@@ -268,7 +268,7 @@ class BuilderView {
         specs: comp.weight ? `Supplier: ${comp.supplier} &bull; Mass: ${comp.weight} kg &bull; Delivery: ${comp.leadDays} Days` : "Zero Tare Weight",
         desc: comp.desc,
         disabled: !isUnlocked,
-        badge: !isUnlocked ? "Research Required" : (comp.isOptional ? "Optional" : null)
+        badge: !isUnlocked ? "Research Tree Locked" : (comp.isOptional ? "Optional" : null)
       };
     });
 
@@ -312,7 +312,7 @@ class BuilderView {
       `;
 
       el.onclick = () => {
-        if (item.disabled) { UI.toast("Option unavailable: Research required in R&D Directorate.", "danger"); return; }
+        if (item.disabled) { UI.toast("Option unavailable: Technology must be unlocked in Research Tree.", "danger"); return; }
         onSelect(item.id);
         UI.closeModal();
         BuilderView.render(document.getElementById("viewport-root"));

@@ -43,7 +43,7 @@ class SimulationRunner {
         const tech = TECH_DATA.find(t => t.id === state.activeResearchId);
         if (tech) {
           state.unlockedTechs.add(tech.id);
-          UI.toast(`Research Complete: "${tech.name}" is now fully developed and available for production.`, "success");
+          UI.toast(`Research Tree Complete: "${tech.name}" is now fully developed and unlocked.`, "success");
           SoundSystem.playSuccess();
         }
         state.activeResearchId = null;

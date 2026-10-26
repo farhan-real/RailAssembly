@@ -35,21 +35,29 @@ class TreeCanvas {
 
   bindGestures() {
     let isDown = false;
+    let didDrag = false;
     let startX = 0;
     let startY = 0;
     let initialPanX = 0;
     let initialPanY = 0;
-    this.hasMoved = false;
+    let pendingNode = null;
 
     this.viewport.addEventListener("pointerdown", (e) => {
-      // Ignore if clicking floating overlays
       if (e.target.closest(".tree-hud-controls") || e.target.closest(".tree-inspector-panel")) return;
       isDown = true;
-      this.hasMoved = false;
+      didDrag = false;
       startX = e.clientX;
       startY = e.clientY;
       initialPanX = this.panX;
       initialPanY = this.panY;
+
+      const glyph = e.target.closest(".tree-node-glyph");
+      if (glyph) {
+        const nodeId = glyph.getAttribute("data-id");
+        pendingNode = TECH_DATA.find(n => n.id === nodeId) || null;
+      } else {
+        pendingNode = null;
+      }
     });
 
     window.addEventListener("pointermove", (e) => {
@@ -57,25 +65,33 @@ class TreeCanvas {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
 
-      // Only engage panning drag if pointer moves past threshold
-      if (Math.hypot(dx, dy) > 4) {
-        this.hasMoved = true;
+      if (!didDrag && Math.hypot(dx, dy) > 5) {
+        didDrag = true;
+        this.viewport.style.cursor = "grabbing";
+      }
+
+      if (didDrag) {
         this.panX = initialPanX + dx;
         this.panY = initialPanY + dy;
         this.updateTransform();
-        this.viewport.style.cursor = "grabbing";
       }
     });
 
-    const stopGesture = () => {
+    const endPointer = () => {
       if (!isDown) return;
       isDown = false;
       this.viewport.style.cursor = "grab";
-    };
-    window.addEventListener("pointerup", stopGesture);
-    window.addEventListener("pointercancel", stopGesture);
 
-    // Zoom anchored directly to the mouse cursor position
+      if (!didDrag && pendingNode) {
+        this.selectNode(pendingNode);
+      }
+      pendingNode = null;
+      didDrag = false;
+    };
+
+    window.addEventListener("pointerup", endPointer, true);
+    window.addEventListener("pointercancel", endPointer, true);
+
     this.viewport.addEventListener("wheel", (e) => {
       e.preventDefault();
       const rect = this.viewport.getBoundingClientRect();
@@ -112,12 +128,17 @@ class TreeCanvas {
     this.updateTransform();
   }
 
+  setSelectedNode(nodeId) {
+    this.selectedNodeId = nodeId;
+    if (!this.surface) return;
+    this.surface.querySelectorAll(".tree-node-glyph").forEach(el => {
+      el.classList.toggle("is-selected", el.getAttribute("data-id") === nodeId);
+    });
+  }
+
   selectNode(node) {
     if (!node) return;
-    this.selectedNodeId = node.id;
-    this.surface.querySelectorAll(".tree-node-glyph").forEach(el => {
-      el.classList.toggle("is-selected", el.getAttribute("data-id") === node.id);
-    });
+    this.setSelectedNode(node.id);
     if (this.onNodeSelect) {
       this.onNodeSelect(node);
     }
@@ -147,7 +168,6 @@ class TreeCanvas {
     const nodeMap = new Map();
     allNodes.forEach(n => nodeMap.set(n.id, n));
 
-    // 1. Draw Orthogonal Circuit Paths (Connecting Parent to Child)
     allNodes.forEach(node => {
       if (!node.prereq || node.prereq.length === 0) return;
 
@@ -172,7 +192,6 @@ class TreeCanvas {
       });
     });
 
-    // 2. Render Square Mindustry Nodes with Interactive Selection
     allNodes.forEach(node => {
       const isResearched = state.unlockedTechs.has(node.id);
       const isActive = state.activeResearchId === node.id;
@@ -198,19 +217,6 @@ class TreeCanvas {
         </span>
         <span class="tree-node-label">${node.name.length > 20 ? node.name.substring(0, 18) + "…" : node.name}</span>
       `;
-
-      // Reliable click & tap selection
-      glyph.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (this.hasMoved) return;
-        this.selectNode(node);
-      });
-
-      glyph.addEventListener("pointerup", (e) => {
-        if (this.hasMoved) return;
-        e.stopPropagation();
-        this.selectNode(node);
-      });
 
       this.surface.appendChild(glyph);
     });

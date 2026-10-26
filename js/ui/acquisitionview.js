@@ -79,7 +79,7 @@ class AcquisitionView {
         <span class="text-muted" style="font-size:10px;">
           ${this.activeSource === "supplier"
             ? "Supplier Bulk Discounts: 5+ Units (8% Off) &bull; 15+ Units (15% Off) &bull; 30+ Units (25% Off). Subject to delivery lead times."
-            : "In-House Manufacturing: Save 42% on retail costs using internal factory tooling. Advanced parts require R&D research."}
+            : "In-House Manufacturing: Save 42% on retail costs using internal factory tooling. Advanced parts require Research Tree development."}
         </span>
         <span class="font-mono text-blue" style="font-size:10px;">${components.length} Available Specifications</span>
       </div>
@@ -153,7 +153,7 @@ class AcquisitionView {
               <span class="text-muted" style="font-size:10px;">Supplier: ${comp.supplier} &bull; Mass: ${comp.weight} kg</span>
             </div>
             <span class="c-badge ${isSupplier ? "badge-blue" : (isUnlocked ? "badge-green" : "badge-amber")}">
-              ${isSupplier ? "External Supplier" : (isUnlocked ? "In-House Ready" : "Research Required")}
+              ${isSupplier ? "External Supplier" : (isUnlocked ? "In-House Ready" : "Research Tree Locked")}
             </span>
           </div>
 
@@ -179,7 +179,7 @@ class AcquisitionView {
 
           <div style="display:flex; justify-content:flex-end;">
             <button class="c-btn ${isSupplier ? "btn-primary" : "btn-accent"} btn-sm btn-submit-order" data-id="${comp.id}" ${(!isSupplier && !isUnlocked) ? "disabled" : ""}>
-              ${isSupplier ? `Order from Supplier ($${totalCost.toLocaleString()})` : (isUnlocked ? `Fabricate In-House ($${totalCost.toLocaleString()})` : "Locked (Research Required)")}
+              ${isSupplier ? `Order from Supplier ($${totalCost.toLocaleString()})` : (isUnlocked ? `Fabricate In-House ($${totalCost.toLocaleString()})` : "Locked (Research Tree Unlock Needed)")}
             </button>
           </div>
         </div>

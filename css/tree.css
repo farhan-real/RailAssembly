@@ -1,4 +1,4 @@
-/* Mindustry-Style Visual Tech Tree Graph Styling */
+/* Mindustry-Style Visual Research Tree Graph Styling */
 .visual-tree-container {
   position: relative;
   width: 100%;
@@ -8,6 +8,7 @@
   border-radius: var(--radius-sm);
   overflow: hidden;
   user-select: none;
+  touch-action: none;
 }
 
 /* Dedicated Canvas Viewport Element */
@@ -19,6 +20,7 @@
   height: 100%;
   overflow: hidden;
   cursor: grab;
+  touch-action: none;
 }
 .tree-viewport:active {
   cursor: grabbing;
@@ -85,6 +87,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   z-index: 5;
+  user-select: none;
 }
 .tree-node-glyph:hover {
   transform: scale(1.12);
@@ -171,15 +174,16 @@
   border-color: var(--border-strong);
 }
 
-/* Floating Node Inspector Side-Sheet */
+/* Floating Node Inspector Panel */
 .tree-inspector-panel {
   position: absolute;
-  bottom: 14px;
-  left: 14px;
-  width: 390px;
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 200px);
+  top: 56px;
+  right: 14px;
+  width: 360px;
+  max-width: calc(100vw - 28px);
+  max-height: calc(100% - 70px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   background-color: rgba(19, 28, 43, 0.96);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -187,4 +191,53 @@
   z-index: 30;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
+}
+.tree-inspector-panel.is-collapsed {
+  display: none !important;
+}
+
+.tree-inspector-toggle-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 30;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.tree-inspector-toggle-btn:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--color-blue);
+}
+
+@media (max-width: 640px) {
+  .tree-inspector-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 50vh;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 10px 12px;
+  }
+  .tree-hud-controls {
+    top: 8px;
+    right: 8px;
+  }
+  .tree-inspector-toggle-btn {
+    bottom: 8px;
+    right: 8px;
+  }
 }

@@ -22,9 +22,9 @@ class DashboardView {
               <span class="font-mono text-blue">$${qEst.revenueEst.toLocaleString()}</span>
             </div>
             <div class="stat-gauge-row">
-              <span class="text-muted">Active R&amp;D Development</span>
+              <span class="text-muted">Research Tree Development</span>
               <span class="font-mono ${activeTech ? "text-blue" : "text-muted"}">
-                ${activeTech ? `${activeTech.name} (${state.researchDaysLeft}d left)` : "Directorate Idle"}
+                ${activeTech ? `${activeTech.name} (${state.researchDaysLeft}d left)` : "Research Tree Idle"}
               </span>
             </div>
             <div class="stat-gauge-row">

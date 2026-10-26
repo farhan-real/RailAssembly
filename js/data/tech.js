@@ -1,4 +1,4 @@
-// Single-Source Research Tree with Highly Descriptive Industrial Engineering Specifications
+// Research Tree Graph Structure with Highly Descriptive Industrial Engineering Specifications
 const TREE_STRUCTURE = {
   core: {
     id: "tech_core",
@@ -10,7 +10,7 @@ const TREE_STRUCTURE = {
     durationDays: 0,
     prereq: [],
     unlocks: [],
-    desc: "The central electric traction directorate and laboratory foundation. All specialized engineering lines branch outward from this single core."
+    desc: "The central electric traction research tree foundation. All specialized engineering lines branch outward from this single core."
   },
   branches: [
     { key: "aerodynamics", label: "Track 1: Aerodynamics, Carbodies & Nose Cones" },
@@ -224,7 +224,7 @@ const TREE_STRUCTURE = {
   }
 };
 
-// Build master TECH_DATA array by combining root, registered component nodes, and hierarchy
+// Build master TECH_DATA array combining core, registered components, and hierarchy
 const TECH_DATA = [
   TREE_STRUCTURE.core,
   ...(window.COMPONENT_RESEARCH || []).map(node => {
