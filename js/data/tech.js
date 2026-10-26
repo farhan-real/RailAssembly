@@ -9,7 +9,7 @@ const TREE_STRUCTURE = {
     costMoney: 0,
     durationDays: 0,
     prereq: [],
-    unlocks: ["wind_copper", "cool_mineral", "susp_coil", "whl_standard", "aero_none", "crash_standard", "cal_cast", "disc_iron", "btherm_passive", "bprot_standard", "sand_heater", "draft_rubber_elastomer", "bus_wtb", "sens_standard", "gd_optical", "therm_coldplate", "pwm_dsp_dualcore", "pwm_spread_spectrum", "gb_single", "dclink_precharge_contactor", "vcb_bottle_cucr", "transm_teeth_carburized", "dryer_desiccant"],
+    unlocks: ["wind_copper", "wind_alribbon", "cool_mineral", "susp_coil", "susp_rubber_chevron", "whl_standard", "whl_damping_ring", "aero_none", "crash_standard", "cal_cast", "disc_iron", "disc_internally_vaned", "btherm_passive", "bprot_standard", "sand_heater", "sand_calcined_quartz", "sand_metering_flow", "sand_nozzle_aerofoil", "draft_rubber_elastomer", "bus_wtb", "sens_standard", "gd_optical", "gd_analog_pushpull", "therm_coldplate", "therm_extruded_fin", "pwm_dsp_dualcore", "pwm_analog_comparator", "pwm_spread_spectrum", "gb_single", "brg_steel_sealed", "dclink_precharge_contactor", "vcb_bottle_cucr", "transm_teeth_carburized", "transm_magnetic_filter", "dryer_desiccant"],
     desc: "The central electric traction research tree foundation. All specialized engineering lines branch outward from this single core."
   },
   branches: [
@@ -29,7 +29,7 @@ const TREE_STRUCTURE = {
     tech_body_supersonic_420: { x: 1300, y: 300 },
     tech_coup_retractable_nose: { x: 1500, y: 440 },
 
-    // Track 2: Power Electronics & Core Subcomponents
+    // Track 2: Power Electronics & Subcomponents
     tech_trans_heavy_ac: { x: 1180, y: 860 },
     tech_trans_dc_choke: { x: 1020, y: 860 },
     tech_dclink_electrolytic: { x: 1180, y: 720 },
@@ -54,7 +54,6 @@ const TREE_STRUCTURE = {
     tech_aux_aps_hvac: { x: 1020, y: 300 },
     tech_wind_supercond: { x: 860, y: 50 },
     tech_cool_ester: { x: 1180, y: 300 },
-    tech_dclink_crowbar: { x: 700, y: 220 },
     tech_gd_dynamic: { x: 1020, y: 160 },
     tech_therm_phasechange: { x: 860, y: 220 },
     tech_pwm_fpga: { x: 540, y: 220 },
@@ -91,6 +90,12 @@ const TREE_STRUCTURE = {
     tech_coup_heavy_aar: { x: 2020, y: 1500 },
     tech_bog_composite_420: { x: 2620, y: 1140 },
     tech_transm_direct_420: { x: 2620, y: 1260 },
+    tech_susp_air: { x: 1720, y: 1380 },
+    tech_susp_active: { x: 2320, y: 1380 },
+    tech_whl_cryo: { x: 1920, y: 1260 },
+    tech_transm_oil_mist: { x: 2120, y: 1260 },
+    tech_cal_monobloc: { x: 1920, y: 1380 },
+    tech_disc_carbonceramic: { x: 2120, y: 1380 },
 
     // Track 5: Power Collection, Adhesion & Cooling
     tech_panto_baseline_ac: { x: 1400, y: 1140 },
@@ -115,6 +120,8 @@ const TREE_STRUCTURE = {
     tech_panto_wing_360: { x: 1260, y: 1860 },
     tech_panto_ultra_380: { x: 1260, y: 1980 },
     tech_sand_plasma: { x: 1540, y: 1860 },
+    tech_sand_alumina: { x: 1660, y: 1620 },
+    tech_sand_anti_slip: { x: 1660, y: 1860 },
     tech_panto_hyper_420: { x: 1400, y: 2100 },
 
     // Track 6: Automation & Auxiliary
@@ -164,7 +171,6 @@ const TREE_STRUCTURE = {
     tech_inv_sic_hyper_380: ["tech_trans_solid_state"],
     tech_wind_supercond: ["tech_trans_solid_state"],
     tech_cool_ester: ["tech_trans_compact_underfloor"],
-    tech_dclink_crowbar: ["tech_dclink_film"],
     tech_gd_dynamic: ["tech_inv_liquid_vvvf"],
     tech_therm_phasechange: ["tech_inv_sic_mosfet"],
     tech_pwm_fpga: ["tech_pwm_space_vector"],
@@ -199,6 +205,12 @@ const TREE_STRUCTURE = {
     tech_coup_heavy_aar: ["tech_bog_coco_freight"],
     tech_bog_composite_420: ["tech_bog_tilting_360"],
     tech_transm_direct_420: ["tech_bog_composite_420"],
+    tech_susp_air: ["tech_bog_flexicoil_220"],
+    tech_susp_active: ["tech_bog_tilting_360"],
+    tech_whl_cryo: ["tech_bog_coco_freight"],
+    tech_transm_oil_mist: ["tech_transm_quill_230"],
+    tech_cal_monobloc: ["tech_brk_blended_regen"],
+    tech_disc_carbonceramic: ["tech_brk_eddy_track"],
 
     tech_panto_baseline_ac: ["tech_core"],
     tech_panto_urban_dc: ["tech_core"],
@@ -222,6 +234,8 @@ const TREE_STRUCTURE = {
     tech_panto_wing_360: ["tech_panto_hs_320"],
     tech_panto_ultra_380: ["tech_panto_hs_350"],
     tech_sand_plasma: ["tech_sand_pneumatic"],
+    tech_sand_alumina: ["tech_sand_pneumatic"],
+    tech_sand_anti_slip: ["tech_sand_plasma"],
     tech_panto_hyper_420: ["tech_panto_ultra_380"],
 
     tech_comp_piston_basic: ["tech_core"],

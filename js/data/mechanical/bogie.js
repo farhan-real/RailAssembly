@@ -106,13 +106,17 @@ COMPONENTS_DATA.bogie = [
 
 SUBCOMPONENTS_DATA.bogie = {
   subcomponents: [
-    { id: "susp_coil", name: "Steel Coil Spring Primary Suspension", cost: 12000, weight: 240, speedBonus: 0, reliabilityBonus: 4, desc: "Standard robust mechanical spring assembly with rubber snubbers." },
-    { id: "susp_air", name: "Self-Leveling Secondary Air-Spring Suspension", cost: 28000, weight: 180, speedBonus: 20, reliabilityBonus: 8, desc: "Pneumatic bellows isolating carbody vibrations across variable axle loads." },
-    { id: "susp_active", name: "Active Electro-Hydraulic Tilting Dampers", cost: 54000, weight: 310, speedBonus: 45, reliabilityBonus: 12, desc: "Computerized cant compensation enabling elevated curving speeds." }
+    { id: "susp_coil", name: "Steel Coil Spring Primary Suspension", cost: 12000, weight: 240, speedBonus: 0, reliabilityBonus: 4, inHouseTech: null, desc: "Standard robust mechanical spring assembly with rubber snubbers." },
+    { id: "susp_rubber_chevron", name: "Chevron Rubber Spring Pack", cost: 8500, weight: 280, adhesionBonus: 0.02, reliabilityBonus: 8, inHouseTech: null, desc: "Rugged zero-maintenance rubber shear blocks ideal for dirty mineral tracks." },
+    { id: "susp_air", name: "Self-Leveling Secondary Air-Spring Suspension", cost: 28000, weight: 180, speedBonus: 20, reliabilityBonus: 8, inHouseTech: "tech_susp_air", desc: "Pneumatic bellows isolating carbody vibrations across variable passenger loads." },
+    { id: "susp_semi_active", name: "Magnetorheological Semi-Active Damper", cost: 42000, weight: 220, speedBonus: 30, reliabilityBonus: 12, safetyBonus: 6, inHouseTech: "tech_susp_air", desc: "Continuous variable fluid viscosity damping adapting to track curvature in milliseconds." },
+    { id: "susp_active", name: "Active Electro-Hydraulic Tilting Dampers", cost: 54000, weight: 310, speedBonus: 45, reliabilityBonus: 12, inHouseTech: "tech_susp_active", desc: "Computerized cant compensation enabling elevated curving speeds up to 360 km/h." }
   ],
   modifications: [
-    { id: "whl_standard", name: "Monobloc Forged Carbon Steel Wheelsets", cost: 14000, weight: 600, reliabilityBonus: 0, desc: "Standard wheel discs for routine passenger and freight duties." },
-    { id: "whl_cryo", name: "Cryogenic Micro-Alloy Treated Wheelsets", cost: 32000, weight: 580, reliabilityBonus: 16, desc: "Treated martensitic steel reducing spalling and thermal cracking." }
+    { id: "whl_standard", name: "Monobloc Forged Carbon Steel Wheelsets", cost: 14000, weight: 600, reliabilityBonus: 0, inHouseTech: null, desc: "Standard wheel discs for routine passenger and freight duties." },
+    { id: "whl_damping_ring", name: "Viscoelastic Acoustic Damping Rings", cost: 18000, weight: 620, reliabilityBonus: 8, inHouseTech: null, desc: "Suppresses curve wheel screech and reduces high-frequency bogie vibration." },
+    { id: "whl_cryo", name: "Cryogenic Micro-Alloy Treated Wheelsets", cost: 32000, weight: 580, reliabilityBonus: 16, inHouseTech: "tech_whl_cryo", desc: "Treated martensitic steel reducing spalling and thermal cracking." },
+    { id: "whl_laser_clad", name: "Laser-Clad Tungsten-Carbide Flange Armor", cost: 46000, weight: 590, reliabilityBonus: 22, adhesionBonus: 0.02, inHouseTech: "tech_whl_cryo", desc: "Quadruples wheel turning interval on tortuous mountain corridors." }
   ]
 };
 
@@ -122,5 +126,8 @@ COMPONENT_RESEARCH.push(
   { id: "tech_bog_coco_freight", name: "Six-Axle High-Adhesion Co-Co Freight Bogie", branch: "running_gear", costMoney: 450000, durationDays: 55, unlocks: ["bog_co_co", "bog_heavy_haul_ballast"], desc: "Six heavy axles maximizing rail tractive grip for heavy haul freight locomotives." },
   { id: "tech_bog_radial_320", name: "Active Radial Self-Steering Bogie (320 km/h)", branch: "running_gear", costMoney: 1900000, durationDays: 90, unlocks: ["bog_radial_320"], desc: "Self-steering axles reducing curve flange wear and permitting 320 km/h." },
   { id: "tech_bog_tilting_360", name: "Active-Cant Hydraulic Tilting Running Gear (360 km/h)", branch: "running_gear", costMoney: 3200000, durationDays: 120, unlocks: ["bog_articulated_360"], desc: "Hydraulic actuators tilting carbody in curves to sustain 360 km/h passenger speeds." },
-  { id: "tech_bog_composite_420", name: "Ultra-Light Carbon-Composite Bogie (420 km/h)", branch: "running_gear", costMoney: 4800000, durationDays: 160, unlocks: ["bog_highspeed_400"], desc: "Composite structural frame cutting unsprung mass for speeds exceeding 400 km/h." }
+  { id: "tech_bog_composite_420", name: "Ultra-Light Carbon-Composite Bogie (420 km/h)", branch: "running_gear", costMoney: 4800000, durationDays: 160, unlocks: ["bog_highspeed_400"], desc: "Composite structural frame cutting unsprung mass for speeds exceeding 400 km/h." },
+  { id: "tech_susp_air", name: "Pneumatic Air-Spring & Semi-Active Suspensions", branch: "running_gear", costMoney: 520000, durationDays: 45, unlocks: ["susp_air", "susp_semi_active"], desc: "Pneumatic bellows and magnetorheological fluid damping for superior passenger comfort." },
+  { id: "tech_susp_active", name: "Active Hydraulic Tilting Actuators", branch: "running_gear", costMoney: 1600000, durationDays: 85, unlocks: ["susp_active"], desc: "Active tilting actuators counteracting curve centrifugal forces up to 360 km/h." },
+  { id: "tech_whl_cryo", name: "Cryogenic & Laser-Clad Tungsten Wheelsets", branch: "running_gear", costMoney: 780000, durationDays: 60, unlocks: ["whl_cryo", "whl_laser_clad"], desc: "Martensitic alloy treatments and tungsten-carbide cladding for extreme wear resistance." }
 );

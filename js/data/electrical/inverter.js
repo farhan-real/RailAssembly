@@ -80,11 +80,15 @@ COMPONENTS_DATA.auxiliary = [
 SUBCOMPONENTS_DATA.inverter = {
   subcomponents: [
     { id: "gd_optical", name: "Fiber-Optic Isolated Gate Driver", cost: 14000, weight: 25, reliabilityBonus: 6, efficiencyBonus: 0.004, inHouseTech: null, desc: "Immune to high-voltage electromagnetic interference transients." },
-    { id: "gd_dynamic", name: "Adaptive Microsecond Intelligent Gate Controller", cost: 32000, weight: 30, reliabilityBonus: 14, efficiencyBonus: 0.012, inHouseTech: "tech_gd_dynamic", desc: "Active switching slope regulation minimizing harmonic losses." }
+    { id: "gd_analog_pushpull", name: "Bipolar Push-Pull Gate Driver", cost: 6000, weight: 35, reliabilityBonus: 0, efficiencyBonus: -0.003, inHouseTech: null, desc: "Economical discrete analog driver. Slightly higher switching losses." },
+    { id: "gd_dynamic", name: "Adaptive Microsecond Intelligent Gate Controller", cost: 32000, weight: 30, reliabilityBonus: 14, efficiencyBonus: 0.012, inHouseTech: "tech_gd_dynamic", desc: "Active switching slope regulation minimizing harmonic losses." },
+    { id: "gd_gan_ultrafast", name: "GaN Picosecond Auxiliary Gate Driver", cost: 52000, weight: 15, reliabilityBonus: 10, efficiencyBonus: 0.018, inHouseTech: "tech_gd_dynamic", desc: "Picosecond rise time cutting switching energy losses to near zero." }
   ],
   modifications: [
     { id: "therm_coldplate", name: "Micro-Channel Aluminum Liquid Coldplate", cost: 16000, weight: 65, efficiencyBonus: 0.006, inHouseTech: null, desc: "Closed-circuit glycol-water cooling directly across semiconductor baseplates." },
-    { id: "therm_phasechange", name: "Vapor Chamber Phase-Change Thermal Heatpipe", cost: 38000, weight: 40, efficiencyBonus: 0.015, inHouseTech: "tech_therm_phasechange", desc: "Two-phase evaporative cooling enabling continuous high peak current." }
+    { id: "therm_extruded_fin", name: "Skived-Fin Forced-Air Cowling", cost: 8000, weight: 110, reliabilityBonus: 6, efficiencyBonus: 0.002, inHouseTech: null, desc: "Rugged zero-fluid cooling. Completely leak-proof but increases module tare weight." },
+    { id: "therm_phasechange", name: "Vapor Chamber Phase-Change Thermal Heatpipe", cost: 38000, weight: 40, efficiencyBonus: 0.015, inHouseTech: "tech_therm_phasechange", desc: "Two-phase evaporative cooling enabling continuous high peak current." },
+    { id: "therm_graphene", name: "Graphene-Copper Micro-Lattice Interface", cost: 62000, weight: 12, reliabilityBonus: 14, efficiencyBonus: 0.020, inHouseTech: "tech_therm_phasechange", desc: "Aerospace carbon lattice extracting heat directly from silicon carbide dies." }
   ]
 };
 
@@ -94,8 +98,8 @@ COMPONENT_RESEARCH.push(
   { id: "tech_inv_highpower_320", name: "High-Throughput 7500 kW Inverter (320 km/h)", branch: "electronics", costMoney: 1100000, durationDays: 75, unlocks: ["inv_liquid_highpower_320"], desc: "High-density multi-channel converter engineered for 320 km/h passenger operations." },
   { id: "tech_inv_sic_mosfet", name: "Silicon Carbide (SiC) MOSFET Power Converter", branch: "electronics", costMoney: 2400000, durationDays: 120, unlocks: ["inv_sic"], desc: "Wide-bandgap semiconductors cutting switching losses by 70% with 8.8 MW power." },
   { id: "tech_inv_sic_hyper_380", name: "Hyper-Velocity 9.8 MW Dual-Core SiC Converter", branch: "electronics", costMoney: 4600000, durationDays: 160, unlocks: ["inv_sic_dual_380"], desc: "Dual parallel SiC arrays delivering 9800 kW for 380+ km/h sustained sprints." },
-  { id: "tech_gd_dynamic", name: "Adaptive Microsecond Intelligent Gate Controller", branch: "electronics", costMoney: 680000, durationDays: 55, unlocks: ["gd_dynamic"], desc: "Dynamic slew-rate gate controller eliminating switching harmonics and ringing." },
-  { id: "tech_therm_phasechange", name: "Vapor Chamber Phase-Change Thermal Heatpipe", branch: "electronics", costMoney: 1200000, durationDays: 75, unlocks: ["therm_phasechange"], desc: "Two-phase evaporative baseplates providing ultra-fast thermal heat spreading." },
+  { id: "tech_gd_dynamic", name: "Adaptive GaN & Intelligent Gate Drivers", branch: "electronics", costMoney: 680000, durationDays: 55, unlocks: ["gd_dynamic", "gd_gan_ultrafast"], desc: "Dynamic slew-rate and GaN gate controllers eliminating switching ringing." },
+  { id: "tech_therm_phasechange", name: "Vapor Chamber & Graphene Thermal Coldplates", branch: "electronics", costMoney: 1200000, durationDays: 75, unlocks: ["therm_phasechange", "therm_graphene"], desc: "Two-phase evaporative and graphene baseplates providing rapid heat dissipation." },
   { id: "tech_aux_aps_static", name: "Solid-State Static Auxiliary Inverter (180 kVA)", branch: "electronics", costMoney: 140000, durationDays: 25, unlocks: ["aux_std_static"], desc: "Provides regulated 400V 50Hz and 110V DC power for cabin lighting and controls." },
   { id: "tech_aux_aps_hvac", name: "High-Capacity Dual-Channel APS (450 kVA)", branch: "electronics", costMoney: 320000, durationDays: 45, unlocks: ["aux_hvac_commercial"], desc: "Heavy auxiliary power supply powering multiple-coach HVAC and galley equipment." }
 );

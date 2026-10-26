@@ -12,19 +12,27 @@ class SubcompView {
 
     const items = list.map(item => {
       const isUnlocked = state.isSubcomponentUnlocked(item.id);
-      const bonusTags = [];
-      if (item.speedBonus) bonusTags.push(`${item.speedBonus > 0 ? "+" : ""}${item.speedBonus} km/h Speed`);
-      if (item.adhesionBonus) bonusTags.push(`+${item.adhesionBonus} Adhesion μ`);
-      if (item.safetyBonus) bonusTags.push(`+${item.safetyBonus} Safety`);
-      if (item.efficiencyBonus) bonusTags.push(`+${(item.efficiencyBonus * 100).toFixed(1)}% Efficiency`);
-      if (item.reliabilityBonus) bonusTags.push(`+${item.reliabilityBonus} Reliability`);
+      const strengths = [];
+      const tradeOffs = [];
+
+      if (item.speedBonus) strengths.push(`+${item.speedBonus} km/h Speed`);
+      if (item.adhesionBonus) strengths.push(`+${item.adhesionBonus} Adhesion μ`);
+      if (item.safetyBonus) strengths.push(`+${item.safetyBonus} Safety`);
+      if (item.efficiencyBonus && item.efficiencyBonus > 0) strengths.push(`+${(item.efficiencyBonus * 100).toFixed(1)}% Eff`);
+      if (item.reliabilityBonus && item.reliabilityBonus > 0) strengths.push(`+${item.reliabilityBonus} Rel`);
+
+      if (item.weight > 0) tradeOffs.push(`+${item.weight} kg Mass`);
+      else if (item.weight < 0) strengths.push(`${item.weight} kg Mass`);
+
+      if (item.efficiencyBonus && item.efficiencyBonus < 0) tradeOffs.push(`${(item.efficiencyBonus * 100).toFixed(1)}% Eff`);
 
       return {
         id: item.id,
         name: item.name,
         cost: item.cost,
         weight: item.weight,
-        bonusText: bonusTags.join(" • ") || "Standard Baseline Tuning",
+        strengthsText: strengths.join(" • ") || "Standard Spec",
+        tradeOffsText: tradeOffs.join(" • ") || "None",
         desc: item.desc,
         disabled: !isUnlocked,
         badge: !isUnlocked ? "Research Required" : (item.id.includes("standard") || item.id.includes("single") ? "Standard" : "Engineered")
@@ -61,8 +69,9 @@ class SubcompView {
             </button>
           </div>
         </div>
-        <div class="catalog-item-specs text-muted">
-          Mass: ${item.weight >= 0 ? "+" : ""}${item.weight} kg &bull; Impact: <span class="text-positive font-mono">${item.bonusText}</span>
+        <div class="catalog-item-specs text-muted" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+          <span>Strengths: <strong class="text-positive font-mono">${item.strengthsText}</strong></span>
+          ${item.tradeOffsText !== "None" ? `<span>Trade-offs: <strong class="text-warning font-mono">${item.tradeOffsText}</strong></span>` : ""}
         </div>
         <div class="catalog-item-desc">${item.desc}</div>
       `;
