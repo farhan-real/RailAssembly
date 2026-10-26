@@ -51,6 +51,58 @@
   font-size: 11px;
 }
 
+/* Custom Text Inputs */
+.c-input-custom {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  color: var(--text-main);
+  padding: 5px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  transition: border-color var(--trans-fast), background-color var(--trans-fast);
+  outline: none;
+}
+.c-input-custom:focus {
+  border-color: var(--border-focus);
+  background-color: var(--bg-panel);
+}
+.c-input-custom::placeholder {
+  color: var(--text-muted);
+}
+
+/* Segmented Control Buttons */
+.type-segmented-control {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 2px;
+  gap: 2px;
+}
+.type-segmented-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+.type-segmented-btn:hover {
+  color: var(--text-main);
+  background-color: var(--bg-surface-hover);
+}
+.type-segmented-btn.active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 /* Corporate Cards */
 .c-card {
   background-color: var(--bg-panel);

@@ -27,6 +27,19 @@
   overflow: hidden;
 }
 
+.consist-summary-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 /* Categorized Component Acquisition Navigation */
 .acquisition-cat-bar {
   display: flex;

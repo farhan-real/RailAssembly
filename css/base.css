@@ -49,6 +49,7 @@ input, button, select, textarea {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
+  background: transparent;
   border: none;
   outline: none;
 }
