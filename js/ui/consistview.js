@@ -5,7 +5,7 @@ class ConsistView {
 
     container.innerHTML = `
       <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
-        Configure carriages in this trainset consist. You can create custom carriage types and append carriages directly to the end of the train:
+        Build long, short, or express trainset consists. Create and name custom carriage types and append carriages directly to the end of the train:
       </p>
 
       <div class="consist-toolbar">
@@ -66,13 +66,8 @@ class ConsistView {
       list.appendChild(row);
     });
 
-    container.querySelector("#btn-add-carriage-end").onclick = () => {
-      ConsistView.openAppendCarriageMenu(builderInstance);
-    };
-
-    container.querySelector("#btn-create-custom-type").onclick = () => {
-      ConsistView.openCreateTypeModal(builderInstance);
-    };
+    container.querySelector("#btn-add-carriage-end").onclick = () => ConsistView.openAppendCarriageMenu(builderInstance);
+    container.querySelector("#btn-create-custom-type").onclick = () => ConsistView.openCreateTypeModal(builderInstance);
 
     UI.showModal({
       title: "Consist Carriages & Custom Rolling Stock Composition",
@@ -81,9 +76,7 @@ class ConsistView {
         {
           label: "Apply to CAD Blueprint",
           className: "btn-primary",
-          onClick: () => {
-            BuilderView.render(document.getElementById("viewport-root"));
-          }
+          onClick: () => BuilderView.render(document.getElementById("viewport-root"))
         }
       ]
     });
@@ -101,8 +94,7 @@ class ConsistView {
     BuilderView.openSelectionModal({
       title: "Add Carriage to End of Consist",
       subtitle: "Select carriage specification to append to the end of this trainset:",
-      items,
-      activeId: null,
+      items, activeId: null,
       onSelect: (typeId) => {
         const typeDef = state.findCarriageType(typeId);
         const newIdx = builderInstance.consistConfig.carriages.length + 1;
@@ -131,8 +123,7 @@ class ConsistView {
     BuilderView.openSelectionModal({
       title: `Assign Carriage Type for Position ${carIdx + 1}`,
       subtitle: "Choose standard or custom carriage type for this position:",
-      items,
-      activeId: car.typeId,
+      items, activeId: car.typeId,
       onSelect: (typeId) => {
         const typeDef = state.findCarriageType(typeId);
         car.typeId = typeDef.id;
@@ -156,7 +147,7 @@ class ConsistView {
       <div style="display:flex; flex-direction:column; gap:10px;">
         <div>
           <label style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Carriage Type Name</label>
-          <input type="text" class="c-input-custom" id="custom-type-name" placeholder="e.g. Panoramic Observation Lounge Car" style="margin-top:4px;">
+          <input type="text" class="c-input-custom" id="custom-type-name" placeholder="e.g. High-Speed Sleeper Berths Coach" style="margin-top:4px;">
         </div>
 
         <div>
@@ -179,7 +170,7 @@ class ConsistView {
 
         <div>
           <label style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Operational Purpose Description</label>
-          <input type="text" class="c-input-custom" id="custom-type-desc" placeholder="e.g. Luxury interior seating with panoramic glass dome." style="margin-top:4px;">
+          <input type="text" class="c-input-custom" id="custom-type-desc" placeholder="e.g. Long-distance sleeping compartment with acoustic insulation." style="margin-top:4px;">
         </div>
       </div>
     `;
@@ -225,16 +216,12 @@ class ConsistView {
 
             const newType = {
               id: "cartype_" + Date.now().toString(36),
-              name,
-              isPowered,
-              layout: selectedLayout,
-              seatMultiplier: seatMult,
-              weightOffset: wOffset,
-              costOffset: cOffset,
-              desc
+              name, isPowered, layout: selectedLayout,
+              seatMultiplier: seatMult, weightOffset: wOffset, costOffset: cOffset, desc
             };
 
             state.customCarriageTypes.push(newType);
+            state.saveToStorage();
             UI.toast(`Carriage Type "${name}" created and added to catalog.`, "success");
             ConsistView.openConsistModal(builderInstance);
           }

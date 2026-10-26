@@ -1,4 +1,4 @@
-// Central Game State Singleton with Custom Carriage Types and Presets
+// Central Game State Singleton with Variant Editing, Persistence, and Contract Swapping
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -28,102 +28,52 @@ class GameState {
     this.marketTenders = [];
     this.nextTenderCountdown = 0;
 
-    // Standard and Custom Carriage Types Registry
     this.customCarriageTypes = [
-      {
-        id: "driving_motor",
-        name: "Driving Cab Motor Coach",
-        isPowered: true,
-        layout: "standard",
-        seatMultiplier: 1.0,
-        weightOffset: 0,
-        costOffset: 0,
-        desc: "Front/rear driver cab equipped with TCMS master and high-voltage traction motor bogie."
-      },
-      {
-        id: "intermediate_motor",
-        name: "Intermediate Motor Coach",
-        isPowered: true,
-        layout: "standard",
-        seatMultiplier: 1.0,
-        weightOffset: 0,
-        costOffset: 0,
-        desc: "Underfloor inverter and traction motor pack driving standard passenger coach body."
-      },
-      {
-        id: "intermediate_trailer",
-        name: "Intermediate Trailer Coach",
-        isPowered: false,
-        layout: "standard",
-        seatMultiplier: 1.15,
-        weightOffset: -4000,
-        costOffset: -60000,
-        desc: "Unpowered passenger coach maximizing seating density and reducing consist tare mass."
-      },
-      {
-        id: "driving_trailer",
-        name: "Driving Cab Trailer Coach",
-        isPowered: false,
-        layout: "standard",
-        seatMultiplier: 0.95,
-        weightOffset: -3000,
-        costOffset: -45000,
-        desc: "Front/rear driver cab with lightweight unpowered guide bogies."
-      },
-      {
-        id: "bistro_trailer",
-        name: "Bistro & First-Class Lounge Car",
-        isPowered: false,
-        layout: "lounge",
-        seatMultiplier: 0.6,
-        weightOffset: 1200,
-        costOffset: 35000,
-        desc: "Dining galley and premium passenger lounge with reduced seat count."
-      }
+      { id: "driving_motor", name: "Driving Cab Motor Coach", isPowered: true, layout: "standard", seatMultiplier: 1.0, weightOffset: 0, costOffset: 0, desc: "Front/rear driver cab equipped with TCMS master and high-voltage motor bogie." },
+      { id: "intermediate_motor", name: "Intermediate Motor Coach", isPowered: true, layout: "standard", seatMultiplier: 1.0, weightOffset: 0, costOffset: 0, desc: "Underfloor inverter and traction motor pack driving standard passenger coach body." },
+      { id: "intermediate_trailer", name: "Intermediate Trailer Coach", isPowered: false, layout: "standard", seatMultiplier: 1.15, weightOffset: -4000, costOffset: -60000, desc: "Unpowered passenger coach maximizing seating density and reducing consist tare mass." },
+      { id: "driving_trailer", name: "Driving Cab Trailer Coach", isPowered: false, layout: "standard", seatMultiplier: 0.95, weightOffset: -3000, costOffset: -45000, desc: "Front/rear driver cab with lightweight unpowered guide bogies." },
+      { id: "bistro_trailer", name: "Bistro & First-Class Lounge Car", isPowered: false, layout: "lounge", seatMultiplier: 0.6, weightOffset: 1200, costOffset: 35000, desc: "Dining galley and premium passenger lounge with reduced seat count." }
     ];
 
-    this.savedDesigns = [
-      {
-        id: "design_preset_emu_8car",
-        name: "Express 8-Car Intercity EMU (4M4T)",
-        type: "trainset",
-        slots: {
-          pantograph: "panto_std", transformer: "trans_compact", inverter: "inv_igbt_liquid",
-          motor: "mot_ind_commuter", bogie: "bog_bo_bo", carbody: "body_aluminum",
-          brakes: "brk_disc_regen", battery: "bat_none", tcms: "tcms_etcs2"
-        },
-        subSelections: {
-          pantograph: { subcomponent: "cs_carbon", modification: "act_servo" },
-          transformer: { subcomponent: "wind_copper", modification: "cool_ester" },
-          inverter: { subcomponent: "gd_optical", modification: "therm_coldplate" },
-          motor: { subcomponent: "gb_single", modification: "brg_ceramic" },
-          bogie: { subcomponent: "susp_air", modification: "whl_cryo" },
-          carbody: { subcomponent: "crash_crushzone", modification: "aero_nose" },
-          brakes: { subcomponent: "cal_monobloc", modification: "disc_iron" },
-          battery: { subcomponent: "btherm_passive", modification: "bprot_standard" },
-          tcms: { subcomponent: "bus_etb", modification: "sens_radar" }
-        },
-        consistConfig: {
-          carriageCount: 8,
-          carriages: [
-            { index: 1, typeId: "driving_motor", name: "Car 1: Driving Motor Coach", isPowered: true },
-            { index: 2, typeId: "intermediate_motor", name: "Car 2: Intermediate Motor Coach", isPowered: true },
-            { index: 3, typeId: "intermediate_trailer", name: "Car 3: Intermediate Trailer Coach", isPowered: false },
-            { index: 4, typeId: "bistro_trailer", name: "Car 4: Bistro Trailer Coach", isPowered: false },
-            { index: 5, typeId: "intermediate_trailer", name: "Car 5: Intermediate Trailer Coach", isPowered: false },
-            { index: 6, typeId: "intermediate_motor", name: "Car 6: Intermediate Motor Coach", isPowered: true },
-            { index: 7, typeId: "intermediate_motor", name: "Car 7: Intermediate Motor Coach", isPowered: true },
-            { index: 8, typeId: "driving_trailer", name: "Car 8: Driving Trailer Coach", isPowered: false }
-          ]
-        },
-        marginPercent: 25,
-        savedDate: "Factory Master Reference"
-      }
-    ];
+    this.savedDesigns = [];
+    this.loadFromStorage();
+  }
 
-    this.quarterlyRevenue = 0;
-    this.quarterlyExpenses = 0;
-    this.lastQuarterProfit = 0;
+  saveVariant(variantData) {
+    const existingIndex = this.variants.findIndex(v => v.id === variantData.id);
+    if (existingIndex >= 0) {
+      this.variants[existingIndex] = { ...variantData };
+    } else {
+      this.variants.push(variantData);
+    }
+    this.saveToStorage();
+    Events.emit("variantsChanged");
+  }
+
+  saveToStorage() {
+    try {
+      const data = {
+        variants: this.variants,
+        customCarriageTypes: this.customCarriageTypes,
+        savedDesigns: this.savedDesigns,
+        funds: this.funds,
+        reputation: this.reputation,
+        day: this.day
+      };
+      localStorage.setItem("rail_assembly_save", JSON.stringify(data));
+    } catch (e) { /* Storage optional */ }
+  }
+
+  loadFromStorage() {
+    try {
+      const raw = localStorage.getItem("rail_assembly_save");
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.variants)) this.variants = data.variants;
+      if (Array.isArray(data.customCarriageTypes)) this.customCarriageTypes = data.customCarriageTypes;
+      if (Array.isArray(data.savedDesigns)) this.savedDesigns = data.savedDesigns;
+    } catch (e) { /* Safe fallback */ }
   }
 
   getWarehouseCount() {
@@ -162,18 +112,16 @@ class GameState {
     return this.customCarriageTypes.find(t => t.id === typeId) || this.customCarriageTypes[0];
   }
 
-  isInHouseAvailable(component) {
-    if (!component.inHouseTech) return true;
-    return this.unlockedTechs.has(component.inHouseTech);
+  findComponentById(id) {
+    for (const cat in COMPONENTS_DATA) {
+      const match = COMPONENTS_DATA[cat].find(c => c.id === id);
+      if (match) return match;
+    }
+    return null;
   }
 
-  getInHouseUnitCost(component) {
-    return Math.round(component.cost * 0.58);
-  }
-
-  getInHouseFabricationDays(component, quantity) {
-    const baseDays = Math.max(3, Math.round(component.leadDays * 0.65));
-    return baseDays + Math.floor(quantity * 0.5);
+  findTechById(techId) {
+    return TECH_DATA.find(t => t.id === techId) || null;
   }
 
   getDateString() {
@@ -185,18 +133,6 @@ class GameState {
 
   getQuarterString() {
     return `Quarter ${this.quarter} Year ${this.year}`;
-  }
-
-  findComponentById(id) {
-    for (const cat in COMPONENTS_DATA) {
-      const match = COMPONENTS_DATA[cat].find(c => c.id === id);
-      if (match) return match;
-    }
-    return null;
-  }
-
-  findTechById(techId) {
-    return TECH_DATA.find(t => t.id === techId) || null;
   }
 }
 
