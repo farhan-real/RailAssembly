@@ -87,7 +87,6 @@ class TrainModelCalc {
     const axleLoad = Number((totalMassTons / totalAxles).toFixed(2));
     const axleOverloaded = axleLoad > (bogie.maxAxleLoadTons || 25);
 
-    // Diagnostics & Physical Limit Check (including PWM switching limits)
     const diagnostics = TrainValidator.validateSystemIntegrity(baseComponents, totalMassTons, carriageCount);
 
     const singlePackKw = diagnostics.effectiveMotorPowerKw;
@@ -96,7 +95,6 @@ class TrainModelCalc {
     const netTractionPowerKw = Math.max(500, availablePowerKw - hotelPowerDrawKw);
     const horsepower = Math.round(netTractionPowerKw * 1.341);
 
-    // Mechanical transmission & PWM inverter modulation efficiencies
     const mechEff = transmission?.mechanicalEfficiency || 0.97;
     const pwmDelta = pwm?.efficiencyDelta || 0.0;
     let totalEfficiency = Number((mechEff * (0.94 + pwmDelta) + efficiencyBonusTotal).toFixed(3));
@@ -108,14 +106,13 @@ class TrainModelCalc {
       Math.pow((netTractionPowerKw * totalEfficiency * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
     ) + speedBonusTotal;
 
-    // Apply strict speed limits (Pantograph, Bogie, Motor RPM, Transmission, PWM Modulator)
     theoreticalSpeed = Math.min(theoreticalSpeed, diagnostics.strictSpeedLimit + speedBonusTotal);
     if (axleOverloaded) theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
 
-    // Dynamic Adhesion: Base Bogie Adhesion + Rail Sanding + PWM Direct Torque Adhesion Response
+    // Dynamic Adhesion: Base Bogie Adhesion + Rail Sanding + PWM Anti-Slip
     const adhesiveMassTons = isTrainset ? Number(((poweredCarCount * motorCarWeightKg) / 1000).toFixed(1)) : totalMassTons;
-    const baseAdhesion = bogie.axles === 6 ? 0.38 : 0.32;
-    const totalAdhesionCoeff = baseAdhesion + (sander?.adhesionBonus || 0) + (pwm?.adhesionBonus || 0) + extraAdhesionBonus;
+    const baseAdhesion = bogie.axles >= 6 ? 0.38 : (bogie.axles === 2 ? 0.28 : 0.32);
+    const totalAdhesionCoeff = Number((baseAdhesion + (sander?.adhesionBonus || 0) + (pwm?.adhesionBonus || 0) + extraAdhesionBonus).toFixed(3));
     const maxAdhesionKn = Math.round(adhesiveMassTons * 9.81 * totalAdhesionCoeff);
 
     const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round((netTractionPowerKw * mechEff) / 8.2));
@@ -130,6 +127,7 @@ class TrainModelCalc {
       roughSpeedMin: Math.round(theoreticalSpeed * 0.90),
       roughSpeedMax: Math.round(theoreticalSpeed * 1.08),
       totalEfficiency, maxAdhesionKn, acceleration,
+      adhesiveMassTons, totalAdhesionCoeff,
       bomCost: totalBOMCost, passengerCap,
       cargoCapacityTons: isTrainset ? 0 : body.cargoCapacityTons,
       batteryRangeKm: battery?.rangeKm || 0,

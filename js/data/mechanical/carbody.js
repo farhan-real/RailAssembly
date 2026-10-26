@@ -16,7 +16,21 @@ COMPONENTS_DATA.carbody = [
     leadDays: 14,
     supplier: "Standard Industrial Foundry",
     inHouseTech: "tech_body_structural_steel",
-    desc: "Heavy carbon-steel chassis for locomotives and heavy haulage routes."
+    desc: "Heavy carbon-steel chassis for electric locomotives and general freight operations."
+  },
+  {
+    id: "body_heavy_ballast",
+    name: "High-Adhesion Ballasted Freight Locomotive Chassis",
+    type: "carbody",
+    dragCd: 0.55,
+    passengerCap: 0,
+    cargoCapacityTons: 120,
+    weight: 58000,
+    cost: 280000,
+    leadDays: 18,
+    supplier: "Standard Industrial Foundry",
+    inHouseTech: "tech_body_structural_steel",
+    desc: "Massive 58-ton cast-iron ballasted underframe providing the deadweight needed to generate 500+ kN tractive adhesion."
   },
   {
     id: "body_aluminum",
@@ -88,7 +102,7 @@ SUBCOMPONENTS_DATA.carbody = {
 };
 
 COMPONENT_RESEARCH.push(
-  { id: "tech_body_structural_steel", name: "High-Tensile Carbon Steel Monocoque Shell", branch: "aerodynamics", costMoney: 180000, durationDays: 30, unlocks: ["body_steel"], desc: "Welded high-yield steel box structure for freight locomotives and utility sets." },
+  { id: "tech_body_structural_steel", name: "High-Tensile Carbon Steel Monocoque Shell", branch: "aerodynamics", costMoney: 180000, durationDays: 30, unlocks: ["body_steel", "body_heavy_ballast"], desc: "Welded high-yield steel box structure and ballasted chassis for freight locomotives." },
   { id: "tech_body_aluminum_extruded", name: "6000-Series Welded Aluminum Modular Shell", branch: "aerodynamics", costMoney: 350000, durationDays: 45, unlocks: ["body_aluminum"], desc: "Hollow extruded aluminum coach bodies cutting vehicle mass by 40%." },
   { id: "tech_body_carbon_monocoque", name: "Carbon-Fiber Reinforced Monocoque (300 km/h)", branch: "aerodynamics", costMoney: 1200000, durationDays: 75, unlocks: ["body_aero_cf"], desc: "Autoclave carbon composite shell minimizing drag to Cd 0.22." },
   { id: "tech_body_shinkansen_360", name: "Long-Nose Aerodynamic Shockwave Mitigator (360 km/h)", branch: "aerodynamics", costMoney: 2600000, durationDays: 110, unlocks: ["body_bullet_360"], desc: "Dual-taper nose fairing preventing tunnel micro-pressure waves at 360 km/h." },

@@ -69,15 +69,15 @@ class BuilderView {
 
     container.innerHTML = `
       <div class="cad-container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
-          <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:300px;">
-            <div class="type-segmented-control">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px; min-width:0;">
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0; flex-wrap:wrap;">
+            <div class="type-segmented-control" style="flex-shrink:0;">
               <button class="type-segmented-btn ${this.rollingStockType === "locomotive" ? "active" : ""}" id="btn-type-locomotive">Locomotive</button>
               <button class="type-segmented-btn ${this.rollingStockType === "trainset" ? "active" : ""}" id="btn-type-trainset">Trainset</button>
             </div>
-            <input type="text" class="c-input-custom" id="input-variant-name" value="${this.trainName}" placeholder="Enter Custom Variant Name" style="max-width:280px;">
+            <input type="text" class="c-input-custom" id="input-variant-name" value="${this.trainName}" placeholder="Enter Model Name" style="min-width:140px; flex:1; max-width:260px;">
           </div>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:6px; flex-shrink:0;">
             <button class="c-btn btn-ghost btn-sm" id="btn-design-archive">Archive / Presets...</button>
             <button class="c-btn btn-primary" id="btn-save-variant">
               ${this.editingVariantId ? "Update Variant in Catalog" : "Save as New Variant"}
@@ -86,7 +86,7 @@ class BuilderView {
         </div>
 
         ${this.rollingStockType === "trainset" ? `
-          <div class="consist-summary-banner">
+          <div class="consist-summary-banner" style="min-width:0;">
             <div>
               <strong style="font-size:12px;">Trainset Architecture:</strong>
               <span class="text-blue font-mono" style="font-size:12px; margin-left:6px;">
@@ -101,23 +101,29 @@ class BuilderView {
         ` : ""}
 
         <div class="view-grid-four" style="margin-bottom:12px;">
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
-            <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
-              ${stats.roughSpeedMin} &sim; ${stats.roughSpeedMax} km/h &bull; ${stats.acceleration} m/s²
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Speed &bull; Acceleration</span>
+              <span class="c-badge badge-blue font-mono" style="font-size:9px;">Adhesion: ${stats.maxAdhesionKn} kN</span>
             </div>
-            <span class="text-muted" style="font-size:9px;">Adhesion Force: ${stats.maxAdhesionKn} kN</span>
+            <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
+              ${stats.roughSpeedMin}&sim;${stats.roughSpeedMax} km/h &bull; ${stats.acceleration} m/s²
+            </div>
+            <div class="text-muted" style="font-size:9px; display:flex; justify-content:space-between;">
+              <span>Adhesion: &mu; ${(stats.totalAdhesionCoeff || 0.38).toFixed(2)}</span>
+              <span>Adhesive Mass: ${stats.adhesiveMassTons || stats.totalMassTons} t</span>
+            </div>
           </div>
 
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Net Traction Power</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.availablePowerKw} kW (${stats.horsepower.toLocaleString()} hp)
             </div>
-            <span class="text-muted" style="font-size:9px;">Efficiency: ${Math.round(stats.totalEfficiency * 100)}%</span>
+            <span class="text-muted" style="font-size:9px;">Powertrain Efficiency: ${Math.round(stats.totalEfficiency * 100)}%</span>
           </div>
 
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load &bull; Gross Mass</span>
             <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:13px; margin:2px 0;">
               ${stats.axleLoad} t / Axle (Limit: ${stats.maxAllowedAxleLoad} t)
@@ -125,7 +131,7 @@ class BuilderView {
             <span class="text-muted" style="font-size:9px;">Consist Mass: ${stats.totalMassTons} Metric Tons</span>
           </div>
 
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Consist BOM Cost</span>
             <div class="font-mono text-warning" style="font-size:13px; margin:2px 0;">
               $${stats.bomCost.toLocaleString()}
@@ -134,7 +140,7 @@ class BuilderView {
           </div>
         </div>
 
-        <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:var(--radius-xs); padding:8px 12px; margin-bottom:14px;">
+        <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:var(--radius-xs); padding:8px 12px; margin-bottom:14px; min-width:0;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
             <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-secondary);">Electrical Chain &amp; System Limits Diagnostic</span>
             <span class="c-badge ${diag.isFullySufficient ? "badge-green" : "badge-amber"}">

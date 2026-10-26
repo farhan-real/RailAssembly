@@ -1,17 +1,17 @@
 /* Layout Grids */
 .view-grid-two {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 .view-grid-three {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 .view-grid-four {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -19,8 +19,12 @@
   background-color: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 14px;
   margin-bottom: 14px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Categorized Component Acquisition Navigation */
@@ -84,6 +88,7 @@
   justify-content: space-between;
   gap: 10px;
   transition: border-color var(--trans-fast);
+  min-width: 0;
 }
 .component-buy-card:hover {
   border-color: var(--border-strong);
@@ -144,10 +149,13 @@
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 12px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .subsystem-header {
   display: flex;
@@ -155,12 +163,18 @@
   align-items: center;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--border-subtle);
+  min-width: 0;
+  gap: 6px;
 }
 .subsystem-title {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* Menu Trigger Rows with Horizontal Part & Button Alignment */
@@ -169,17 +183,22 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   padding: 8px 10px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .menu-trigger-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
+  width: 100%;
 }
 .menu-trigger-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;
 }
 .menu-trigger-value {
   font-size: 11px;
@@ -188,6 +207,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
   flex: 1;
 }
 .menu-trigger-sub {
@@ -195,6 +215,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-width: 0;
 }
 .menu-trigger-label {
   font-size: 9px;
@@ -202,6 +223,7 @@
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.4px;
+  white-space: nowrap;
 }
 
 /* Component Selection Catalog Modal Items */
@@ -223,6 +245,7 @@
   gap: 6px;
   transition: border-color var(--trans-fast), background-color var(--trans-fast);
   cursor: pointer;
+  min-width: 0;
 }
 .catalog-menu-item:hover {
   border-color: var(--border-strong);
@@ -238,6 +261,7 @@
   justify-content: space-between;
   gap: 12px;
   width: 100%;
+  min-width: 0;
 }
 .catalog-item-title-group {
   display: flex;
@@ -317,8 +341,20 @@
   background-color: var(--color-blue);
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
+  .view-grid-four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .view-grid-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
   .view-grid-two, .view-grid-three, .view-grid-four {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cad-container {
+    padding: 10px;
   }
 }

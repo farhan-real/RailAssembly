@@ -44,7 +44,21 @@ COMPONENTS_DATA.bogie = [
     leadDays: 15,
     supplier: "CastIron Engineering Works",
     inHouseTech: "tech_bog_coco_freight",
-    desc: "Six heavy axles delivering immense tractive adhesion for freight. Speed limit: 140 km/h."
+    desc: "Six heavy axles delivering high tractive adhesion for freight. Speed limit: 140 km/h."
+  },
+  {
+    id: "bog_heavy_haul_ballast",
+    name: "Heavy-Haul Ballasted 6-Axle Locomotive Bogies",
+    type: "bogie",
+    axles: 6,
+    maxAxleLoadTons: 26.0,
+    maxSafeSpeed: 140,
+    cost: 210000,
+    weight: 32000,
+    leadDays: 18,
+    supplier: "CastIron Engineering Works",
+    inHouseTech: "tech_bog_coco_freight",
+    desc: "High-mass 32-ton Co-Co running gear engineered with integrated ballast blocks to transfer 600+ kN of tractive effort."
   },
   {
     id: "bog_radial_320",
@@ -105,7 +119,7 @@ SUBCOMPONENTS_DATA.bogie = {
 COMPONENT_RESEARCH.push(
   { id: "tech_bog_light_tram", name: "Two-Axle Lightweight Articulated Bogie", branch: "running_gear", costMoney: 160000, durationDays: 30, unlocks: ["bog_tram_light"], desc: "Low-floor running gear for suburban commuter trainsets." },
   { id: "tech_bog_flexicoil_220", name: "Secondary Air-Spring Flexicoil Bogie (220 km/h)", branch: "running_gear", costMoney: 280000, durationDays: 45, unlocks: ["bog_bo_bo"], desc: "Air-suspension bogie delivering quiet passenger comfort up to 220 km/h." },
-  { id: "tech_bog_coco_freight", name: "Six-Axle High-Adhesion Co-Co Freight Bogie", branch: "running_gear", costMoney: 450000, durationDays: 55, unlocks: ["bog_co_co"], desc: "Six heavy axles maximizing rail tractive grip for heavy haul locomotives." },
+  { id: "tech_bog_coco_freight", name: "Six-Axle High-Adhesion Co-Co Freight Bogie", branch: "running_gear", costMoney: 450000, durationDays: 55, unlocks: ["bog_co_co", "bog_heavy_haul_ballast"], desc: "Six heavy axles maximizing rail tractive grip for heavy haul freight locomotives." },
   { id: "tech_bog_radial_320", name: "Active Radial Self-Steering Bogie (320 km/h)", branch: "running_gear", costMoney: 1900000, durationDays: 90, unlocks: ["bog_radial_320"], desc: "Self-steering axles reducing curve flange wear and permitting 320 km/h." },
   { id: "tech_bog_tilting_360", name: "Active-Cant Hydraulic Tilting Running Gear (360 km/h)", branch: "running_gear", costMoney: 3200000, durationDays: 120, unlocks: ["bog_articulated_360"], desc: "Hydraulic actuators tilting carbody in curves to sustain 360 km/h passenger speeds." },
   { id: "tech_bog_composite_420", name: "Ultra-Light Carbon-Composite Bogie (420 km/h)", branch: "running_gear", costMoney: 4800000, durationDays: 160, unlocks: ["bog_highspeed_400"], desc: "Composite structural frame cutting unsprung mass for speeds exceeding 400 km/h." }
