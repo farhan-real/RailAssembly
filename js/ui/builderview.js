@@ -1,6 +1,6 @@
-// Industrial Engineering CAD View: Variant Editing, Custom Naming, and Blueprint Management
+// Industrial Engineering CAD View: Multi-Component Slots, Limits & Electrical Diagnostics
 class BuilderView {
-  static editingVariantId = null; // null for new variant, or string variantId when editing
+  static editingVariantId = null;
   static rollingStockType = "trainset";
 
   static consistConfig = {
@@ -14,9 +14,17 @@ class BuilderView {
   };
 
   static currentSlots = {
-    pantograph: "panto_std", transformer: "trans_heavy", inverter: "inv_igbt_air",
-    motor: "mot_ind_basic", bogie: "bog_co_co", carbody: "body_steel",
-    brakes: "brk_disc_regen", battery: "bat_none", tcms: "tcms_basic"
+    pantograph: "panto_std",
+    transformer: "trans_heavy",
+    inverter: "inv_igbt_air",
+    motor: "mot_ind_basic",
+    auxiliary: "aux_std_static",
+    bogie: "bog_co_co",
+    carbody: "body_steel",
+    brakes: "brk_disc_regen",
+    resistor: "res_none",
+    battery: "bat_none",
+    tcms: "tcms_basic"
   };
 
   static subSelections = {
@@ -46,10 +54,11 @@ class BuilderView {
 
   static render(container) {
     const stats = TrainModelCalc.calculateTrainStats(this.currentSlots, this.subSelections, this.rollingStockType, this.consistConfig);
+    const diag = stats.diagnostics;
 
     container.innerHTML = `
       <div class="cad-container">
-        <!-- Variant Header, Custom Naming Input & Action Controls -->
+        <!-- Top Toolbar -->
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:300px;">
             <div class="type-segmented-control">
@@ -81,7 +90,8 @@ class BuilderView {
           </div>
         ` : ""}
 
-        <div class="view-grid-four" style="margin-bottom:14px;">
+        <!-- Physical Telemetry Grid -->
+        <div class="view-grid-four" style="margin-bottom:12px;">
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
@@ -91,7 +101,7 @@ class BuilderView {
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Traction Power Rating</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Traction Power Output</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.availablePowerKw} kW (${stats.horsepower.toLocaleString()} hp)
             </div>
@@ -112,6 +122,26 @@ class BuilderView {
               $${stats.bomCost.toLocaleString()}
             </div>
             <span class="text-muted" style="font-size:9px;">Direct hardware component sum</span>
+          </div>
+        </div>
+
+        <!-- Electrical Chain & Physical Limit Diagnostics Panel -->
+        <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:var(--radius-xs); padding:8px 12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-secondary);">Electrical Chain &amp; System Limits Diagnostic</span>
+            <span class="c-badge ${diag.isFullySufficient ? "badge-green" : "badge-amber"}">
+              ${diag.isFullySufficient ? "Supply Chain Sufficient" : "Limits / Bottlenecks Detected"}
+            </span>
+          </div>
+          <div style="font-size:11px; display:flex; flex-direction:column; gap:3px;">
+            <div>
+              <span class="text-muted">Primary Speed Ceiling:</span>
+              <strong class="font-mono text-blue">${diag.strictSpeedLimit} km/h</strong>
+              <span class="text-muted"> (Limited by ${diag.primarySpeedLimiter.component})</span>
+            </div>
+            ${diag.bottlenecks.map(b => `
+              <div class="text-warning" style="font-size:10px;">&bull; ${b}</div>
+            `).join("")}
           </div>
         </div>
 
@@ -163,15 +193,17 @@ class BuilderView {
     container.innerHTML = "";
 
     const categories = [
-      { key: "pantograph", label: "Pantograph Collector System" },
-      { key: "transformer", label: "Main Traction Transformer" },
-      { key: "inverter", label: "Traction Inverter / Converter" },
-      { key: "motor", label: "Traction Motors" },
-      { key: "bogie", label: "Bogie & Wheelset Assembly" },
-      { key: "carbody", label: "Carbody Shell Architecture" },
-      { key: "brakes", label: "Braking & Recovery System" },
-      { key: "battery", label: "Auxiliary Energy Storage" },
-      { key: "tcms", label: "TCMS Control Network" }
+      { key: "pantograph", label: "Pantograph Collector System", required: true },
+      { key: "transformer", label: "Main Traction Transformer / Filter", required: true },
+      { key: "inverter", label: "Traction Inverter / Converter", required: true },
+      { key: "motor", label: "Traction Motors", required: true },
+      { key: "auxiliary", label: "Auxiliary Power Converter (Optional)", required: false },
+      { key: "bogie", label: "Bogie & Wheelset Assembly", required: true },
+      { key: "carbody", label: "Carbody Shell Architecture", required: true },
+      { key: "brakes", label: "Braking & Recovery System", required: true },
+      { key: "resistor", label: "Dynamic Resistor Grid (Optional)", required: false },
+      { key: "battery", label: "Auxiliary Battery Pack (Optional)", required: false },
+      { key: "tcms", label: "TCMS Control Network", required: true }
     ];
 
     categories.forEach(cat => {
@@ -180,54 +212,54 @@ class BuilderView {
 
       const comp = state.findComponentById(this.currentSlots[cat.key]) || COMPONENTS_DATA[cat.key][0];
       const subData = SUBCOMPONENTS_DATA[cat.key];
-      const activeSub = subData?.subcomponents?.find(s => s.id === this.subSelections[cat.key]?.subcomponent);
-      const activeMod = subData?.modifications?.find(m => m.id === this.subSelections[cat.key]?.modification);
+      const isNone = !comp || comp.cost === 0;
 
       card.innerHTML = `
         <div class="subsystem-header">
           <span class="subsystem-title">${cat.label}</span>
-          <span class="c-badge badge-blue font-mono">$${comp.cost.toLocaleString()}</span>
+          <span class="c-badge ${isNone ? "badge-amber" : "badge-blue"} font-mono">
+            ${isNone ? "Unequipped" : `$${comp.cost.toLocaleString()}`}
+          </span>
         </div>
 
         <div class="menu-trigger-box">
           <div class="menu-trigger-info">
-            <span class="menu-trigger-label">Primary Module</span>
-            <span class="menu-trigger-value">${comp.name}</span>
-            <span class="text-muted" style="font-size:10px;">${comp.supplier} &bull; ${comp.weight} kg</span>
+            <span class="menu-trigger-label">${cat.required ? "Mandatory Module" : "Configurable Option"}</span>
+            <span class="menu-trigger-value">${comp ? comp.name : "None (Unequipped)"}</span>
+            <span class="text-muted" style="font-size:10px;">${comp && comp.weight ? `${comp.supplier} &bull; ${comp.weight} kg` : "Zero Weight &bull; No Cost"}</span>
           </div>
-          <button class="c-btn btn-ghost btn-sm btn-open-comp-menu" data-cat="${cat.key}">Choose Module...</button>
+          <button class="c-btn btn-ghost btn-sm btn-open-comp-menu" data-cat="${cat.key}">
+            ${isNone ? "Equip Module..." : "Change Module..."}
+          </button>
         </div>
-
-        ${subData?.subcomponents ? `
-          <div class="menu-trigger-box">
-            <div class="menu-trigger-info">
-              <span class="menu-trigger-label">Subcomponent Module</span>
-              <span class="menu-trigger-value">${activeSub ? activeSub.name : "None Configured"}</span>
-              <span class="menu-trigger-deltas">${activeSub ? `+$${activeSub.cost.toLocaleString()} &bull; ${activeSub.weight >= 0 ? "+" : ""}${activeSub.weight} kg` : ""}</span>
-            </div>
-            <button class="c-btn btn-ghost btn-sm btn-open-sub-menu" data-cat="${cat.key}">Subcomponent...</button>
-          </div>
-        ` : ""}
-
-        ${subData?.modifications ? `
-          <div class="menu-trigger-box">
-            <div class="menu-trigger-info">
-              <span class="menu-trigger-label">Engineering Modification</span>
-              <span class="menu-trigger-value">${activeMod ? activeMod.name : "None Configured"}</span>
-              <span class="menu-trigger-deltas">${activeMod ? `+$${activeMod.cost.toLocaleString()} &bull; ${activeMod.weight >= 0 ? "+" : ""}${activeMod.weight} kg` : ""}</span>
-            </div>
-            <button class="c-btn btn-ghost btn-sm btn-open-mod-menu" data-cat="${cat.key}">Modification...</button>
-          </div>
-        ` : ""}
       `;
 
       card.querySelector(".btn-open-comp-menu").onclick = () => BuilderView.openPrimaryComponentMenu(cat.key, cat.label);
-      const subBtn = card.querySelector(".btn-open-sub-menu");
-      if (subBtn) subBtn.onclick = () => BuilderView.openSubcomponentMenu(cat.key, cat.label);
-      const modBtn = card.querySelector(".btn-open-mod-menu");
-      if (modBtn) modBtn.onclick = () => BuilderView.openModificationMenu(cat.key, cat.label);
-
       container.appendChild(card);
+    });
+  }
+
+  static openPrimaryComponentMenu(catKey, catLabel) {
+    const list = COMPONENTS_DATA[catKey] || [];
+    const items = list.map(comp => {
+      const isUnlocked = !comp.inHouseTech || state.unlockedTechs.has(comp.inHouseTech);
+      return {
+        id: comp.id,
+        name: comp.name,
+        cost: comp.cost,
+        specs: comp.weight ? `Supplier: ${comp.supplier} &bull; Mass: ${comp.weight} kg &bull; Delivery: ${comp.leadDays} Days` : "Zero Tare Weight",
+        desc: comp.desc,
+        disabled: !isUnlocked,
+        badge: !isUnlocked ? "Research Required" : (comp.isOptional ? "Optional" : null)
+      };
+    });
+
+    this.openSelectionModal({
+      title: `Select ${catLabel}`,
+      subtitle: `Choose standard, high-performance, or unequipped configuration:`,
+      items,
+      activeId: this.currentSlots[catKey],
+      onSelect: (id) => { this.currentSlots[catKey] = id; }
     });
   }
 
@@ -262,7 +294,7 @@ class BuilderView {
       `;
 
       el.onclick = () => {
-        if (item.disabled) { UI.toast(item.disabledReason || "Option unavailable.", "danger"); return; }
+        if (item.disabled) { UI.toast("Option unavailable: Research required in R&D Directorate.", "danger"); return; }
         onSelect(item.id);
         UI.closeModal();
         BuilderView.render(document.getElementById("viewport-root"));
@@ -272,62 +304,5 @@ class BuilderView {
 
     container.appendChild(menuList);
     UI.showModal({ title, contentNode: container, actions: [] });
-  }
-
-  static openPrimaryComponentMenu(catKey, catLabel) {
-    const items = COMPONENTS_DATA[catKey].map(comp => {
-      const isUnlocked = !comp.inHouseTech || state.unlockedTechs.has(comp.inHouseTech);
-      return {
-        id: comp.id, name: comp.name, cost: comp.cost,
-        specs: `Supplier: ${comp.supplier} &bull; Mass: ${comp.weight} kg &bull; Delivery: ${comp.leadDays} Days`,
-        desc: comp.desc, disabled: !isUnlocked,
-        badge: !isUnlocked ? "Research Required" : null
-      };
-    });
-
-    this.openSelectionModal({
-      title: `Select ${catLabel}`,
-      subtitle: `Choose standard or specialized ${catLabel} for this electric rolling stock configuration:`,
-      items, activeId: this.currentSlots[catKey],
-      onSelect: (id) => { this.currentSlots[catKey] = id; }
-    });
-  }
-
-  static openSubcomponentMenu(catKey, catLabel) {
-    const subData = SUBCOMPONENTS_DATA[catKey];
-    if (!subData?.subcomponents) return;
-    const items = subData.subcomponents.map(sub => ({
-      id: sub.id, name: sub.name, cost: sub.cost, priceLabel: `+$${sub.cost.toLocaleString()}`,
-      specs: `Mass Delta: ${sub.weight >= 0 ? "+" : ""}${sub.weight} kg`, desc: sub.desc, disabled: false
-    }));
-
-    this.openSelectionModal({
-      title: `Configure ${catLabel} Subcomponent`,
-      subtitle: `Choose technical internal subcomponent module for ${catLabel}:`,
-      items, activeId: this.subSelections[catKey]?.subcomponent,
-      onSelect: (id) => {
-        if (!this.subSelections[catKey]) this.subSelections[catKey] = {};
-        this.subSelections[catKey].subcomponent = id;
-      }
-    });
-  }
-
-  static openModificationMenu(catKey, catLabel) {
-    const subData = SUBCOMPONENTS_DATA[catKey];
-    if (!subData?.modifications) return;
-    const items = subData.modifications.map(mod => ({
-      id: mod.id, name: mod.name, cost: mod.cost, priceLabel: `+$${mod.cost.toLocaleString()}`,
-      specs: `Mass Delta: ${mod.weight >= 0 ? "+" : ""}${mod.weight} kg`, desc: mod.desc, disabled: false
-    }));
-
-    this.openSelectionModal({
-      title: `Configure ${catLabel} Engineering Modification`,
-      subtitle: `Select specialized engineering modification package for ${catLabel}:`,
-      items, activeId: this.subSelections[catKey]?.modification,
-      onSelect: (id) => {
-        if (!this.subSelections[catKey]) this.subSelections[catKey] = {};
-        this.subSelections[catKey].modification = id;
-      }
-    });
   }
 }

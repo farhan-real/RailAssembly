@@ -1,111 +1,147 @@
-// Electric rolling stock component specifications with full technical descriptions
-const COMPONENTS_DATA = {
+// Core Electrical Traction Architecture: Power Collection, Conversion, and Propulsion
+const TRACTION_COMPONENTS_DATA = {
   pantograph: [
+    {
+      id: "panto_urban_dc",
+      name: "Low-Voltage DC Single-Arm Collector",
+      type: "pantograph",
+      voltage: "1.5kV DC",
+      maxSpeed: 120,
+      maxCurrentAmps: 2200,
+      weight: 240,
+      cost: 32000,
+      leadDays: 6,
+      supplier: "VanderPant Overhead Systems",
+      inHouseTech: null,
+      desc: "Low-mass collector designed for suburban 1.5kV DC catenary networks. Speed ceiling: 120 km/h."
+    },
     {
       id: "panto_std",
       name: "Single-Arm AC Pantograph",
       type: "pantograph",
-      voltage: "25 Kilovolt Alternating Current",
+      voltage: "25kV AC",
       maxSpeed: 200,
+      maxCurrentAmps: 1100,
       weight: 320,
       cost: 45000,
       leadDays: 7,
       supplier: "VanderPant Overhead Systems",
       inHouseTech: null,
-      desc: "Standard single-arm collector designed for 25kV 50Hz overhead catenary systems."
-    },
-    {
-      id: "panto_dual",
-      name: "Dual-System AC and DC Pantograph",
-      type: "pantograph",
-      voltage: "Dual-System (25kV AC / 3kV DC)",
-      maxSpeed: 280,
-      weight: 480,
-      cost: 85000,
-      leadDays: 14,
-      supplier: "Catenary Dynamics Corporation",
-      inHouseTech: "tech_multisystem",
-      desc: "Multi-voltage collector capable of dynamic switching between AC and DC networks."
+      desc: "Standard single-arm collector for 25kV 50Hz overhead wires. Speed ceiling: 200 km/h."
     },
     {
       id: "panto_freight",
       name: "Heavy-Duty Dual-Head Freight Collector",
       type: "pantograph",
-      voltage: "25 Kilovolt Alternating Current",
-      maxSpeed: 160,
+      voltage: "25kV AC",
+      maxSpeed: 140,
+      maxCurrentAmps: 2600,
       weight: 560,
       cost: 65000,
       leadDays: 11,
       supplier: "VanderPant Overhead Systems",
       inHouseTech: null,
-      desc: "Reinforced twin-strip head designed for sustained high current on freight grades."
+      desc: "Twin-strip heavy contact head providing sustained 2600A current for mineral freight. Speed ceiling: 140 km/h."
+    },
+    {
+      id: "panto_dual",
+      name: "Dual-System Multi-Voltage Collector",
+      type: "pantograph",
+      voltage: "Multi-System (25kV AC / 3kV DC)",
+      maxSpeed: 280,
+      maxCurrentAmps: 2400,
+      weight: 480,
+      cost: 85000,
+      leadDays: 14,
+      supplier: "Catenary Dynamics Corporation",
+      inHouseTech: "tech_multisystem",
+      desc: "Pneumatically actuated collector capable of dynamic switching between AC and DC. Speed ceiling: 280 km/h."
     },
     {
       id: "panto_hs",
       name: "Aerodynamic High-Speed Pantograph",
       type: "pantograph",
-      voltage: "25 Kilovolt Alternating Current",
+      voltage: "25kV AC",
       maxSpeed: 380,
+      maxCurrentAmps: 1300,
       weight: 290,
       cost: 160000,
       leadDays: 20,
       supplier: "AeroVolt High-Speed Technologies",
       inHouseTech: "tech_composite_chassis",
-      desc: "Carbon-profile collector engineered for reduced aerodynamic drag above 300 km/h."
+      desc: "Carbon-profile ultra-low drag collector engineered for 380 km/h high-speed express corridors."
     }
   ],
   transformer: [
+    {
+      id: "trans_none_dc",
+      name: "Direct DC Choke Filter & Reactor Unit",
+      type: "transformer",
+      powerRatingKw: 4200,
+      supportedVoltage: "1.5kV DC / 3kV DC",
+      efficiency: 0.99,
+      weight: 850,
+      cost: 75000,
+      leadDays: 8,
+      supplier: "TrafoTech Global AG",
+      inHouseTech: null,
+      desc: "Eliminates heavy AC magnetic cores for DC catenary networks with direct LC smoothing."
+    },
     {
       id: "trans_heavy",
       name: "Heavy-Duty Core Transformer",
       type: "transformer",
       powerRatingKw: 4200,
+      supportedVoltage: "25kV AC",
       efficiency: 0.92,
       weight: 5800,
       cost: 180000,
       leadDays: 18,
       supplier: "TrafoTech Global AG",
       inHouseTech: null,
-      desc: "Robust oil-immersed core transformer suited for freight locomotives."
-    },
-    {
-      id: "trans_regional",
-      name: "Medium Modular Regional Transformer",
-      type: "transformer",
-      powerRatingKw: 4800,
-      efficiency: 0.94,
-      weight: 4900,
-      cost: 240000,
-      leadDays: 20,
-      supplier: "TrafoTech Global AG",
-      inHouseTech: null,
-      desc: "Balanced footprint transformer engineered for interurban commuter trainsets."
+      desc: "Robust mineral-oil cooled iron core transformer suited for freight locomotives."
     },
     {
       id: "trans_compact",
       name: "Compact Underfloor Traction Transformer",
       type: "transformer",
       powerRatingKw: 5500,
+      supportedVoltage: "Multi-System (25kV AC / 3kV DC)",
       efficiency: 0.95,
       weight: 4100,
       cost: 320000,
       leadDays: 24,
       supplier: "Helvetia Electric Industries",
       inHouseTech: "tech_compact_transformer",
-      desc: "Low-profile underfloor transformer freeing passenger cabin volume."
+      desc: "Low-profile underfloor transformer freeing passenger cabin volume in multiple units."
+    },
+    {
+      id: "trans_freight_mega",
+      name: "Mega-Watt High-Traction Transformer",
+      type: "transformer",
+      powerRatingKw: 7500,
+      supportedVoltage: "25kV AC",
+      efficiency: 0.94,
+      weight: 7100,
+      cost: 410000,
+      leadDays: 26,
+      supplier: "TrafoTech Global AG",
+      inHouseTech: "tech_high_torque_motors",
+      desc: "Massive 7.5 MW core capable of supplying continuous full current to six traction inverters."
     },
     {
       id: "trans_solidstate",
       name: "Solid-State Electronic Matrix Transformer",
       type: "transformer",
-      powerRatingKw: 7200,
+      powerRatingKw: 8800,
+      supportedVoltage: "Multi-System (25kV AC / 3kV DC)",
       efficiency: 0.98,
       weight: 2600,
       cost: 580000,
       leadDays: 32,
       supplier: "QuantumPower Systems",
       inHouseTech: "tech_solid_state_trans",
-      desc: "Next-generation electronic power conversion replacing heavy mineral-oil iron cores."
+      desc: "Electronic high-frequency switching matrix transformer eliminating oil-core weight."
     }
   ],
   inverter: [
@@ -120,7 +156,7 @@ const COMPONENTS_DATA = {
       leadDays: 10,
       supplier: "StaticPulse Power Systems",
       inHouseTech: null,
-      desc: "Standard dual-level insulated-gate bipolar transistor converter with air cooling."
+      desc: "Baseline air-cooled inverter. Power limited to 3600 kW; bottlenecks larger motors."
     },
     {
       id: "inv_igbt_freight",
@@ -133,61 +169,61 @@ const COMPONENTS_DATA = {
       leadDays: 14,
       supplier: "StaticPulse Power Systems",
       inHouseTech: null,
-      desc: "Enhanced thermal mass converter capable of sustaining 150% peak starting torque."
+      desc: "Reinforced copper heat-sink inverter sustaining 150% peak starting current for heavy loads."
     },
     {
       id: "inv_igbt_liquid",
       name: "Liquid-Cooled Variable Frequency Inverter",
       type: "inverter",
-      maxKw: 6000,
+      maxKw: 6200,
       efficiency: 0.95,
       weight: 1950,
       cost: 260000,
       leadDays: 16,
       supplier: "StaticPulse Power Systems",
       inHouseTech: "tech_advanced_inverters",
-      desc: "High-power liquid-cooled traction converter delivering smooth motor torque regulation."
+      desc: "Smooth VVVF liquid-cooled converter delivering up to 6200 kW motor drive power."
     },
     {
       id: "inv_sic",
       name: "Silicon Carbide Power Module Inverter",
       type: "inverter",
-      maxKw: 8500,
+      maxKw: 8800,
       efficiency: 0.985,
       weight: 1200,
       cost: 510000,
       leadDays: 26,
       supplier: "Semiconductor Rail Dynamics",
       inHouseTech: "tech_sic_power",
-      desc: "High-efficiency silicon carbide MOSFET power converter with reduced thermal losses."
+      desc: "Next-gen SiC MOSFET converter with minimal thermal loss and full 8800 kW throughput."
     }
   ],
   motor: [
     {
+      id: "mot_ind_commuter",
+      name: "Lightweight Regional Induction Motor",
+      type: "motor",
+      powerKw: 2800,
+      maxRpmSpeed: 170,
+      weight: 2400,
+      cost: 80000,
+      leadDays: 10,
+      supplier: "Nordic Traction Motors",
+      inHouseTech: null,
+      desc: "Compact asynchronous motor suited for frequent station starts. Max speed limit: 170 km/h."
+    },
+    {
       id: "mot_ind_basic",
       name: "Three-Phase Asynchronous Induction Motor",
       type: "motor",
-      powerKw: 3200,
-      maxRpmSpeed: 180,
+      powerKw: 3600,
+      maxRpmSpeed: 190,
       weight: 3400,
       cost: 95000,
       leadDays: 12,
       supplier: "Nordic Traction Motors",
       inHouseTech: null,
-      desc: "Durable squirrel-cage induction motor with low maintenance requirements."
-    },
-    {
-      id: "mot_ind_commuter",
-      name: "Lightweight Regional Induction Motor",
-      type: "motor",
-      powerKw: 4200,
-      maxRpmSpeed: 210,
-      weight: 3100,
-      cost: 145000,
-      leadDays: 15,
-      supplier: "Nordic Traction Motors",
-      inHouseTech: null,
-      desc: "Optimized for frequent stop-and-go acceleration profiles."
+      desc: "Sturdy induction motor requiring at least 3600 kW inverter output. Max speed limit: 190 km/h."
     },
     {
       id: "mot_ind_highoutput",
@@ -200,7 +236,7 @@ const COMPONENTS_DATA = {
       leadDays: 18,
       supplier: "Nordic Traction Motors",
       inHouseTech: "tech_high_torque_motors",
-      desc: "Reinforced copper rotor construction engineered for high starting tractive effort."
+      desc: "Heavy-duty copper rotor delivering high tractive force. Max speed limit: 230 km/h."
     },
     {
       id: "mot_pmsm",
@@ -213,246 +249,48 @@ const COMPONENTS_DATA = {
       leadDays: 28,
       supplier: "MagnaDrive Electric",
       inHouseTech: "tech_pmsm_traction",
-      desc: "High-power-density synchronous motor enabling rapid express acceleration."
+      desc: "Ultra-high power density motor for high-speed express trainsets. Max speed limit: 360 km/h."
     }
   ],
-  bogie: [
+  auxiliary: [
     {
-      id: "bog_co_co",
-      name: "Six-Axle Heavy Haul Bogie Assembly",
-      type: "bogie",
-      axles: 6,
-      maxAxleLoadTons: 25.0,
-      maxSafeSpeed: 140,
-      cost: 140000,
-      weight: 18000,
-      leadDays: 15,
-      supplier: "CastIron Engineering Works",
-      inHouseTech: null,
-      desc: "Six high-capacity wheelsets delivering maximum rail adhesion for heavy mineral transport."
-    },
-    {
-      id: "bog_bo_bo_standard",
-      name: "Four-Axle Commuter Bogie Assembly",
-      type: "bogie",
-      axles: 4,
-      maxAxleLoadTons: 19.0,
-      maxSafeSpeed: 180,
-      cost: 130000,
-      weight: 12500,
-      leadDays: 14,
-      supplier: "CastIron Engineering Works",
-      inHouseTech: null,
-      desc: "Simple four-axle frame optimized for suburban and regional commuter fleets."
-    },
-    {
-      id: "bog_bo_bo",
-      name: "Four-Axle Express Flexicoil Bogie Assembly",
-      type: "bogie",
-      axles: 4,
-      maxAxleLoadTons: 20.0,
-      maxSafeSpeed: 220,
-      cost: 175000,
-      weight: 11000,
-      leadDays: 16,
-      supplier: "CastIron Engineering Works",
-      inHouseTech: null,
-      desc: "Secondary air-suspension bogie optimized for smooth high-speed passenger ride."
-    },
-    {
-      id: "bog_articulated",
-      name: "Four-Axle Radial Steering High-Speed Bogie",
-      type: "bogie",
-      axles: 4,
-      maxAxleLoadTons: 17.5,
-      maxSafeSpeed: 350,
-      cost: 380000,
-      weight: 8500,
-      leadDays: 25,
-      supplier: "Stadler Dynamics AG",
-      inHouseTech: "tech_radial_bogies",
-      desc: "Self-steering axles reducing curve flange wear and increasing curve speed limits."
-    }
-  ],
-  carbody: [
-    {
-      id: "body_steel",
-      name: "Welded Structural Steel Monocoque Carbody",
-      type: "carbody",
-      dragCd: 0.52,
-      passengerCap: 0,
-      cargoCapacityTons: 90,
-      weight: 24000,
-      cost: 160000,
-      leadDays: 14,
-      supplier: "Standard Industrial Foundry",
-      inHouseTech: null,
-      desc: "High-yield structural carbon steel chassis designed for heavy freight locomotives."
-    },
-    {
-      id: "body_steel_passenger",
-      name: "Stainless Steel Single-Deck Passenger Coach",
-      type: "carbody",
-      dragCd: 0.42,
-      passengerCap: 220,
-      cargoCapacityTons: 10,
-      weight: 19500,
-      cost: 210000,
-      leadDays: 16,
-      supplier: "Standard Industrial Foundry",
-      inHouseTech: null,
-      desc: "Corrosion-resistant corrugated stainless steel shell for commuter service."
-    },
-    {
-      id: "body_aluminum",
-      name: "Hollow Extruded Aluminum Carbody Shell",
-      type: "carbody",
-      dragCd: 0.34,
-      passengerCap: 280,
-      cargoCapacityTons: 15,
-      weight: 14000,
-      cost: 290000,
-      leadDays: 20,
-      supplier: "AeroAlloy Trainworks",
-      inHouseTech: "tech_aluminum_extrusion",
-      desc: "Lightweight extruded aluminum profile body shell built for multiple units."
-    },
-    {
-      id: "body_aero_cf",
-      name: "Carbon-Fiber Composite Aerodynamic Nose Body",
-      type: "carbody",
-      dragCd: 0.22,
-      passengerCap: 340,
-      cargoCapacityTons: 10,
-      weight: 10500,
-      cost: 650000,
-      leadDays: 30,
-      supplier: "AeroAlloy Trainworks",
-      inHouseTech: "tech_composite_chassis",
-      desc: "Streamlined aerodynamic front profile engineered to minimize tunnel waves."
-    }
-  ],
-  brakes: [
-    {
-      id: "brk_disc_basic",
-      name: "Standard Pneumatic Triple-Valve Disc Brakes",
-      type: "brakes",
-      regenEfficiency: 0.12,
-      safetyIndex: 78,
-      weight: 2600,
-      cost: 45000,
-      leadDays: 7,
-      supplier: "Bremse Systems International",
-      inHouseTech: null,
-      desc: "Traditional pneumatic brake pipe system with mechanical discs."
-    },
-    {
-      id: "brk_disc_regen",
-      name: "Blended Regenerative and Pneumatic Disc Brakes",
-      type: "brakes",
-      regenEfficiency: 0.22,
-      safetyIndex: 85,
-      weight: 2200,
-      cost: 60000,
-      leadDays: 8,
-      supplier: "Bremse Systems International",
-      inHouseTech: null,
-      desc: "Recovers electrical kinetic energy to the catenary while maintaining fail-safe discs."
-    },
-    {
-      id: "brk_eddy_current",
-      name: "Electromagnetic Linear Track and Ceramic Brakes",
-      type: "brakes",
-      regenEfficiency: 0.35,
-      safetyIndex: 98,
-      weight: 1800,
-      cost: 190000,
-      leadDays: 18,
-      supplier: "Bremse Systems International",
-      inHouseTech: "tech_regenerative_grid",
-      desc: "Frictionless electromagnetic rail brake providing high deceleration rates."
-    }
-  ],
-  battery: [
-    {
-      id: "bat_none",
-      name: "Continuous Catenary Powered (No Auxiliary Battery)",
-      type: "battery",
-      kwh: 0,
-      rangeKm: 0,
+      id: "aux_none",
+      name: "None (Direct Low-Voltage Line Taps)",
+      type: "auxiliary",
+      isOptional: true,
+      powerKw: 0,
       weight: 0,
       cost: 0,
       leadDays: 0,
-      supplier: "Direct Wire Configuration",
+      supplier: "Internal Standard",
       inHouseTech: null,
-      desc: "Locomotive operates exclusively while connected to energized catenary."
+      desc: "No auxiliary converter. Relies on minimal battery bus for basic electronics."
     },
     {
-      id: "bat_lfp_lastmile",
-      name: "Lithium Iron Phosphate Auxiliary Traction Pack",
-      type: "battery",
-      kwh: 350,
-      rangeKm: 35,
-      weight: 2900,
-      cost: 130000,
+      id: "aux_std_static",
+      name: "Static Auxiliary Inverter (180 kVA)",
+      type: "auxiliary",
+      isOptional: true,
+      powerKw: 180,
+      weight: 480,
+      cost: 35000,
+      leadDays: 8,
+      supplier: "StaticPulse Power Systems",
+      inHouseTech: null,
+      desc: "Supplies stable low-voltage AC/DC power for headlights, cab displays, and air compressors."
+    },
+    {
+      id: "aux_hvac_commercial",
+      name: "High-Capacity Dual-Channel APS (450 kVA)",
+      type: "auxiliary",
+      isOptional: true,
+      powerKw: 450,
+      weight: 920,
+      cost: 85000,
       leadDays: 14,
-      supplier: "VoltaRail Storage Systems",
-      inHouseTech: "tech_battery_traction",
-      desc: "Provides self-propelled last-mile shunting across non-electrified sidings."
-    },
-    {
-      id: "bat_nmc_intercity",
-      name: "High-Capacity Traction Energy Storage System",
-      type: "battery",
-      kwh: 1100,
-      rangeKm: 110,
-      weight: 6200,
-      cost: 380000,
-      leadDays: 24,
-      supplier: "VoltaRail Storage Systems",
-      inHouseTech: "tech_intercity_battery",
-      desc: "High-energy density module designed to span non-electrified gaps on branch lines."
-    }
-  ],
-  tcms: [
-    {
-      id: "tcms_basic",
-      name: "Relay Microprocessor Control Unit",
-      type: "tcms",
-      automationLevel: "Manual Operation (Grade 1)",
-      reliabilityBonus: 0,
-      weight: 350,
-      cost: 50000,
-      leadDays: 7,
-      supplier: "RailLogic Electronics Group",
-      inHouseTech: null,
-      desc: "Standard train control and monitoring architecture with hardware relay logic."
-    },
-    {
-      id: "tcms_etcs2",
-      name: "Automatic Train Protection System (ETCS Level 2)",
-      type: "tcms",
-      automationLevel: "Semi-Automated Operation (Grade 2)",
-      reliabilityBonus: 12,
-      weight: 220,
-      cost: 180000,
-      leadDays: 15,
-      supplier: "RailLogic Electronics Group",
-      inHouseTech: "tech_etcs_automation",
-      desc: "Continuous radio-block signaling supervision and automatic cab speed enforcement."
-    },
-    {
-      id: "tcms_cbtc_ai",
-      name: "Autonomous Automated Train Operation System",
-      type: "tcms",
-      automationLevel: "Unattended Driverless Operation (Grade 4)",
-      reliabilityBonus: 25,
-      weight: 180,
-      cost: 390000,
-      leadDays: 24,
-      supplier: "CyberTransit Systems",
-      inHouseTech: "tech_driverless_ato",
-      desc: "Full automated train operation with neural adhesion control and coasting optimization."
+      supplier: "Helvetia Electric Industries",
+      inHouseTech: "tech_advanced_inverters",
+      desc: "Powers multi-coach passenger air conditioning, galley equipment, and redundant compressors."
     }
   ]
 };

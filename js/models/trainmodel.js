@@ -9,7 +9,12 @@ class TrainModelCalc {
 
     const baseComponents = {};
     for (const catKey in slots) {
-      const comp = state.findComponentById(slots[catKey]) || COMPONENTS_DATA[catKey][0];
+      const compId = slots[catKey];
+      if (!compId || compId === "bat_none" || compId === "res_none" || compId === "aux_none") {
+        baseComponents[catKey] = COMPONENTS_DATA[catKey]?.find(c => c.id === compId) || { weight: 0, cost: 0, powerRatingKw: 9999, maxKw: 9999, efficiency: 1.0 };
+        continue;
+      }
+      const comp = state.findComponentById(compId) || COMPONENTS_DATA[catKey][0];
       baseComponents[catKey] = comp;
       motorCarWeightKg += comp.weight || 0;
       motorCarBOMCost += comp.cost || 0;
@@ -36,7 +41,9 @@ class TrainModelCalc {
       }
     }
 
-    const { pantograph: panto, transformer: trans, inverter: inv, motor, bogie, carbody: body, brakes, battery, tcms } = baseComponents;
+    // System validation and power-flow bottlenecks
+    const diagnostics = TrainValidator.validateSystemIntegrity(baseComponents);
+    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms } = baseComponents;
     const isTrainset = rollingStockType === "trainset" && consistConfig?.carriages?.length > 0;
     const carriageCount = isTrainset ? consistConfig.carriages.length : 1;
 
@@ -80,19 +87,23 @@ class TrainModelCalc {
     const axleLoad = Number((totalMassTons / totalAxles).toFixed(2));
     const axleOverloaded = axleLoad > bogie.maxAxleLoadTons;
 
-    const singlePackKw = Math.min(motor.powerKw, inv.maxKw, trans.powerRatingKw);
+    // Power Calculation Throttled by Electrical Chain Bottlenecks
+    const singlePackKw = diagnostics.effectiveMotorPowerKw;
     const availablePowerKw = isTrainset ? (poweredCarCount * singlePackKw) : singlePackKw;
     const horsepower = Math.round(availablePowerKw * 1.341);
 
-    let totalEfficiency = Number((trans.efficiency * inv.efficiency * 0.96 + efficiencyBonusTotal).toFixed(3));
+    let totalEfficiency = Number((0.92 + efficiencyBonusTotal).toFixed(3));
     totalEfficiency = Math.min(0.99, Math.max(0.70, totalEfficiency));
 
+    // Consist Aerodynamics & Speed Limits Check
     const baseCd = body.dragCd;
     const consistCd = isTrainset ? Number((baseCd + (carriageCount - 1) * 0.035).toFixed(3)) : baseCd;
     let theoreticalSpeed = Math.round(
       Math.pow((availablePowerKw * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
     ) + speedBonusTotal;
-    theoreticalSpeed = Math.min(theoreticalSpeed, motor.maxRpmSpeed + speedBonusTotal, bogie.maxSafeSpeed + speedBonusTotal, panto.maxSpeed + speedBonusTotal);
+
+    // Apply Hard Physical Component Speed Ceilings (Pantograph, Bogie, Motor RPM)
+    theoreticalSpeed = Math.min(theoreticalSpeed, diagnostics.strictSpeedLimit + speedBonusTotal);
     if (axleOverloaded) theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
 
     const adhesiveMassTons = isTrainset ? Number(((poweredCarCount * motorCarWeightKg) / 1000).toFixed(1)) : totalMassTons;
@@ -113,11 +124,12 @@ class TrainModelCalc {
       totalEfficiency, maxAdhesionKn, acceleration,
       bomCost: totalBOMCost, passengerCap,
       cargoCapacityTons: isTrainset ? 0 : body.cargoCapacityTons,
-      batteryRangeKm: battery.rangeKm,
-      safetyScore: brakes.safetyIndex + (tcms.reliabilityBonus || 0) + safetyBonusTotal,
+      batteryRangeKm: battery?.rangeKm || 0,
+      safetyScore: (brakes?.safetyIndex || 80) + (tcms?.reliabilityBonus || 0) + safetyBonusTotal,
       components: baseComponents,
       subSelections: JSON.parse(JSON.stringify(subSelections)),
-      consistConfig: consistConfig ? JSON.parse(JSON.stringify(consistConfig)) : null
+      consistConfig: consistConfig ? JSON.parse(JSON.stringify(consistConfig)) : null,
+      diagnostics
     };
   }
 
