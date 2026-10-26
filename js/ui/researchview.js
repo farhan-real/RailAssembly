@@ -1,4 +1,4 @@
-// Interactive Mindustry-Style Visual Research Tree Controller with Live Progress
+// Interactive Visual Research Tree Controller with High-Visibility Dependency Guides
 class ResearchView {
   static canvasInstance = null;
   static selectedNode = null;
@@ -14,7 +14,13 @@ class ResearchView {
         <div class="tree-hud-controls">
           <button class="tree-hud-btn" id="hud-zoom-in" title="Zoom In">+</button>
           <button class="tree-hud-btn" id="hud-zoom-out" title="Zoom Out">&minus;</button>
-          <button class="tree-hud-btn" id="hud-center-core" title="Center Core">Center Core</button>
+          <button class="tree-hud-btn" id="hud-center-core">Core</button>
+          <button class="tree-hud-btn" data-track="aerodynamics">Aero</button>
+          <button class="tree-hud-btn" data-track="electronics">Power</button>
+          <button class="tree-hud-btn" data-track="motors">Motors</button>
+          <button class="tree-hud-btn" data-track="running_gear">Bogies</button>
+          <button class="tree-hud-btn" data-track="power_collection">Panto</button>
+          <button class="tree-hud-btn" data-track="automation">TCMS</button>
         </div>
 
         <div class="tree-inspector-panel ${this.isInspectorCollapsed ? "is-collapsed" : ""}" id="tree-inspector"></div>
@@ -37,6 +43,16 @@ class ResearchView {
       this.inspectNode(TREE_STRUCTURE.core, container);
     };
 
+    container.querySelectorAll("[data-track]").forEach(btn => {
+      btn.onclick = () => {
+        const trackKey = btn.getAttribute("data-track");
+        const branchDef = TREE_STRUCTURE.branches.find(b => b.key === trackKey);
+        if (branchDef && branchDef.target) {
+          this.canvasInstance.centerOnNode(branchDef.target);
+        }
+      };
+    });
+
     container.querySelector("#btn-show-inspector").onclick = () => {
       this.isInspectorCollapsed = false;
       const targetNode = this.selectedNode || TREE_STRUCTURE.core;
@@ -56,8 +72,7 @@ class ResearchView {
 
     const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
     const progressPercent = activeTech && state.researchTotalDays > 0
-      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
-      : 0;
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100) : 0;
 
     banner.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -85,17 +100,15 @@ class ResearchView {
 
     const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
     const progressPercent = activeTech && state.researchTotalDays > 0
-      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
-      : 0;
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100) : 0;
 
     const titleEl = document.getElementById("tree-active-title");
     const progressEl = document.getElementById("tree-active-progress");
     const barEl = document.getElementById("tree-active-bar");
 
     if (activeTech) {
-      if (!barEl) {
-        this.updateBanner();
-      } else {
+      if (!barEl) this.updateBanner();
+      else {
         if (titleEl) titleEl.textContent = `${activeTech.name} ($${activeTech.costMoney.toLocaleString()})`;
         if (progressEl) {
           progressEl.textContent = `${state.researchDaysLeft} Days Remaining (${progressPercent}%)`;
@@ -104,9 +117,8 @@ class ResearchView {
         barEl.style.width = `${progressPercent}%`;
       }
     } else {
-      if (barEl) {
-        this.updateBanner();
-      } else {
+      if (barEl) this.updateBanner();
+      else {
         if (titleEl) titleEl.textContent = "Research Tree Idle";
         if (progressEl) {
           progressEl.textContent = "No Active Project";
@@ -115,9 +127,7 @@ class ResearchView {
       }
     }
 
-    if (this.canvasInstance) {
-      this.canvasInstance.updateNodeStates();
-    }
+    if (this.canvasInstance) this.canvasInstance.updateNodeStates();
 
     if (this.selectedNode && document.getElementById("tree-inspector")) {
       const liveBtn = document.getElementById("btn-fund-inspected-node");
@@ -129,13 +139,9 @@ class ResearchView {
 
   static onTechUnlocked() {
     this.updateBanner();
-    if (this.canvasInstance) {
-      this.canvasInstance.updateNodeStates();
-    }
+    if (this.canvasInstance) this.canvasInstance.updateNodeStates();
     const container = document.getElementById("viewport-root");
-    if (container && this.selectedNode) {
-      this.inspectNode(this.selectedNode, container);
-    }
+    if (container && this.selectedNode) this.inspectNode(this.selectedNode, container);
   }
 
   static bindPanelEvents(container) {
@@ -152,9 +158,7 @@ class ResearchView {
     const toggleBtn = container.querySelector("#btn-show-inspector");
     if (!inspector) return;
 
-    if (this.canvasInstance) {
-      this.canvasInstance.setSelectedNode(node.id);
-    }
+    if (this.canvasInstance) this.canvasInstance.setSelectedNode(node.id);
 
     if (this.isInspectorCollapsed) {
       inspector.classList.add("is-collapsed");
@@ -170,14 +174,11 @@ class ResearchView {
     const prereqsMet = !node.prereq || node.prereq.every(p => state.unlockedTechs.has(p));
     const isLocked = !prereqsMet && !isResearched;
 
-    const prereqNames = (node.prereq || []).map(pId => {
-      const pNode = TECH_DATA.find(n => n.id === pId);
-      return pNode ? pNode.name : pId;
-    });
+    const prereqNodes = (node.prereq || []).map(pId => TECH_DATA.find(n => n.id === pId)).filter(Boolean);
+    const childNodes = TECH_DATA.filter(n => n.prereq && n.prereq.includes(node.id));
 
     const progressPercent = isActive && state.researchTotalDays > 0
-      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
-      : 0;
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100) : 0;
 
     inspector.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -193,31 +194,48 @@ class ResearchView {
         </div>
       </div>
 
-      <p class="text-muted" style="font-size:10px; line-height:1.4; margin-bottom:10px;">${node.desc}</p>
+      <p class="text-muted" style="font-size:10px; line-height:1.4; margin-bottom:8px;">${node.desc}</p>
 
-      <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); padding:6px 10px; border-radius:var(--radius-xs); margin-bottom:10px; font-size:10px; display:flex; flex-direction:column; gap:4px;">
+      <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); padding:6px 10px; border-radius:var(--radius-xs); margin-bottom:8px; font-size:10px; display:flex; flex-direction:column; gap:4px;">
         <div style="display:flex; justify-content:space-between;">
-          <span class="text-muted">Development Cost:</span>
+          <span class="text-muted">Development Capital:</span>
           <strong class="font-mono text-warning">${node.costMoney > 0 ? `$${node.costMoney.toLocaleString()}` : "Zero (Core Baseline)"}</strong>
         </div>
         <div style="display:flex; justify-content:space-between;">
           <span class="text-muted">Engineering Duration:</span>
           <strong class="font-mono text-blue">${node.durationDays > 0 ? `${node.durationDays} Days` : "Zero Days"}</strong>
         </div>
-        ${prereqNames.length > 0 ? `
-          <div style="margin-top:2px; font-size:9px;">
-            <span class="text-muted">Prerequisites:</span>
-            <span style="color:var(--text-main);">${prereqNames.join(", ")}</span>
-          </div>
-        ` : ""}
       </div>
 
+      ${prereqNodes.length > 0 ? `
+        <div style="margin-bottom:8px;">
+          <span class="text-muted" style="font-size:9px; text-transform:uppercase; font-weight:700;">Direct Prerequisites (Incoming Flow):</span>
+          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:3px;">
+            ${prereqNodes.map(p => {
+              const pRes = state.unlockedTechs.has(p.id);
+              return `<button class="c-btn ${pRes ? "btn-ghost" : "btn-primary"} btn-sm btn-jump-node" data-jump="${p.id}" style="font-size:9.5px; padding:2px 6px;">${pRes ? "✓" : "🔒"} ${p.name.substring(0, 24)}…</button>`;
+            }).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      ${childNodes.length > 0 ? `
+        <div style="margin-bottom:8px;">
+          <span class="text-muted" style="font-size:9px; text-transform:uppercase; font-weight:700;">Unlocks Next In Branch (Outgoing Flow):</span>
+          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:3px;">
+            ${childNodes.map(c => `
+              <button class="c-btn btn-ghost btn-sm btn-jump-node" data-jump="${c.id}" style="font-size:9.5px; padding:2px 6px;">&rarr; ${c.name.substring(0, 24)}…</button>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
       ${node.unlocks && node.unlocks.length > 0 ? `
-        <div style="margin-bottom:10px;">
-          <span class="text-muted" style="font-size:9px; text-transform:uppercase; font-weight:700;">Unlocked Component Blueprints:</span>
-          <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px;">
+        <div style="margin-bottom:8px;">
+          <span class="text-muted" style="font-size:9px; text-transform:uppercase; font-weight:700;">Component Blueprints Unlocked:</span>
+          <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:3px;">
             ${node.unlocks.map(uId => {
-              const comp = state.findComponentById(uId);
+              const comp = state.findComponentById(uId) || state.findSubcomponentOrMod(uId);
               return `<span class="c-badge badge-blue" style="font-size:8px;">${comp ? comp.name : uId}</span>`;
             }).join("")}
           </div>
@@ -240,15 +258,24 @@ class ResearchView {
       if (toggleBtn) toggleBtn.classList.remove("hidden");
     };
 
-    inspector.querySelector("#btn-center-on-node").onclick = () => {
-      this.canvasInstance.centerOnNode(node);
-    };
+    inspector.querySelector("#btn-center-on-node").onclick = () => this.canvasInstance.centerOnNode(node);
+
+    inspector.querySelectorAll(".btn-jump-node").forEach(btn => {
+      btn.onclick = () => {
+        const targetId = btn.getAttribute("data-jump");
+        const targetNode = TECH_DATA.find(n => n.id === targetId);
+        if (targetNode) {
+          this.canvasInstance.centerOnNode(targetNode);
+          this.inspectNode(targetNode, container);
+        }
+      };
+    });
 
     const fundBtn = inspector.querySelector("#btn-fund-inspected-node");
     if (fundBtn && !isActive) {
       fundBtn.onclick = () => {
         if (state.activeResearchId && state.activeResearchId !== node.id) {
-          UI.toast(`Research Tree Occupied: Current project must finish first (${state.researchDaysLeft} days left).`, "danger");
+          UI.toast(`Research Directorate Busy: Current project must finish first (${state.researchDaysLeft} days left).`, "danger");
           return;
         }
 
@@ -258,9 +285,7 @@ class ResearchView {
           UI.toast(`Research Tree: ${node.name} funded ($${node.costMoney.toLocaleString()}). Completion in ${node.durationDays} days.`, "success");
           this.updateBanner();
           this.inspectNode(node, container);
-          if (this.canvasInstance) {
-            this.canvasInstance.updateNodeStates();
-          }
+          if (this.canvasInstance) this.canvasInstance.updateNodeStates();
         } else {
           UI.toast(res.reason, "danger");
         }

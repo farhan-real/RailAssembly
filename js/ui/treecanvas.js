@@ -1,4 +1,4 @@
-// Interactive Pan-Zoom Mindustry-Style Visual Tech Tree Graph Canvas
+// Interactive Pan-Zoom Visual Research Tree with Smooth Bezier Connectors & Directional Arrows
 class TreeCanvas {
   constructor(viewportEl, onNodeSelect) {
     this.viewport = viewportEl;
@@ -7,7 +7,6 @@ class TreeCanvas {
     this.svgLayer = null;
     this.selectedNodeId = "tech_core";
 
-    // Viewport coordinates
     this.panX = -500;
     this.panY = -450;
     this.scale = 0.85;
@@ -20,17 +19,66 @@ class TreeCanvas {
 
     this.surface = document.createElement("div");
     this.surface.className = "tree-canvas-surface";
-    this.surface.style.width = "3400px";
-    this.surface.style.height = "2600px";
 
     this.svgLayer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     this.svgLayer.setAttribute("class", "tree-svg-layer");
+    this.svgLayer.appendChild(this.createArrowDefs());
     this.surface.appendChild(this.svgLayer);
 
     this.viewport.appendChild(this.surface);
+    this.renderTrackBanners();
     this.bindGestures();
     this.renderGraph();
     this.updateTransform();
+  }
+
+  createArrowDefs() {
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    const colors = [
+      { id: "arrow-locked", fill: "#1e293d" },
+      { id: "arrow-active", fill: "#3b82f6" },
+      { id: "arrow-researched", fill: "#10b981" },
+      { id: "arrow-prereq", fill: "#60a5fa" },
+      { id: "arrow-unlock", fill: "#f59e0b" }
+    ];
+
+    colors.forEach(c => {
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+      marker.setAttribute("id", c.id);
+      marker.setAttribute("viewBox", "0 0 10 10");
+      marker.setAttribute("refX", "26");
+      marker.setAttribute("refY", "5");
+      marker.setAttribute("markerWidth", "5");
+      marker.setAttribute("markerHeight", "5");
+      marker.setAttribute("orient", "auto");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M 0 1 L 9 5 L 0 9 z");
+      path.setAttribute("fill", c.fill);
+      marker.appendChild(path);
+      defs.appendChild(marker);
+    });
+
+    return defs;
+  }
+
+  renderTrackBanners() {
+    const banners = [
+      { text: "Track 1: Aerodynamics & Nose Cones", x: 1400, y: 160 },
+      { text: "Track 2: Power Electronics & Converters", x: 740, y: 20 },
+      { text: "Track 3: High-RPM Traction Motors & Rotors", x: 2160, y: 780 },
+      { text: "Track 4: Bogies, Transmissions & Brakes", x: 2160, y: 1720 },
+      { text: "Track 5: Pantographs & Power Collection", x: 1400, y: 2240 },
+      { text: "Track 6: Automation, Safety & TCMS", x: 740, y: 1720 }
+    ];
+
+    banners.forEach(b => {
+      const el = document.createElement("div");
+      el.className = "tree-track-banner";
+      el.style.left = `${b.x}px`;
+      el.style.top = `${b.y}px`;
+      el.textContent = b.text;
+      this.surface.appendChild(el);
+    });
   }
 
   bindGestures() {
@@ -43,7 +91,7 @@ class TreeCanvas {
     let pendingNode = null;
 
     this.viewport.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".tree-hud-controls") || e.target.closest(".tree-inspector-panel")) return;
+      if (e.target.closest(".tree-hud-controls") || e.target.closest(".tree-inspector-panel") || e.target.closest(".tree-inspector-toggle-btn")) return;
       isDown = true;
       didDrag = false;
       startX = e.clientX;
@@ -52,12 +100,7 @@ class TreeCanvas {
       initialPanY = this.panY;
 
       const glyph = e.target.closest(".tree-node-glyph");
-      if (glyph) {
-        const nodeId = glyph.getAttribute("data-id");
-        pendingNode = TECH_DATA.find(n => n.id === nodeId) || null;
-      } else {
-        pendingNode = null;
-      }
+      pendingNode = glyph ? (TECH_DATA.find(n => n.id === glyph.getAttribute("data-id")) || null) : null;
     });
 
     window.addEventListener("pointermove", (e) => {
@@ -134,6 +177,7 @@ class TreeCanvas {
     this.surface.querySelectorAll(".tree-node-glyph").forEach(el => {
       el.classList.toggle("is-selected", el.getAttribute("data-id") === nodeId);
     });
+    this.highlightDependencies(nodeId);
   }
 
   selectNode(node) {
@@ -144,11 +188,30 @@ class TreeCanvas {
     }
   }
 
+  highlightDependencies(nodeId) {
+    if (!this.svgLayer) return;
+    this.svgLayer.querySelectorAll(".tree-link-path").forEach(path => {
+      path.classList.remove("link-dependency-in", "link-dependency-out");
+      const parentId = path.getAttribute("data-parent");
+      const childId = path.getAttribute("data-child");
+
+      if (childId === nodeId) {
+        path.classList.add("link-dependency-in");
+        path.setAttribute("marker-end", "url(#arrow-prereq)");
+      } else if (parentId === nodeId) {
+        path.classList.add("link-dependency-out");
+        path.setAttribute("marker-end", "url(#arrow-unlock)");
+      } else {
+        const markerType = path.getAttribute("data-base-marker") || "arrow-locked";
+        path.setAttribute("marker-end", `url(#${markerType})`);
+      }
+    });
+  }
+
   zoomBy(factor) {
     const rect = this.viewport.getBoundingClientRect();
     const centerX = (rect.width || 800) / 2;
     const centerY = (rect.height || 600) / 2;
-
     const worldX = (centerX - this.panX) / this.scale;
     const worldY = (centerY - this.panY) / this.scale;
 
@@ -156,21 +219,15 @@ class TreeCanvas {
     this.panX = centerX - worldX * newScale;
     this.panY = centerY - worldY * newScale;
     this.scale = newScale;
-
     this.updateTransform();
   }
 
   updateNodeStates() {
     if (!this.surface || !this.svgLayer) return;
-    const allNodes = TECH_DATA;
-    const nodeMap = new Map();
-    allNodes.forEach(n => nodeMap.set(n.id, n));
-
     const progressPercent = state.activeResearchId && state.researchTotalDays > 0
-      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
-      : 0;
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100) : 0;
 
-    allNodes.forEach(node => {
+    TECH_DATA.forEach(node => {
       const glyph = this.surface.querySelector(`.tree-node-glyph[data-id="${node.id}"]`);
       if (!glyph) return;
 
@@ -181,17 +238,12 @@ class TreeCanvas {
       const isCore = node.id === "tech_core";
       const isSelected = this.selectedNodeId === node.id;
 
-      let stateClass = "state-locked";
-      if (isResearched) stateClass = "state-researched";
-      else if (isActive) stateClass = "state-active";
-      else if (prereqsMet) stateClass = "state-available";
-
-      glyph.className = `tree-node-glyph ${stateClass} ${isCore ? "is-core" : ""} ${isSelected ? "is-selected" : ""}`;
+      glyph.className = `tree-node-glyph ${isCore ? "is-core" : ""} ${isSelected ? "is-selected" : ""} ${
+        isResearched ? "state-researched" : (isActive ? "state-active" : (prereqsMet ? "state-available" : "state-locked"))
+      }`;
 
       const iconSpan = glyph.querySelector(".tree-glyph-icon");
-      if (iconSpan) {
-        iconSpan.textContent = isCore ? "⬢" : (isResearched ? "✓" : (isActive ? "⚡" : (isLocked ? "🔒" : "◈")));
-      }
+      if (iconSpan) iconSpan.textContent = isCore ? "⬢" : (isResearched ? "✓" : (isActive ? "⚡" : (isLocked ? "🔒" : "◈")));
 
       let miniBar = glyph.querySelector(".tree-node-mini-bar");
       if (isActive) {
@@ -208,39 +260,17 @@ class TreeCanvas {
       }
     });
 
-    const pathElements = this.svgLayer.querySelectorAll(".tree-link-path");
-    let linkIdx = 0;
-    allNodes.forEach(node => {
-      if (!node.prereq || node.prereq.length === 0) return;
-      node.prereq.forEach(parentId => {
-        const parent = nodeMap.get(parentId);
-        if (!parent) return;
-        const pathEl = pathElements[linkIdx++];
-        if (!pathEl) return;
-
-        const isParentResearched = state.unlockedTechs.has(parent.id);
-        const isChildResearched = state.unlockedTechs.has(node.id);
-        const isChildActive = state.activeResearchId === node.id;
-
-        let statusClass = "link-locked";
-        if (isChildResearched) statusClass = "link-researched";
-        else if (isParentResearched && isChildActive) statusClass = "link-active";
-        else if (isParentResearched) statusClass = "link-active";
-
-        pathEl.setAttribute("class", `tree-link-path ${statusClass}`);
-      });
-    });
+    this.highlightDependencies(this.selectedNodeId);
   }
 
   renderGraph() {
-    this.svgLayer.innerHTML = "";
     this.surface.querySelectorAll(".tree-node-glyph").forEach(el => el.remove());
+    this.svgLayer.querySelectorAll(".tree-link-path").forEach(el => el.remove());
 
-    const allNodes = TECH_DATA;
     const nodeMap = new Map();
-    allNodes.forEach(n => nodeMap.set(n.id, n));
+    TECH_DATA.forEach(n => nodeMap.set(n.id, n));
 
-    allNodes.forEach(node => {
+    TECH_DATA.forEach(node => {
       if (!node.prereq || node.prereq.length === 0) return;
 
       node.prereq.forEach(parentId => {
@@ -252,19 +282,23 @@ class TreeCanvas {
         const isChildActive = state.activeResearchId === node.id;
 
         let statusClass = "link-locked";
-        if (isChildResearched) statusClass = "link-researched";
-        else if (isParentResearched && isChildActive) statusClass = "link-active";
-        else if (isParentResearched) statusClass = "link-active";
+        let markerId = "arrow-locked";
+        if (isChildResearched) { statusClass = "link-researched"; markerId = "arrow-researched"; }
+        else if (isParentResearched) { statusClass = "link-active"; markerId = "arrow-active"; }
 
-        const pathData = this.getOrthogonalCircuitPath(parent.x, parent.y, node.x, node.y);
+        const pathData = this.getSmoothCurvePath(parent.x, parent.y, node.x, node.y);
         const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
         pathEl.setAttribute("d", pathData);
         pathEl.setAttribute("class", `tree-link-path ${statusClass}`);
+        pathEl.setAttribute("data-parent", parent.id);
+        pathEl.setAttribute("data-child", node.id);
+        pathEl.setAttribute("data-base-marker", markerId);
+        pathEl.setAttribute("marker-end", `url(#${markerId})`);
         this.svgLayer.appendChild(pathEl);
       });
     });
 
-    allNodes.forEach(node => {
+    TECH_DATA.forEach(node => {
       const isResearched = state.unlockedTechs.has(node.id);
       const isActive = state.activeResearchId === node.id;
       const prereqsMet = !node.prereq || node.prereq.every(p => state.unlockedTechs.has(p));
@@ -272,13 +306,8 @@ class TreeCanvas {
       const isCore = node.id === "tech_core";
       const isSelected = this.selectedNodeId === node.id;
 
-      let stateClass = "state-locked";
-      if (isResearched) stateClass = "state-researched";
-      else if (isActive) stateClass = "state-active";
-      else if (prereqsMet) stateClass = "state-available";
-
       const glyph = document.createElement("div");
-      glyph.className = `tree-node-glyph ${stateClass} ${isCore ? "is-core" : ""} ${isSelected ? "is-selected" : ""}`;
+      glyph.className = `tree-node-glyph ${isResearched ? "state-researched" : (isActive ? "state-active" : (prereqsMet ? "state-available" : "state-locked"))} ${isCore ? "is-core" : ""} ${isSelected ? "is-selected" : ""}`;
       glyph.setAttribute("data-id", node.id);
       glyph.style.left = `${node.x}px`;
       glyph.style.top = `${node.y}px`;
@@ -287,27 +316,24 @@ class TreeCanvas {
         <span class="tree-glyph-icon" style="font-size:${isCore ? "22px" : "18px"}; pointer-events:none;">
           ${isCore ? "⬢" : (isResearched ? "✓" : (isActive ? "⚡" : (isLocked ? "🔒" : "◈")))}
         </span>
-        <span class="tree-node-label">${node.name.length > 20 ? node.name.substring(0, 18) + "…" : node.name}</span>
+        <span class="tree-node-label">${node.name.length > 22 ? node.name.substring(0, 20) + "…" : node.name}</span>
       `;
-
-      if (isActive) {
-        const miniBar = document.createElement("div");
-        miniBar.className = "tree-node-mini-bar";
-        const progressPercent = state.researchTotalDays > 0
-          ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
-          : 0;
-        miniBar.innerHTML = `<div class="tree-node-mini-bar-fill" style="width:${progressPercent}%;"></div>`;
-        glyph.appendChild(miniBar);
-      }
 
       this.surface.appendChild(glyph);
     });
+
+    this.highlightDependencies(this.selectedNodeId);
   }
 
-  getOrthogonalCircuitPath(x1, y1, x2, y2) {
-    if (Math.abs(x1 - x2) < 4) return `M ${x1} ${y1} L ${x2} ${y2}`;
-    if (Math.abs(y1 - y2) < 4) return `M ${x1} ${y1} L ${x2} ${y2}`;
-    const midY = y1 + (y2 - y1) * 0.5;
-    return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+  getSmoothCurvePath(x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      const cx = x1 + dx * 0.5;
+      return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+    } else {
+      const cy = y1 + dy * 0.5;
+      return `M ${x1} ${y1} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${y2}`;
+    }
   }
 }

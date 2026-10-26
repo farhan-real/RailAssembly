@@ -3,7 +3,7 @@
   position: relative;
   width: 100%;
   height: calc(100vh - 120px);
-  background-color: #080c14;
+  background-color: #060910;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -11,7 +11,6 @@
   touch-action: none;
 }
 
-/* Dedicated Canvas Viewport Element */
 .tree-viewport {
   position: absolute;
   top: 0;
@@ -26,7 +25,6 @@
   cursor: grabbing;
 }
 
-/* Pannable Coordinate Surface */
 .tree-canvas-surface {
   position: absolute;
   top: 0;
@@ -34,13 +32,29 @@
   width: 3400px;
   height: 2600px;
   background-image: 
-    radial-gradient(rgba(45, 66, 99, 0.35) 1px, transparent 1px);
-  background-size: 24px 24px;
+    radial-gradient(rgba(59, 130, 246, 0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
   transform-origin: 0 0;
   will-change: transform;
 }
 
-/* SVG Circuit Connector Layer */
+.tree-track-banner {
+  position: absolute;
+  padding: 5px 12px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  color: var(--color-blue);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+  white-space: nowrap;
+}
+
 .tree-svg-layer {
   position: absolute;
   top: 0;
@@ -51,10 +65,9 @@
 }
 .tree-link-path {
   fill: none;
-  stroke-width: 2.5px;
+  stroke-width: 2.2px;
   stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: stroke 0.3s ease, filter 0.3s ease;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease, filter 0.25s ease;
 }
 .tree-link-path.link-active {
   stroke: var(--color-blue);
@@ -69,7 +82,20 @@
   stroke-dasharray: 4 4;
 }
 
-/* Mindustry Square Node Badges */
+/* Dynamic Dependency Highlighting */
+.tree-link-path.link-dependency-in {
+  stroke: #60a5fa !important;
+  stroke-width: 4px !important;
+  stroke-dasharray: none !important;
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.9)) !important;
+}
+.tree-link-path.link-dependency-out {
+  stroke: #f59e0b !important;
+  stroke-width: 3.5px !important;
+  stroke-dasharray: none !important;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8)) !important;
+}
+
 .tree-node-glyph {
   position: absolute;
   width: 48px;
@@ -85,7 +111,7 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-  transition: transform 0.15s ease, border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   z-index: 5;
   user-select: none;
 }
@@ -134,18 +160,21 @@
 }
 .tree-node-label {
   position: absolute;
-  top: 52px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
   pointer-events: none;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  background: rgba(8, 12, 18, 0.90);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
 }
 
-/* Live In-Node Mini Progress Bar */
 .tree-node-mini-bar {
   position: absolute;
   bottom: 3px;
@@ -170,18 +199,19 @@
   right: 14px;
   display: flex;
   gap: 4px;
-  background-color: rgba(15, 22, 34, 0.92);
+  background-color: rgba(15, 22, 34, 0.94);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
   padding: 4px;
   z-index: 30;
   backdrop-filter: blur(4px);
+  flex-wrap: wrap;
 }
 .tree-hud-btn {
   background: var(--bg-surface);
   color: var(--text-main);
   border: 1px solid var(--border-subtle);
-  padding: 4px 10px;
+  padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   border-radius: var(--radius-xs);
@@ -192,7 +222,6 @@
   border-color: var(--border-strong);
 }
 
-/* Floating Node Inspector Panel */
 .tree-inspector-panel {
   position: absolute;
   top: 56px;
@@ -245,17 +274,8 @@
     max-width: 100%;
     max-height: 50vh;
     border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
+    border: none;
+    border-top: 1px solid var(--border-strong);
     padding: 10px 12px;
-  }
-  .tree-hud-controls {
-    top: 8px;
-    right: 8px;
-  }
-  .tree-inspector-toggle-btn {
-    bottom: 8px;
-    right: 8px;
   }
 }
