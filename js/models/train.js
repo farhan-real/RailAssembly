@@ -139,7 +139,7 @@ class TrainModelCalc {
     };
   }
 
-  static createVariant(name, type, slots, subSelections, consistConfig, marginPercent) {
+  static createVariant(name, type, slots, subSelections, consistConfig, marginPercent, baseInfo = {}) {
     const stats = this.calculateTrainStats(slots, subSelections, type, consistConfig);
     const laborAssemblyCost = type === "trainset" ? (stats.carriageCount * 45000) : 140000;
     const unitProductionCost = stats.bomCost + laborAssemblyCost;
@@ -154,7 +154,10 @@ class TrainModelCalc {
       consistConfig: consistConfig ? JSON.parse(JSON.stringify(consistConfig)) : null,
       stats, marginPercent, unitProductionCost, salePrice,
       profitPerUnit: salePrice - unitProductionCost,
-      certified: false, testedStats: null, unitsProduced: 0
+      certified: false, testedStats: null, unitsProduced: 0,
+      isVariant: Boolean(baseInfo?.isVariant),
+      baseModelId: baseInfo?.baseModelId || null,
+      baseModelName: baseInfo?.baseModelName || null
     };
   }
 

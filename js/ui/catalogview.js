@@ -16,9 +16,9 @@ class CatalogView {
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <div>
           <h2 style="font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Commissioned Fleet Catalog</h2>
-          <span class="text-muted" style="font-size:11px;">Edit variant specifications in CAD, duplicate models, manage margins, and run dynamic test certification</span>
+          <span class="text-muted" style="font-size:11px;">Edit variant specifications in CAD, make variants, manage margins, and run dynamic test certification</span>
         </div>
-        <button class="c-btn btn-primary btn-sm" onclick="BuilderView.editingVariantId = null; Events.emit('navTo', 'builder');">+ Engineer New Model</button>
+        <button class="c-btn btn-primary btn-sm" onclick="BuilderView.editingVariantId = null; BuilderView.isMakingVariant = false; Events.emit('navTo', 'builder');">+ Engineer New Model</button>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:12px;" id="catalog-list"></div>
@@ -39,16 +39,21 @@ class CatalogView {
         ? `${variant.consistConfig.carriageCount}-Car Trainset (${variant.stats.poweredCarCount}M${variant.stats.trailerCarCount}T)`
         : "Standalone Locomotive";
 
+      const variantOfBadge = (variant.isVariant && variant.baseModelName)
+        ? `<span class="c-badge badge-blue">Variant of: ${variant.baseModelName}</span>`
+        : "";
+
       card.innerHTML = `
         <div class="card-header">
-          <div style="display:flex; align-items:center; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span class="card-title">${variant.name}</span>
             <span class="c-badge ${isTrainset ? "badge-blue" : "badge-green"}">${archInfo}</span>
+            ${variantOfBadge}
             ${certBadge}
           </div>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="c-btn btn-ghost btn-sm btn-edit-variant" data-id="${variant.id}">Edit in CAD</button>
-            <button class="c-btn btn-ghost btn-sm btn-duplicate-variant" data-id="${variant.id}">Duplicate Variant</button>
+            <button class="c-btn btn-ghost btn-sm btn-make-variant" data-id="${variant.id}">+ Make Variant</button>
             ${!variant.certified 
               ? `<button class="c-btn btn-accent btn-sm btn-test-track" data-id="${variant.id}">Dynamic Test Run ($45,000)</button>` 
               : ""
@@ -90,15 +95,9 @@ class CatalogView {
         Events.emit("navTo", "builder");
       };
 
-      card.querySelector(".btn-duplicate-variant").onclick = () => {
-        const cloned = JSON.parse(JSON.stringify(variant));
-        cloned.id = "var_" + Date.now().toString(36);
-        cloned.name = `${variant.name} (Variant ${Date.now().toString(36).substring(3, 6).toUpperCase()})`;
-        cloned.certified = false;
-        cloned.testedStats = null;
-        state.saveVariant(cloned);
-        UI.toast(`Duplicated new variant "${cloned.name}".`, "success");
-        CatalogView.render(document.getElementById("viewport-root"));
+      card.querySelector(".btn-make-variant").onclick = () => {
+        BuilderView.startMakingVariant(variant);
+        Events.emit("navTo", "builder");
       };
 
       const sliderBox = card.querySelector(`#slider-box-${variant.id}`);

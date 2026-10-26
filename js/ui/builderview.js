@@ -2,6 +2,9 @@
 class BuilderView {
   static editingVariantId = null;
   static rollingStockType = "trainset";
+  static isMakingVariant = false;
+  static currentBaseModelId = null;
+  static currentBaseModelName = null;
 
   static consistConfig = {
     carriageCount: 4,
@@ -58,9 +61,31 @@ class BuilderView {
     this.trainName = variant.name;
     this.rollingStockType = variant.type;
     this.marginPercent = variant.marginPercent || 22;
+    this.isMakingVariant = Boolean(variant.isVariant);
+    this.currentBaseModelId = variant.baseModelId || variant.id;
+    this.currentBaseModelName = variant.baseModelName || variant.name;
     this.currentSlots = JSON.parse(JSON.stringify(variant.slots));
-    this.subSelections = JSON.parse(JSON.stringify(variant.subSelections));
+    this.subSelections = JSON.parse(JSON.stringify(variant.subSelections || {}));
     this.consistConfig = variant.consistConfig ? JSON.parse(JSON.stringify(variant.consistConfig)) : { carriageCount: 4, carriages: [] };
+  }
+
+  static startMakingVariant(baseModel) {
+    this.isMakingVariant = true;
+    this.currentBaseModelId = baseModel.id;
+    this.currentBaseModelName = baseModel.name;
+    this.editingVariantId = null;
+
+    const existingVariantsCount = state.variants.filter(v => v.baseModelId === baseModel.id).length;
+    const variantLetter = String.fromCharCode(65 + existingVariantsCount);
+    this.trainName = `${baseModel.name} (Variant ${variantLetter})`;
+    this.rollingStockType = baseModel.type;
+    this.marginPercent = baseModel.marginPercent || 22;
+    this.currentSlots = JSON.parse(JSON.stringify(baseModel.slots));
+    this.subSelections = JSON.parse(JSON.stringify(baseModel.subSelections || {}));
+    this.consistConfig = baseModel.consistConfig ? JSON.parse(JSON.stringify(baseModel.consistConfig)) : null;
+
+    BuilderView.render(document.getElementById("viewport-root"));
+    UI.toast(`Configuring variant of "${baseModel.name}".`, "normal");
   }
 
   static render(container) {
@@ -76,12 +101,19 @@ class BuilderView {
               <button class="type-segmented-btn ${this.rollingStockType === "trainset" ? "active" : ""}" id="btn-type-trainset">Trainset</button>
             </div>
             <input type="text" class="c-input-custom" id="input-variant-name" value="${this.trainName}" placeholder="Enter Model Name" style="min-width:140px; flex:1; max-width:260px;">
+            ${this.isMakingVariant ? `
+              <div class="variant-indicator-banner">
+                <span class="c-badge badge-blue">Making variant of: <strong>${this.currentBaseModelName}</strong></span>
+                <button class="c-btn btn-ghost btn-sm" id="btn-cancel-variant" style="padding:2px 6px;">✕</button>
+              </div>
+            ` : ""}
           </div>
           <div style="display:flex; gap:6px; flex-shrink:0;">
+            ${(!this.isMakingVariant && this.currentBaseModelName) ? `
+              <button class="c-btn btn-ghost btn-sm" id="btn-toolbar-make-variant">+ Make Variant</button>
+            ` : ""}
             <button class="c-btn btn-ghost btn-sm" id="btn-design-archive">Archive / Presets...</button>
-            <button class="c-btn btn-primary" id="btn-save-variant">
-              ${this.editingVariantId ? "Update Variant in Catalog" : "Save as New Variant"}
-            </button>
+            <button class="c-btn btn-primary" id="btn-save-variant">Save</button>
           </div>
         </div>
 
@@ -179,6 +211,30 @@ class BuilderView {
     };
     document.getElementById("btn-design-archive").onclick = () => DesignView.openDesignManager(this);
 
+    const btnMakeVar = document.getElementById("btn-toolbar-make-variant");
+    if (btnMakeVar) {
+      btnMakeVar.onclick = () => {
+        const currentModel = state.variants.find(v => v.id === this.editingVariantId) || {
+          id: "var_" + Date.now().toString(36),
+          name: this.trainName,
+          type: this.rollingStockType,
+          slots: this.currentSlots,
+          subSelections: this.subSelections,
+          consistConfig: this.consistConfig,
+          marginPercent: this.marginPercent
+        };
+        BuilderView.startMakingVariant(currentModel);
+      };
+    }
+
+    const btnCancelVar = document.getElementById("btn-cancel-variant");
+    if (btnCancelVar) {
+      btnCancelVar.onclick = () => {
+        this.isMakingVariant = false;
+        BuilderView.render(document.getElementById("viewport-root"));
+      };
+    }
+
     const cfgConsist = document.getElementById("btn-configure-consist");
     if (cfgConsist) cfgConsist.onclick = () => ConsistView.openConsistModal(this);
 
@@ -189,14 +245,46 @@ class BuilderView {
         return;
       }
 
-      const variantId = this.editingVariantId || ("var_" + Date.now().toString(36));
-      const variant = TrainModelCalc.createVariant(this.trainName, this.rollingStockType, this.currentSlots, this.subSelections, this.consistConfig, this.marginPercent);
+      const isVar = this.isMakingVariant;
+      const baseInfo = {
+        isVariant: isVar,
+        baseModelId: isVar ? this.currentBaseModelId : null,
+        baseModelName: isVar ? this.currentBaseModelName : null
+      };
+
+      const variantId = (!isVar && this.editingVariantId) ? this.editingVariantId : ("var_" + Date.now().toString(36));
+      const variant = TrainModelCalc.createVariant(this.trainName, this.rollingStockType, this.currentSlots, this.subSelections, this.consistConfig, this.marginPercent, baseInfo);
       variant.id = variantId;
 
       state.saveVariant(variant);
-      UI.toast(`Variant "${variant.name}" saved and updated in Fleet Catalog.`, "success");
-      this.editingVariantId = null;
-      Events.emit("navTo", "catalog");
+      this.editingVariantId = variant.id;
+      this.currentBaseModelId = variant.id;
+      this.currentBaseModelName = variant.name;
+      this.isMakingVariant = false;
+
+      UI.showModal({
+        title: `Train Model Saved: ${variant.name}`,
+        contentNode: `
+          <div style="font-size:12px; line-height:1.45; color:var(--text-main);">
+            <p>Model <strong>"${variant.name}"</strong> has been saved to your Fleet Catalog.</p>
+            <p class="text-muted" style="font-size:11px; margin-top:6px;">You can now produce units, engineer specialized variants, or inspect the catalog:</p>
+          </div>
+        `,
+        actions: [
+          {
+            label: "+ Make Variant",
+            className: "btn-ghost",
+            onClick: () => BuilderView.startMakingVariant(variant)
+          },
+          {
+            label: "View in Fleet Catalog",
+            className: "btn-primary",
+            onClick: () => Events.emit("navTo", "catalog")
+          }
+        ]
+      });
+
+      BuilderView.render(document.getElementById("viewport-root"));
     };
   }
 
@@ -314,55 +402,15 @@ class BuilderView {
       };
     });
 
-    this.openSelectionModal({
+    UI.openSelectionModal({
       title: `Select ${catLabel}`,
       subtitle: `Choose standard, high-performance, or unequipped configuration:`,
       items,
       activeId: this.currentSlots[catKey],
-      onSelect: (id) => { this.currentSlots[catKey] = id; }
-    });
-  }
-
-  static openSelectionModal({ title, subtitle, items, activeId, onSelect }) {
-    const container = document.createElement("div");
-    container.innerHTML = `<p class="text-muted" style="font-size:11px; margin-bottom:10px;">${subtitle}</p>`;
-    const menuList = document.createElement("div");
-    menuList.className = "catalog-menu-list";
-
-    items.forEach(item => {
-      const isSelected = item.id === activeId;
-      const el = document.createElement("div");
-      el.className = `catalog-menu-item ${isSelected ? "active" : ""}`;
-      if (item.disabled) el.style.opacity = "0.55";
-
-      el.innerHTML = `
-        <div class="catalog-item-header">
-          <div class="catalog-item-title-group">
-            <strong class="catalog-item-name">${item.name}</strong>
-            ${isSelected ? `<span class="c-badge badge-blue">Selected</span>` : ""}
-            ${item.badge ? `<span class="c-badge badge-amber">${item.badge}</span>` : ""}
-          </div>
-          <div class="catalog-item-actions">
-            <span class="catalog-item-price font-mono text-blue">${item.priceLabel || `$${item.cost.toLocaleString()}`}</span>
-            <button class="c-btn ${isSelected ? "btn-ghost" : "btn-primary"} btn-sm" ${item.disabled ? "disabled" : ""}>
-              ${isSelected ? "Active" : "Select"}
-            </button>
-          </div>
-        </div>
-        ${item.specs ? `<div class="catalog-item-specs text-muted">${item.specs}</div>` : ""}
-        <div class="catalog-item-desc">${item.desc}</div>
-      `;
-
-      el.onclick = () => {
-        if (item.disabled) { UI.toast("Option unavailable: Technology must be unlocked in Research Tree.", "danger"); return; }
-        onSelect(item.id);
-        UI.closeModal();
+      onSelect: (id) => {
+        this.currentSlots[catKey] = id;
         BuilderView.render(document.getElementById("viewport-root"));
-      };
-      menuList.appendChild(el);
+      }
     });
-
-    container.appendChild(menuList);
-    UI.showModal({ title, contentNode: container, actions: [] });
   }
 }
