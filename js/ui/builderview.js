@@ -19,12 +19,18 @@ class BuilderView {
     inverter: "inv_igbt_air",
     motor: "mot_ind_basic",
     auxiliary: "aux_std_static",
-    bogie: "bog_co_co",
-    carbody: "body_steel",
+    cooling: "cool_oil_radiator",
+    compressor: "comp_screw_rotary",
+    sander: "sand_gravity_basic",
+    coupler: "coup_tightlock_h",
+    bogie: "bog_bo_bo",
+    carbody: "body_aluminum",
     brakes: "brk_disc_regen",
+    hvac: "hvac_standard_pack",
     resistor: "res_none",
     battery: "bat_none",
-    tcms: "tcms_basic"
+    tcms: "tcms_basic",
+    safety: "wsp_microprocessor"
   };
 
   static subSelections = {
@@ -101,7 +107,7 @@ class BuilderView {
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Traction Power Output</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Net Traction Power</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.availablePowerKw} kW (${stats.horsepower.toLocaleString()} hp)
             </div>
@@ -139,9 +145,7 @@ class BuilderView {
               <strong class="font-mono text-blue">${diag.strictSpeedLimit} km/h</strong>
               <span class="text-muted"> (Limited by ${diag.primarySpeedLimiter.component})</span>
             </div>
-            ${diag.bottlenecks.map(b => `
-              <div class="text-warning" style="font-size:10px;">&bull; ${b}</div>
-            `).join("")}
+            ${diag.bottlenecks.map(b => `<div class="text-warning" style="font-size:10px;">&bull; ${b}</div>`).join("")}
           </div>
         </div>
 
@@ -197,12 +201,18 @@ class BuilderView {
       { key: "transformer", label: "Main Traction Transformer / Filter", required: true },
       { key: "inverter", label: "Traction Inverter / Converter", required: true },
       { key: "motor", label: "Traction Motors", required: true },
-      { key: "auxiliary", label: "Auxiliary Power Converter (Optional)", required: false },
-      { key: "bogie", label: "Bogie & Wheelset Assembly", required: true },
+      { key: "cooling", label: "Thermal Cooling & Radiator Loop", required: true },
+      { key: "compressor", label: "Pneumatic Air Supply & Drying", required: true },
+      { key: "bogie", label: "Bogie & Running Gear Assembly", required: true },
       { key: "carbody", label: "Carbody Shell Architecture", required: true },
+      { key: "coupler", label: "Coupler & Inter-Car Gangway", required: true },
       { key: "brakes", label: "Braking & Recovery System", required: true },
+      { key: "sander", label: "Rail Adhesion & Sanding Gear", required: false },
+      { key: "auxiliary", label: "Auxiliary Power Converter (APS)", required: false },
+      { key: "hvac", label: "Passenger Climate & HVAC System", required: false },
       { key: "resistor", label: "Dynamic Resistor Grid (Optional)", required: false },
       { key: "battery", label: "Auxiliary Battery Pack (Optional)", required: false },
+      { key: "safety", label: "Wheel Slide Protection & Surge Diverter", required: true },
       { key: "tcms", label: "TCMS Control Network", required: true }
     ];
 
@@ -210,8 +220,7 @@ class BuilderView {
       const card = document.createElement("div");
       card.className = "subsystem-card";
 
-      const comp = state.findComponentById(this.currentSlots[cat.key]) || COMPONENTS_DATA[cat.key][0];
-      const subData = SUBCOMPONENTS_DATA[cat.key];
+      const comp = state.findComponentById(this.currentSlots[cat.key]) || COMPONENTS_DATA[cat.key]?.[0];
       const isNone = !comp || comp.cost === 0;
 
       card.innerHTML = `
@@ -224,7 +233,7 @@ class BuilderView {
 
         <div class="menu-trigger-box">
           <div class="menu-trigger-info">
-            <span class="menu-trigger-label">${cat.required ? "Mandatory Module" : "Configurable Option"}</span>
+            <span class="menu-trigger-label">${cat.required ? "Mandatory System" : "Configurable Option"}</span>
             <span class="menu-trigger-value">${comp ? comp.name : "None (Unequipped)"}</span>
             <span class="text-muted" style="font-size:10px;">${comp && comp.weight ? `${comp.supplier} &bull; ${comp.weight} kg` : "Zero Weight &bull; No Cost"}</span>
           </div>

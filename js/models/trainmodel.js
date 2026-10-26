@@ -1,4 +1,4 @@
-// Train Physics, Consist Distribution, and Dynamic Custom Carriage Integration
+// Train Physics, Consist Distribution, and Dynamic Multi-System Integration Engine
 class TrainModelCalc {
   static calculateTrainStats(slots, subSelections = {}, rollingStockType = "locomotive", consistConfig = null) {
     let motorCarWeightKg = 0;
@@ -6,15 +6,16 @@ class TrainModelCalc {
     let speedBonusTotal = 0;
     let safetyBonusTotal = 0;
     let efficiencyBonusTotal = 0;
+    let extraAdhesionBonus = 0;
 
     const baseComponents = {};
     for (const catKey in slots) {
       const compId = slots[catKey];
-      if (!compId || compId === "bat_none" || compId === "res_none" || compId === "aux_none") {
+      if (!compId || compId.endsWith("_none")) {
         baseComponents[catKey] = COMPONENTS_DATA[catKey]?.find(c => c.id === compId) || { weight: 0, cost: 0, powerRatingKw: 9999, maxKw: 9999, efficiency: 1.0 };
         continue;
       }
-      const comp = state.findComponentById(compId) || COMPONENTS_DATA[catKey][0];
+      const comp = state.findComponentById(compId) || COMPONENTS_DATA[catKey]?.[0] || { weight: 0, cost: 0 };
       baseComponents[catKey] = comp;
       motorCarWeightKg += comp.weight || 0;
       motorCarBOMCost += comp.cost || 0;
@@ -37,13 +38,12 @@ class TrainModelCalc {
           speedBonusTotal += mod.speedBonus || 0;
           safetyBonusTotal += mod.safetyBonus || 0;
           efficiencyBonusTotal += mod.efficiencyBonus || 0;
+          extraAdhesionBonus += mod.adhesionBonus || 0;
         }
       }
     }
 
-    // System validation and power-flow bottlenecks
-    const diagnostics = TrainValidator.validateSystemIntegrity(baseComponents);
-    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms } = baseComponents;
+    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms, sander, hvac } = baseComponents;
     const isTrainset = rollingStockType === "trainset" && consistConfig?.carriages?.length > 0;
     const carriageCount = isTrainset ? consistConfig.carriages.length : 1;
 
@@ -85,47 +85,51 @@ class TrainModelCalc {
     const totalMassTons = Number((totalWeightKg / 1000).toFixed(1));
     const totalAxles = isTrainset ? carriageCount * (bogie.axles || 4) : (bogie.axles || 4);
     const axleLoad = Number((totalMassTons / totalAxles).toFixed(2));
-    const axleOverloaded = axleLoad > bogie.maxAxleLoadTons;
+    const axleOverloaded = axleLoad > (bogie.maxAxleLoadTons || 25);
 
-    // Power Calculation Throttled by Electrical Chain Bottlenecks
+    // Diagnostics & Physical Limit Check
+    const diagnostics = TrainValidator.validateSystemIntegrity(baseComponents, totalMassTons, carriageCount);
+
     const singlePackKw = diagnostics.effectiveMotorPowerKw;
     const availablePowerKw = isTrainset ? (poweredCarCount * singlePackKw) : singlePackKw;
-    const horsepower = Math.round(availablePowerKw * 1.341);
+    const hotelPowerDrawKw = isTrainset ? (carriageCount * (hvac?.hotelPowerKw || 0)) : (hvac?.hotelPowerKw || 0);
+    const netTractionPowerKw = Math.max(500, availablePowerKw - hotelPowerDrawKw);
+    const horsepower = Math.round(netTractionPowerKw * 1.341);
 
     let totalEfficiency = Number((0.92 + efficiencyBonusTotal).toFixed(3));
     totalEfficiency = Math.min(0.99, Math.max(0.70, totalEfficiency));
 
-    // Consist Aerodynamics & Speed Limits Check
     const baseCd = body.dragCd;
     const consistCd = isTrainset ? Number((baseCd + (carriageCount - 1) * 0.035).toFixed(3)) : baseCd;
     let theoreticalSpeed = Math.round(
-      Math.pow((availablePowerKw * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
+      Math.pow((netTractionPowerKw * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
     ) + speedBonusTotal;
 
-    // Apply Hard Physical Component Speed Ceilings (Pantograph, Bogie, Motor RPM)
     theoreticalSpeed = Math.min(theoreticalSpeed, diagnostics.strictSpeedLimit + speedBonusTotal);
     if (axleOverloaded) theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
 
+    // Dynamic Adhesion: Base Bogie Adhesion + Rail Sanding Conditioner
     const adhesiveMassTons = isTrainset ? Number(((poweredCarCount * motorCarWeightKg) / 1000).toFixed(1)) : totalMassTons;
-    const adhesionCoeff = bogie.axles === 6 ? 0.38 : 0.32;
-    const maxAdhesionKn = Math.round(adhesiveMassTons * 9.81 * adhesionCoeff);
+    const baseAdhesion = bogie.axles === 6 ? 0.38 : 0.32;
+    const totalAdhesionCoeff = baseAdhesion + (sander?.adhesionBonus || 0) + extraAdhesionBonus;
+    const maxAdhesionKn = Math.round(adhesiveMassTons * 9.81 * totalAdhesionCoeff);
 
-    const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round(availablePowerKw / 8.2));
+    const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round(netTractionPowerKw / 8.2));
     let acceleration = Number((effectiveTractiveForceKn / totalMassTons).toFixed(2));
-    acceleration = Math.min(1.30, Math.max(0.18, acceleration));
+    acceleration = Math.min(1.35, Math.max(0.18, acceleration));
 
     return {
       rollingStockType, carriageCount, poweredCarCount, trailerCarCount,
       totalMassTons, axles: totalAxles, axleLoad,
-      maxAllowedAxleLoad: bogie.maxAxleLoadTons, axleOverloaded,
-      availablePowerKw, horsepower, theoreticalSpeed,
+      maxAllowedAxleLoad: bogie.maxAxleLoadTons || 25, axleOverloaded,
+      availablePowerKw: netTractionPowerKw, horsepower, theoreticalSpeed,
       roughSpeedMin: Math.round(theoreticalSpeed * 0.90),
       roughSpeedMax: Math.round(theoreticalSpeed * 1.08),
       totalEfficiency, maxAdhesionKn, acceleration,
       bomCost: totalBOMCost, passengerCap,
       cargoCapacityTons: isTrainset ? 0 : body.cargoCapacityTons,
       batteryRangeKm: battery?.rangeKm || 0,
-      safetyScore: (brakes?.safetyIndex || 80) + (tcms?.reliabilityBonus || 0) + safetyBonusTotal,
+      safetyScore: (brakes?.safetyIndex || 80) + (tcms?.reliabilityBonus || 0) + (baseComponents.safety?.safetyScoreBonus || 0) + safetyBonusTotal,
       components: baseComponents,
       subSelections: JSON.parse(JSON.stringify(subSelections)),
       consistConfig: consistConfig ? JSON.parse(JSON.stringify(consistConfig)) : null,

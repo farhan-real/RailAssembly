@@ -2,7 +2,7 @@
 class AcquisitionView {
   static activeCategory = "electrical";
   static activeSubCategory = "pantograph";
-  static activeSource = "supplier"; // "supplier" or "inhouse"
+  static activeSource = "supplier";
   static itemQuantities = {};
 
   static categories = [
@@ -14,23 +14,29 @@ class AcquisitionView {
         { id: "transformer", label: "Traction Transformers & DC Chokes" },
         { id: "inverter", label: "Traction Inverters & Converters" },
         { id: "motor", label: "Traction Motors" },
+        { id: "cooling", label: "Thermal Cooling Loops" },
         { id: "auxiliary", label: "Auxiliary Power Supplies (APS)" }
       ]
     },
     {
       id: "mechanical",
-      label: "Mechanical & Structural Systems",
+      label: "Mechanical & Running Gear",
       subcategories: [
         { id: "bogie", label: "Bogies & Running Gear" },
         { id: "carbody", label: "Carbodies & Aerodynamics" },
-        { id: "brakes", label: "Brakes & Energy Recovery" }
+        { id: "coupler", label: "Couplers & Gangways" },
+        { id: "brakes", label: "Brakes & Energy Recovery" },
+        { id: "sander", label: "Rail Adhesion & Sanding Gear" }
       ]
     },
     {
-      id: "storage_control",
-      label: "Energy Storage & Automation",
+      id: "pneumatics_control",
+      label: "Pneumatics, Energy & Safety",
       subcategories: [
+        { id: "compressor", label: "Air Compressors & Dryers" },
         { id: "battery", label: "Auxiliary Battery Buffers" },
+        { id: "hvac", label: "Passenger Climate & HVAC" },
+        { id: "safety", label: "WSP & Surge Diverters" },
         { id: "resistor", label: "Dynamic Resistor Grids" },
         { id: "tcms", label: "Train Control & Monitoring (TCMS)" }
       ]
@@ -43,7 +49,6 @@ class AcquisitionView {
     const components = (COMPONENTS_DATA[curSubCat.id] || []).filter(c => c.cost > 0 && !c.id.includes("_none"));
 
     container.innerHTML = `
-      <!-- Top Level Category Bar -->
       <div class="acquisition-cat-bar">
         ${this.categories.map(cat => `
           <button class="acquisition-cat-btn ${cat.id === this.activeCategory ? "active" : ""}" data-cat="${cat.id}">
@@ -52,7 +57,6 @@ class AcquisitionView {
         `).join("")}
       </div>
 
-      <!-- Sub-Category Navigation Pills & Sourcing Mode Selector -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
         <div class="acquisition-subcat-bar" style="margin-bottom:0;">
           ${curCat.subcategories.map(sub => `
@@ -62,29 +66,20 @@ class AcquisitionView {
           `).join("")}
         </div>
         <div style="display:flex; gap:4px;">
-          <button class="c-btn ${this.activeSource === "supplier" ? "btn-primary" : "btn-ghost"} btn-sm" id="btn-src-ext-supplier">
-            External Supplier Orders
-          </button>
-          <button class="c-btn ${this.activeSource === "inhouse" ? "btn-primary" : "btn-ghost"} btn-sm" id="btn-src-inhouse-fab">
-            In-House Manufacturing Shop
-          </button>
+          <button class="c-btn ${this.activeSource === "supplier" ? "btn-primary" : "btn-ghost"} btn-sm" id="btn-src-ext-supplier">External Supplier</button>
+          <button class="c-btn ${this.activeSource === "inhouse" ? "btn-primary" : "btn-ghost"} btn-sm" id="btn-src-inhouse-fab">In-House Shop</button>
         </div>
       </div>
 
-      <!-- Information & Bulk Discount Policy Banner -->
       <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); padding:6px 12px; border-radius:var(--radius-xs); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
         <span class="text-muted" style="font-size:10px;">
           ${this.activeSource === "supplier"
-            ? "Supplier Bulk Discount Tiers: 5+ Units (8% Off) &bull; 15+ Units (15% Off) &bull; 30+ Units (25% Off). Delivery is subject to supplier lead time."
-            : "In-House Manufacturing: Save 42% on retail costs using internal factory tooling. Advanced parts require licensed research in the R&D Directorate."
-          }
+            ? "Supplier Bulk Discounts: 5+ Units (8% Off) &bull; 15+ Units (15% Off) &bull; 30+ Units (25% Off). Subject to delivery lead times."
+            : "In-House Manufacturing: Save 42% on retail costs using internal factory tooling. Advanced parts require R&D research."}
         </span>
-        <span class="font-mono text-blue" style="font-size:10px;">
-          ${components.length} Available Technical Specifications
-        </span>
+        <span class="font-mono text-blue" style="font-size:10px;">${components.length} Available Specifications</span>
       </div>
 
-      <!-- Component Alternative Cards Grid -->
       <div class="view-grid-two" id="acquisition-cards-grid"></div>
     `;
 
@@ -130,9 +125,7 @@ class AcquisitionView {
       const qty = this.itemQuantities[comp.id] || 1;
       const isSupplier = this.activeSource === "supplier";
       const isUnlocked = state.isInHouseAvailable(comp);
-      const reqTech = comp.inHouseTech ? state.findTechById(comp.inHouseTech) : null;
 
-      // Pricing & Discount Calculations
       const unitCost = isSupplier ? comp.cost : state.getInHouseUnitCost(comp);
       let discountRate = 0;
       let discountLabel = "Standard Price (0% Discount)";
@@ -159,18 +152,15 @@ class AcquisitionView {
               ${isSupplier ? "External Supplier" : (isUnlocked ? "In-House Ready" : "Research Required")}
             </span>
           </div>
-
           <p class="text-muted" style="font-size:10px; line-height:1.35; margin:6px 0 8px;">${comp.desc}</p>
-
           <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); padding:6px 8px; border-radius:var(--radius-xs); display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
-            <div>Active Warehouse: <strong class="font-mono text-blue">${state.warehouse[comp.id] || 0}</strong></div>
-            <div>Reserve Storage: <strong class="font-mono text-warning">${state.longStorage[comp.id] || 0}</strong></div>
+            <div>Warehouse: <strong class="font-mono text-blue">${state.warehouse[comp.id] || 0}</strong></div>
+            <div>Reserve: <strong class="font-mono text-warning">${state.longStorage[comp.id] || 0}</strong></div>
             <div>${leadTimeText}</div>
           </div>
         </div>
 
         <div style="border-top:1px solid var(--border-subtle); padding-top:8px;">
-          <!-- Quantity Stepper & Price Calculation Summary -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div style="display:flex; align-items:center; gap:6px;">
               <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Quantity:</span>
@@ -190,13 +180,9 @@ class AcquisitionView {
         </div>
       `;
 
-      // Mount Stepper
       const stepperSlot = card.querySelector(`#stepper-slot-${comp.id}`);
       const stepper = UI.createStepper({
-        min: 1,
-        max: 50,
-        value: qty,
-        step: 1,
+        min: 1, max: 50, value: qty, step: 1,
         onChange: (newQty) => {
           this.itemQuantities[comp.id] = newQty;
           this.renderComponentCards(grid, components);
@@ -204,7 +190,6 @@ class AcquisitionView {
       });
       stepperSlot.appendChild(stepper);
 
-      // Order Handler
       card.querySelector(".btn-submit-order").onclick = () => {
         this.processOrder(comp, qty, totalCost, isSupplier);
       };
@@ -218,7 +203,6 @@ class AcquisitionView {
       UI.toast(`Insufficient Capital: Required total is $${totalCost.toLocaleString()}`, "danger");
       return;
     }
-
     if (state.getWarehouseCount() + qty > state.warehouseCapacity) {
       UI.toast("Active Warehouse Full: Capacity exceeded. Stash parts into reserve depot.", "danger");
       return;
@@ -234,7 +218,7 @@ class AcquisitionView {
         daysLeft: comp.leadDays,
         totalDays: comp.leadDays
       });
-      UI.toast(`Supplier Order Dispatched: ${qty} units of ${comp.name}. Lead time: ${comp.leadDays} days.`, "success");
+      UI.toast(`Supplier Order Dispatched: ${qty} units of ${comp.name}. Delivery lag: ${comp.leadDays} days.`, "success");
     } else {
       const requiredDays = state.getInHouseFabricationDays(comp, qty);
       state.inHouseQueue.push({
@@ -244,7 +228,7 @@ class AcquisitionView {
         daysRemaining: requiredDays,
         totalDays: requiredDays
       });
-      UI.toast(`In-House Fabrication Commissioned: ${qty} units of ${comp.name}. Completion in ${requiredDays} days.`, "success");
+      UI.toast(`In-House Fabrication Commissioned: ${qty} units of ${comp.name}. Schedule: ${requiredDays} days.`, "success");
     }
 
     state.saveToStorage();
