@@ -1,4 +1,4 @@
-// Central Game State Singleton with Time and Money R&D System
+// Central Game State Singleton with Audio Settings, Persistence, and Reset
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -19,7 +19,7 @@ class GameState {
     this.audioMuted = false;
 
     this.warehouse = {
-      panto_std: 12, trans_heavy: 6, inv_igbt_air: 10,
+      panto_schunk_wbl85: 12, trans_heavy: 6, inv_igbt_air: 10,
       mot_ind_basic: 12, bog_co_co: 8, body_steel: 8,
       brk_disc_regen: 12, bat_none: 16, tcms_basic: 8
     };
@@ -153,7 +153,7 @@ class GameState {
     this.unlockedTechs = new Set(["tech_core"]);
 
     this.warehouse = {
-      panto_std: 12, trans_heavy: 6, inv_igbt_air: 10,
+      panto_schunk_wbl85: 12, trans_heavy: 6, inv_igbt_air: 10,
       mot_ind_basic: 12, bog_co_co: 8, body_steel: 8,
       brk_disc_regen: 12, bat_none: 16, tcms_basic: 8
     };

@@ -9,11 +9,13 @@ const TREE_STRUCTURE = {
     durationDays: 0,
     prereq: [],
     unlocks: [
-      "body_steel", "panto_std", "panto_urban_dc", "trans_heavy", "trans_none_dc",
-      "inv_igbt_air", "mot_ind_basic", "mot_ind_commuter", "bog_bo_bo", "bog_tram_light",
-      "transm_nose_hung", "vcb_vacuum_ac", "vcb_dc_highspeed", "dclink_electrolytic",
-      "pwm_sine_triangle_analog", "comp_piston_basic", "cool_forced_air", "coup_scharf_commuter",
-      "brk_disc_regen", "tcms_basic", "wsp_basic"
+      "panto_toyo_dc_urban", "panto_secheron_spl", "panto_faiveley_am12", "panto_brecknell_highreach",
+      "panto_stemmann_dsa150", "panto_schunk_wbl85", "panto_stemmann_dsa200",
+      "body_steel", "trans_heavy", "trans_none_dc", "inv_igbt_air", "mot_ind_basic",
+      "mot_ind_commuter", "bog_bo_bo", "bog_tram_light", "transm_nose_hung",
+      "vcb_vacuum_ac", "vcb_dc_highspeed", "dclink_electrolytic", "pwm_sine_triangle_analog",
+      "comp_piston_basic", "cool_forced_air", "coup_scharf_commuter", "brk_disc_regen",
+      "tcms_basic", "wsp_basic"
     ],
     desc: "Foundational multi-system electric traction baseline. The primary root from which all specialized engineering branches originate."
   },

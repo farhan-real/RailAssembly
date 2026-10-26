@@ -14,7 +14,7 @@ class BuilderView {
   };
 
   static currentSlots = {
-    pantograph: "panto_std",
+    pantograph: "panto_schunk_wbl85",
     circuitbreaker: "vcb_vacuum_ac",
     transformer: "trans_heavy",
     dclink: "dclink_polypropylene_film",
@@ -38,11 +38,11 @@ class BuilderView {
   };
 
   static subSelections = {
-    pantograph: { subcomponent: "cs_carbon", modification: "act_pneumatic" },
+    pantograph: { subcomponent: "cs_carbon_rh84", modification: "act_pneumatic_bellows" },
     transformer: { subcomponent: "wind_copper", modification: "cool_mineral" },
     inverter: { subcomponent: "gd_optical", modification: "therm_coldplate" },
     pwm: { subcomponent: "pwm_dsp_dualcore", modification: "pwm_spread_spectrum" },
-    motor: { subcomponent: "gb_single", modification: "brg_steel" },
+    motor: { subcomponent: "gb_single", modification: "brg_ceramic" },
     bogie: { subcomponent: "susp_coil", modification: "whl_standard" },
     carbody: { subcomponent: "crash_standard", modification: "aero_none" },
     brakes: { subcomponent: "cal_cast", modification: "disc_iron" },
