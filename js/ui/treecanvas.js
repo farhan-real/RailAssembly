@@ -160,6 +160,78 @@ class TreeCanvas {
     this.updateTransform();
   }
 
+  updateNodeStates() {
+    if (!this.surface || !this.svgLayer) return;
+    const allNodes = TECH_DATA;
+    const nodeMap = new Map();
+    allNodes.forEach(n => nodeMap.set(n.id, n));
+
+    const progressPercent = state.activeResearchId && state.researchTotalDays > 0
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
+      : 0;
+
+    allNodes.forEach(node => {
+      const glyph = this.surface.querySelector(`.tree-node-glyph[data-id="${node.id}"]`);
+      if (!glyph) return;
+
+      const isResearched = state.unlockedTechs.has(node.id);
+      const isActive = state.activeResearchId === node.id;
+      const prereqsMet = !node.prereq || node.prereq.every(p => state.unlockedTechs.has(p));
+      const isLocked = !prereqsMet && !isResearched;
+      const isCore = node.id === "tech_core";
+      const isSelected = this.selectedNodeId === node.id;
+
+      let stateClass = "state-locked";
+      if (isResearched) stateClass = "state-researched";
+      else if (isActive) stateClass = "state-active";
+      else if (prereqsMet) stateClass = "state-available";
+
+      glyph.className = `tree-node-glyph ${stateClass} ${isCore ? "is-core" : ""} ${isSelected ? "is-selected" : ""}`;
+
+      const iconSpan = glyph.querySelector(".tree-glyph-icon");
+      if (iconSpan) {
+        iconSpan.textContent = isCore ? "⬢" : (isResearched ? "✓" : (isActive ? "⚡" : (isLocked ? "🔒" : "◈")));
+      }
+
+      let miniBar = glyph.querySelector(".tree-node-mini-bar");
+      if (isActive) {
+        if (!miniBar) {
+          miniBar = document.createElement("div");
+          miniBar.className = "tree-node-mini-bar";
+          miniBar.innerHTML = `<div class="tree-node-mini-bar-fill"></div>`;
+          glyph.appendChild(miniBar);
+        }
+        const fill = miniBar.querySelector(".tree-node-mini-bar-fill");
+        if (fill) fill.style.width = `${progressPercent}%`;
+      } else if (miniBar) {
+        miniBar.remove();
+      }
+    });
+
+    const pathElements = this.svgLayer.querySelectorAll(".tree-link-path");
+    let linkIdx = 0;
+    allNodes.forEach(node => {
+      if (!node.prereq || node.prereq.length === 0) return;
+      node.prereq.forEach(parentId => {
+        const parent = nodeMap.get(parentId);
+        if (!parent) return;
+        const pathEl = pathElements[linkIdx++];
+        if (!pathEl) return;
+
+        const isParentResearched = state.unlockedTechs.has(parent.id);
+        const isChildResearched = state.unlockedTechs.has(node.id);
+        const isChildActive = state.activeResearchId === node.id;
+
+        let statusClass = "link-locked";
+        if (isChildResearched) statusClass = "link-researched";
+        else if (isParentResearched && isChildActive) statusClass = "link-active";
+        else if (isParentResearched) statusClass = "link-active";
+
+        pathEl.setAttribute("class", `tree-link-path ${statusClass}`);
+      });
+    });
+  }
+
   renderGraph() {
     this.svgLayer.innerHTML = "";
     this.surface.querySelectorAll(".tree-node-glyph").forEach(el => el.remove());
@@ -212,11 +284,21 @@ class TreeCanvas {
       glyph.style.top = `${node.y}px`;
 
       glyph.innerHTML = `
-        <span style="font-size:${isCore ? "22px" : "18px"}; pointer-events:none;">
+        <span class="tree-glyph-icon" style="font-size:${isCore ? "22px" : "18px"}; pointer-events:none;">
           ${isCore ? "⬢" : (isResearched ? "✓" : (isActive ? "⚡" : (isLocked ? "🔒" : "◈")))}
         </span>
         <span class="tree-node-label">${node.name.length > 20 ? node.name.substring(0, 18) + "…" : node.name}</span>
       `;
+
+      if (isActive) {
+        const miniBar = document.createElement("div");
+        miniBar.className = "tree-node-mini-bar";
+        const progressPercent = state.researchTotalDays > 0
+          ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
+          : 0;
+        miniBar.innerHTML = `<div class="tree-node-mini-bar-fill" style="width:${progressPercent}%;"></div>`;
+        glyph.appendChild(miniBar);
+      }
 
       this.surface.appendChild(glyph);
     });

@@ -1,4 +1,4 @@
-// Central Game State Singleton with Time and Money R&D System
+// Central Game State Singleton with Comprehensive LocalStorage Persistence
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -8,7 +8,7 @@ class GameState {
     this.year = 1;
     this.simSpeed = 1;
 
-    // R&D Project State: Real-World Time & Money
+    // R&D Project State: Real-World Time & Capital
     this.activeResearchId = null;
     this.researchDaysLeft = 0;
     this.researchTotalDays = 0;
@@ -101,19 +101,31 @@ class GameState {
   saveToStorage() {
     try {
       const data = {
-        variants: this.variants,
-        customCarriageTypes: this.customCarriageTypes,
-        savedDesigns: this.savedDesigns,
         funds: this.funds,
         reputation: this.reputation,
         day: this.day,
+        quarter: this.quarter,
+        year: this.year,
+        simSpeed: this.simSpeed,
         activeResearchId: this.activeResearchId,
         researchDaysLeft: this.researchDaysLeft,
         researchTotalDays: this.researchTotalDays,
         unlockedTechs: Array.from(this.unlockedTechs),
         masterVolume: this.masterVolume,
         sfxVolume: this.sfxVolume,
-        audioMuted: this.audioMuted
+        audioMuted: this.audioMuted,
+        warehouse: this.warehouse,
+        warehouseCapacity: this.warehouseCapacity,
+        longStorage: this.longStorage,
+        pendingDeliveries: this.pendingDeliveries,
+        inHouseQueue: this.inHouseQueue,
+        variants: this.variants,
+        productionLines: this.productionLines,
+        activeContracts: this.activeContracts,
+        marketTenders: this.marketTenders,
+        nextTenderCountdown: this.nextTenderCountdown,
+        customCarriageTypes: this.customCarriageTypes,
+        savedDesigns: this.savedDesigns
       };
       localStorage.setItem("rail_assembly_save", JSON.stringify(data));
     } catch (e) { /* Safe fallback */ }
@@ -124,16 +136,34 @@ class GameState {
       const raw = localStorage.getItem("rail_assembly_save");
       if (!raw) return;
       const data = JSON.parse(raw);
+      if (typeof data.funds === "number") this.funds = data.funds;
+      if (typeof data.reputation === "number") this.reputation = data.reputation;
+      if (typeof data.day === "number") this.day = data.day;
+      if (typeof data.quarter === "number") this.quarter = data.quarter;
+      if (typeof data.year === "number") this.year = data.year;
+      if (typeof data.simSpeed === "number") this.simSpeed = data.simSpeed;
+
+      if (data.activeResearchId !== undefined) this.activeResearchId = data.activeResearchId;
+      if (typeof data.researchDaysLeft === "number") this.researchDaysLeft = data.researchDaysLeft;
+      if (typeof data.researchTotalDays === "number") this.researchTotalDays = data.researchTotalDays;
+      if (Array.isArray(data.unlockedTechs)) this.unlockedTechs = new Set(data.unlockedTechs);
+
+      if (typeof data.masterVolume === "number") this.masterVolume = data.masterVolume;
+      if (typeof data.sfxVolume === "number") this.sfxVolume = data.sfxVolume;
+      if (typeof data.audioMuted === "boolean") this.audioMuted = data.audioMuted;
+
+      if (data.warehouse && typeof data.warehouse === "object") this.warehouse = data.warehouse;
+      if (typeof data.warehouseCapacity === "number") this.warehouseCapacity = data.warehouseCapacity;
+      if (data.longStorage && typeof data.longStorage === "object") this.longStorage = data.longStorage;
+      if (Array.isArray(data.pendingDeliveries)) this.pendingDeliveries = data.pendingDeliveries;
+      if (Array.isArray(data.inHouseQueue)) this.inHouseQueue = data.inHouseQueue;
       if (Array.isArray(data.variants)) this.variants = data.variants;
+      if (Array.isArray(data.productionLines)) this.productionLines = data.productionLines;
+      if (Array.isArray(data.activeContracts)) this.activeContracts = data.activeContracts;
+      if (Array.isArray(data.marketTenders)) this.marketTenders = data.marketTenders;
+      if (typeof data.nextTenderCountdown === "number") this.nextTenderCountdown = data.nextTenderCountdown;
       if (Array.isArray(data.customCarriageTypes)) this.customCarriageTypes = data.customCarriageTypes;
       if (Array.isArray(data.savedDesigns)) this.savedDesigns = data.savedDesigns;
-      if (Array.isArray(data.unlockedTechs)) this.unlockedTechs = new Set(data.unlockedTechs);
-      if (data.activeResearchId !== undefined) this.activeResearchId = data.activeResearchId;
-      if (data.researchDaysLeft !== undefined) this.researchDaysLeft = data.researchDaysLeft;
-      if (data.researchTotalDays !== undefined) this.researchTotalDays = data.researchTotalDays;
-      if (data.masterVolume !== undefined) this.masterVolume = data.masterVolume;
-      if (data.sfxVolume !== undefined) this.sfxVolume = data.sfxVolume;
-      if (data.audioMuted !== undefined) this.audioMuted = data.audioMuted;
     } catch (e) { /* Safe fallback */ }
   }
 
@@ -179,18 +209,21 @@ class GameState {
 
   addToWarehouse(componentId, count) {
     this.warehouse[componentId] = (this.warehouse[componentId] || 0) + count;
+    this.saveToStorage();
   }
 
   takeFromWarehouse(componentId, count) {
     if ((this.warehouse[componentId] || 0) < count) return false;
     this.warehouse[componentId] -= count;
     if (this.warehouse[componentId] === 0) delete this.warehouse[componentId];
+    this.saveToStorage();
     return true;
   }
 
   moveToLongStorage(componentId, count) {
     if (this.takeFromWarehouse(componentId, count)) {
       this.longStorage[componentId] = (this.longStorage[componentId] || 0) + count;
+      this.saveToStorage();
       return true;
     }
     return false;
@@ -202,6 +235,7 @@ class GameState {
     this.longStorage[componentId] -= count;
     if (this.longStorage[componentId] === 0) delete this.longStorage[componentId];
     this.addToWarehouse(componentId, count);
+    this.saveToStorage();
     return true;
   }
 

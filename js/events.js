@@ -116,6 +116,11 @@ class SimulationRunner {
       OrderEngine.evaluateGovernmentBids();
     }
 
+    // Periodic simulation persistence every 3 days
+    if (state.day % 3 === 0) {
+      state.saveToStorage();
+    }
+
     Events.emit("dayTick");
   }
 }

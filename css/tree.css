@@ -54,7 +54,7 @@
   stroke-width: 2.5px;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: stroke 0.25s ease;
+  transition: stroke 0.3s ease, filter 0.3s ease;
 }
 .tree-link-path.link-active {
   stroke: var(--color-blue);
@@ -85,7 +85,7 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
   z-index: 5;
   user-select: none;
 }
@@ -101,7 +101,7 @@
 }
 .tree-node-glyph.state-researched {
   border-color: var(--color-positive);
-  background-color: rgba(16, 185, 129, 0.12);
+  background-color: rgba(16, 185, 129, 0.14);
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
 }
 .tree-node-glyph.state-active {
@@ -143,6 +143,24 @@
   white-space: nowrap;
   pointer-events: none;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* Live In-Node Mini Progress Bar */
+.tree-node-mini-bar {
+  position: absolute;
+  bottom: 3px;
+  left: 5px;
+  right: 5px;
+  height: 3px;
+  background-color: rgba(0, 0, 0, 0.65);
+  border-radius: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tree-node-mini-bar-fill {
+  height: 100%;
+  background-color: var(--color-blue);
+  transition: width 0.25s linear;
 }
 
 /* Floating Viewport HUD Controls */

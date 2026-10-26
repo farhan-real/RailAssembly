@@ -10,11 +10,17 @@ class App {
     // User gesture handler to resume AudioContext
     window.addEventListener("pointerdown", () => SoundSystem.init(), { once: true });
 
-    // Populate initial procurement cycle wave
+    // Populate initial procurement cycle wave if no tenders exist
     OrderEngine.evaluateGovernmentBids();
     this.switchTab("dashboard");
     SimulationRunner.start();
     this.updateHeaderMetrics();
+
+    // Synchronize time controls with saved simulation speed
+    const p = document.getElementById("btn-pause");
+    const p1 = document.getElementById("btn-play-1");
+    const p2 = document.getElementById("btn-play-2");
+    this.refreshSpeedButtons(p, p1, p2, state.simSpeed);
   }
 
   static bindNavigation() {
@@ -55,16 +61,19 @@ class App {
     p.onclick = () => {
       SoundSystem.playClick();
       state.simSpeed = 0;
+      state.saveToStorage();
       this.refreshSpeedButtons(p, p1, p2, 0);
     };
     p1.onclick = () => {
       SoundSystem.playClick();
       state.simSpeed = 1;
+      state.saveToStorage();
       this.refreshSpeedButtons(p, p1, p2, 1);
     };
     p2.onclick = () => {
       SoundSystem.playClick();
       state.simSpeed = 3;
+      state.saveToStorage();
       this.refreshSpeedButtons(p, p1, p2, 3);
     };
   }
@@ -80,6 +89,14 @@ class App {
       this.updateHeaderMetrics();
       if (this.currentTab === "dashboard") {
         DashboardView.render(document.getElementById("viewport-root"));
+      } else if (this.currentTab === "research") {
+        ResearchView.updateLiveProgress();
+      }
+    });
+
+    Events.on("techUnlocked", () => {
+      if (this.currentTab === "research") {
+        ResearchView.onTechUnlocked();
       }
     });
 
@@ -94,6 +111,10 @@ class App {
     Events.on("inventoryChanged", () => this.updateHeaderMetrics());
 
     document.getElementById("modal-backdrop").onclick = UI.closeModal;
+
+    // Guaranteed persistence on page hide / tab close
+    window.addEventListener("beforeunload", () => state.saveToStorage());
+    window.addEventListener("pagehide", () => state.saveToStorage());
   }
 
   static updateHeaderMetrics() {

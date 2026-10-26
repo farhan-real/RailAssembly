@@ -1,34 +1,12 @@
-// Interactive Mindustry-Style Visual Research Tree Controller with Inspector Panel
+// Interactive Mindustry-Style Visual Research Tree Controller with Live Progress
 class ResearchView {
   static canvasInstance = null;
   static selectedNode = null;
   static isInspectorCollapsed = false;
 
   static render(container) {
-    const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
-    const progressPercent = activeTech && state.researchTotalDays > 0
-      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
-      : 0;
-
     container.innerHTML = `
-      <div class="c-card" style="margin-bottom:10px; padding:10px 14px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Research Tree Progress:</span>
-            <strong class="text-blue" style="font-size:13px; margin-left:6px;">
-              ${activeTech ? `${activeTech.name} ($${activeTech.costMoney.toLocaleString()})` : "Research Tree Idle"}
-            </strong>
-          </div>
-          <span class="font-mono ${activeTech ? "text-positive" : "text-muted"}" id="tree-active-progress" style="font-size:12px;">
-            ${activeTech ? `${state.researchDaysLeft} Days Remaining (${progressPercent}%)` : "No Active Project"}
-          </span>
-        </div>
-        ${activeTech ? `
-          <div class="tech-progress-bar" style="height:4px; margin-top:6px;">
-            <div class="tech-progress-fill" id="tree-active-bar" style="width:${progressPercent}%;"></div>
-          </div>
-        ` : ""}
-      </div>
+      <div class="c-card" id="tree-active-banner" style="margin-bottom:10px; padding:10px 14px;"></div>
 
       <div class="visual-tree-container">
         <div class="tree-viewport" id="visual-tree-viewport"></div>
@@ -43,6 +21,8 @@ class ResearchView {
         <button class="tree-inspector-toggle-btn ${this.isInspectorCollapsed ? "" : "hidden"}" id="btn-show-inspector">Inspect Node</button>
       </div>
     `;
+
+    this.updateBanner();
 
     const viewportEl = container.querySelector("#visual-tree-viewport");
     this.canvasInstance = new TreeCanvas(viewportEl, (node) => {
@@ -65,8 +45,97 @@ class ResearchView {
 
     this.bindPanelEvents(container);
 
+    const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
     const initialNode = activeTech || this.selectedNode || TREE_STRUCTURE.core;
     this.inspectNode(initialNode, container);
+  }
+
+  static updateBanner() {
+    const banner = document.getElementById("tree-active-banner");
+    if (!banner) return;
+
+    const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
+    const progressPercent = activeTech && state.researchTotalDays > 0
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
+      : 0;
+
+    banner.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Research Tree Progress:</span>
+          <strong class="text-blue" id="tree-active-title" style="font-size:13px; margin-left:6px;">
+            ${activeTech ? `${activeTech.name} ($${activeTech.costMoney.toLocaleString()})` : "Research Tree Idle"}
+          </strong>
+        </div>
+        <span class="font-mono ${activeTech ? "text-positive" : "text-muted"}" id="tree-active-progress" style="font-size:12px;">
+          ${activeTech ? `${state.researchDaysLeft} Days Remaining (${progressPercent}%)` : "No Active Project"}
+        </span>
+      </div>
+      ${activeTech ? `
+        <div class="tech-progress-bar" id="tree-active-bar-wrap" style="height:4px; margin-top:6px;">
+          <div class="tech-progress-fill" id="tree-active-bar" style="width:${progressPercent}%;"></div>
+        </div>
+      ` : ""}
+    `;
+  }
+
+  static updateLiveProgress() {
+    const banner = document.getElementById("tree-active-banner");
+    if (!banner) return;
+
+    const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
+    const progressPercent = activeTech && state.researchTotalDays > 0
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
+      : 0;
+
+    const titleEl = document.getElementById("tree-active-title");
+    const progressEl = document.getElementById("tree-active-progress");
+    const barEl = document.getElementById("tree-active-bar");
+
+    if (activeTech) {
+      if (!barEl) {
+        this.updateBanner();
+      } else {
+        if (titleEl) titleEl.textContent = `${activeTech.name} ($${activeTech.costMoney.toLocaleString()})`;
+        if (progressEl) {
+          progressEl.textContent = `${state.researchDaysLeft} Days Remaining (${progressPercent}%)`;
+          progressEl.className = "font-mono text-positive";
+        }
+        barEl.style.width = `${progressPercent}%`;
+      }
+    } else {
+      if (barEl) {
+        this.updateBanner();
+      } else {
+        if (titleEl) titleEl.textContent = "Research Tree Idle";
+        if (progressEl) {
+          progressEl.textContent = "No Active Project";
+          progressEl.className = "font-mono text-muted";
+        }
+      }
+    }
+
+    if (this.canvasInstance) {
+      this.canvasInstance.updateNodeStates();
+    }
+
+    if (this.selectedNode && document.getElementById("tree-inspector")) {
+      const liveBtn = document.getElementById("btn-fund-inspected-node");
+      if (liveBtn && state.activeResearchId === this.selectedNode.id) {
+        liveBtn.innerHTML = `⚡ ${state.researchDaysLeft} Days Remaining (${progressPercent}%)`;
+      }
+    }
+  }
+
+  static onTechUnlocked() {
+    this.updateBanner();
+    if (this.canvasInstance) {
+      this.canvasInstance.updateNodeStates();
+    }
+    const container = document.getElementById("viewport-root");
+    if (container && this.selectedNode) {
+      this.inspectNode(this.selectedNode, container);
+    }
   }
 
   static bindPanelEvents(container) {
@@ -105,6 +174,10 @@ class ResearchView {
       const pNode = TECH_DATA.find(n => n.id === pId);
       return pNode ? pNode.name : pId;
     });
+
+    const progressPercent = isActive && state.researchTotalDays > 0
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
+      : 0;
 
     inspector.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -157,7 +230,7 @@ class ResearchView {
           <button class="c-btn btn-primary btn-sm" id="btn-fund-inspected-node">
             Initiate R&amp;D ($${node.costMoney.toLocaleString()})
           </button>
-        ` : (isResearched ? `<span class="text-positive font-mono" style="font-size:10px;">✓ Technology Developed</span>` : (isActive ? `<span class="text-blue font-mono" style="font-size:10px;">⚡ ${state.researchDaysLeft} Days Remaining</span>` : `<span class="text-negative" style="font-size:10px;">Locked: Complete Prerequisite</span>`))}
+        ` : (isResearched ? `<span class="text-positive font-mono" style="font-size:10px;">✓ Technology Developed</span>` : (isActive ? `<button class="c-btn btn-primary btn-sm" id="btn-fund-inspected-node" disabled style="opacity:0.85;">⚡ ${state.researchDaysLeft} Days Remaining (${progressPercent}%)</button>` : `<span class="text-negative" style="font-size:10px;">Locked: Complete Prerequisite</span>`))}
       </div>
     `;
 
@@ -172,7 +245,7 @@ class ResearchView {
     };
 
     const fundBtn = inspector.querySelector("#btn-fund-inspected-node");
-    if (fundBtn) {
+    if (fundBtn && !isActive) {
       fundBtn.onclick = () => {
         if (state.activeResearchId && state.activeResearchId !== node.id) {
           UI.toast(`Research Tree Occupied: Current project must finish first (${state.researchDaysLeft} days left).`, "danger");
@@ -183,7 +256,11 @@ class ResearchView {
         if (res.success) {
           SoundSystem.playClick();
           UI.toast(`Research Tree: ${node.name} funded ($${node.costMoney.toLocaleString()}). Completion in ${node.durationDays} days.`, "success");
-          ResearchView.render(document.getElementById("viewport-root"));
+          this.updateBanner();
+          this.inspectNode(node, container);
+          if (this.canvasInstance) {
+            this.canvasInstance.updateNodeStates();
+          }
         } else {
           UI.toast(res.reason, "danger");
         }
