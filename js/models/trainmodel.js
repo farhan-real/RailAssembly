@@ -1,61 +1,77 @@
-// Train Physics, Integration Rules, and Testing Certification Logic
+// Train Physics, Engineering Integration, and Subcomponent Calculation Engine
 class TrainModelCalc {
-  static calculateTrainStats(slots) {
-    const panto = state.findComponentById(slots.pantograph) || COMPONENTS_DATA.pantograph[0];
-    const trans = state.findComponentById(slots.transformer) || COMPONENTS_DATA.transformer[0];
-    const inv = state.findComponentById(slots.inverter) || COMPONENTS_DATA.inverter[0];
-    const motor = state.findComponentById(slots.motor) || COMPONENTS_DATA.motor[0];
-    const bogie = state.findComponentById(slots.bogie) || COMPONENTS_DATA.bogie[0];
-    const body = state.findComponentById(slots.carbody) || COMPONENTS_DATA.carbody[0];
-    const brakes = state.findComponentById(slots.brakes) || COMPONENTS_DATA.brakes[0];
-    const battery = state.findComponentById(slots.battery) || COMPONENTS_DATA.battery[0];
-    const tcms = state.findComponentById(slots.tcms) || COMPONENTS_DATA.tcms[0];
+  static calculateTrainStats(slots, subSelections = {}) {
+    let totalWeightKg = 0;
+    let bomCost = 0;
+    let speedBonusTotal = 0;
+    let safetyBonusTotal = 0;
+    let efficiencyBonusTotal = 0;
 
-    // Total Tare Weight in Metric Tons
-    const totalWeightKg = (
-      panto.weight + trans.weight + inv.weight +
-      motor.weight + bogie.weight + body.weight +
-      brakes.weight + battery.weight + tcms.weight
-    );
+    const baseComponents = {};
+    for (const catKey in slots) {
+      const compId = slots[catKey];
+      const comp = state.findComponentById(compId) || COMPONENTS_DATA[catKey][0];
+      baseComponents[catKey] = comp;
+      totalWeightKg += comp.weight || 0;
+      bomCost += comp.cost || 0;
+
+      // Integrate Subcomponents & Modifications deltas
+      const subConfig = subSelections[catKey] || {};
+      const subData = SUBCOMPONENTS_DATA[catKey];
+      if (subData) {
+        if (subConfig.subcomponent && subData.subcomponents) {
+          const sub = subData.subcomponents.find(s => s.id === subConfig.subcomponent);
+          if (sub) {
+            totalWeightKg += sub.weight || 0;
+            bomCost += sub.cost || 0;
+            speedBonusTotal += sub.speedBonus || 0;
+            safetyBonusTotal += sub.safetyBonus || 0;
+            efficiencyBonusTotal += sub.efficiencyBonus || 0;
+          }
+        }
+        if (subConfig.modification && subData.modifications) {
+          const mod = subData.modifications.find(m => m.id === subConfig.modification);
+          if (mod) {
+            totalWeightKg += mod.weight || 0;
+            bomCost += mod.cost || 0;
+            speedBonusTotal += mod.speedBonus || 0;
+            safetyBonusTotal += mod.safetyBonus || 0;
+            efficiencyBonusTotal += mod.efficiencyBonus || 0;
+          }
+        }
+      }
+    }
+
+    const { pantograph: panto, transformer: trans, inverter: inv, motor, bogie, carbody: body, brakes, battery, tcms } = baseComponents;
+
     const totalMassTons = Number((totalWeightKg / 1000).toFixed(1));
-
-    // Axle Load Constraint Verification
     const axles = bogie.axles || 4;
     const axleLoad = Number((totalMassTons / axles).toFixed(2));
     const axleOverloaded = axleLoad > bogie.maxAxleLoadTons;
 
     // Power Delivery Bottleneck Rule
-    // Traction cannot exceed inverter maxKw, nor transformer primary power
     const availablePowerKw = Math.min(motor.powerKw, inv.maxKw, trans.powerRatingKw);
-    const totalEfficiency = Number((trans.efficiency * inv.efficiency * 0.96).toFixed(3));
+    let totalEfficiency = Number((trans.efficiency * inv.efficiency * 0.96 + efficiencyBonusTotal).toFixed(3));
+    totalEfficiency = Math.min(0.99, Math.max(0.70, totalEfficiency));
 
-    // Aerodynamic Drag & Speed Calculation
-    // P = F * v + 0.5 * rho * Cd * A * v^3
+    // Dynamic Speed Calculation
     const aeroCd = body.dragCd;
     let theoreticalSpeed = Math.round(
       Math.pow((availablePowerKw * 1000) / (0.5 * 1.225 * aeroCd * 10.5), 1 / 3) * 3.6
     );
-    theoreticalSpeed = Math.min(theoreticalSpeed, motor.maxRpmSpeed, bogie.maxSafeSpeed, panto.maxSpeed);
+    theoreticalSpeed += speedBonusTotal;
+    theoreticalSpeed = Math.min(theoreticalSpeed, motor.maxRpmSpeed + speedBonusTotal, bogie.maxSafeSpeed + speedBonusTotal, panto.maxSpeed + speedBonusTotal);
 
     if (axleOverloaded) {
-      theoreticalSpeed = Math.round(theoreticalSpeed * 0.72); // Heavy penalty for track safety overload
+      theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
     }
 
-    // Tractive Effort (kN) calculation based on axle adhesion
     const adhesionCoefficient = bogie.axles === 6 ? 0.38 : 0.31;
     const maxAdhesionKn = Math.round(totalMassTons * 9.81 * adhesionCoefficient);
 
-    // Bill of Materials (BOM) Total Cost
-    const bomCost = (
-      panto.cost + trans.cost + inv.cost + motor.cost +
-      bogie.cost + body.cost + brakes.cost + battery.cost + tcms.cost
-    );
-
-    // Rough Estimates vs Certified
+    // Rough CAD Estimates vs Certified Tested Benchmarks
     const roughSpeedMin = Math.round(theoreticalSpeed * 0.90);
     const roughSpeedMax = Math.round(theoreticalSpeed * 1.08);
-    const roughEffMin = Math.round(totalEfficiency * 88);
-    const roughEffMax = Math.round(totalEfficiency * 102);
 
     return {
       totalMassTons,
@@ -68,20 +84,19 @@ class TrainModelCalc {
       roughSpeedMin,
       roughSpeedMax,
       totalEfficiency,
-      roughEffMin,
-      roughEffMax,
       maxAdhesionKn,
       bomCost,
       passengerCap: body.passengerCap,
       cargoCapacityTons: body.cargoCapacityTons,
       batteryRangeKm: battery.rangeKm,
-      safetyScore: brakes.safetyIndex + (tcms.reliabilityBonus || 0),
-      components: { panto, trans, inv, motor, bogie, body, brakes, battery, tcms }
+      safetyScore: brakes.safetyIndex + (tcms.reliabilityBonus || 0) + safetyBonusTotal,
+      components: baseComponents,
+      subSelections: JSON.parse(JSON.stringify(subSelections))
     };
   }
 
-  static createVariant(name, type, slots, marginPercent) {
-    const stats = this.calculateTrainStats(slots);
+  static createVariant(name, type, slots, subSelections, marginPercent) {
+    const stats = this.calculateTrainStats(slots, subSelections);
     const laborAssemblyCost = 140000;
     const unitProductionCost = stats.bomCost + laborAssemblyCost;
     const markupFactor = 1 + (marginPercent / 100);
@@ -90,15 +105,16 @@ class TrainModelCalc {
 
     return {
       id: "var_" + Date.now().toString(36),
-      name: name || "VoltRunner Express",
-      type: type || "locomotive", // "locomotive" or "trainset"
+      name: name || "VoltRunner Electric Series",
+      type: type || "locomotive",
       slots: { ...slots },
+      subSelections: JSON.parse(JSON.stringify(subSelections)),
       stats,
       marginPercent,
       unitProductionCost,
       salePrice,
       profitPerUnit,
-      certified: false, // Testing track required for true stats
+      certified: false,
       testedStats: null,
       unitsProduced: 0
     };

@@ -9,58 +9,99 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
+.view-grid-four {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
 
 .cad-container {
   background-color: var(--bg-panel);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 14px;
+  padding: 16px;
   margin-bottom: 14px;
 }
 
-/* CAD Schematic Viewport */
-.train-schematic-wrap {
-  width: 100%;
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-subtle);
-  background-color: #0d131e;
-  margin-bottom: 12px;
-}
-.train-schematic-wrap svg {
-  max-width: 95%;
-  height: auto;
-}
-
-/* Component Selector Grid */
-.slot-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px;
-  margin-top: 8px;
-}
-.slot-card {
+/* Subsystem Configuration Cards */
+.subsystem-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.subsystem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.subsystem-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.subcomponent-box {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  padding: 8px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.slot-header {
+.subcomponent-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.c-select-custom {
+  background-color: var(--bg-panel);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  padding: 4px 8px;
+  font-size: 11px;
+  width: 100%;
+  cursor: pointer;
+}
+.c-select-custom:focus {
+  border-color: var(--color-blue);
+}
+
+/* Menu Modal Selection Cards */
+.catalog-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 520px;
+  overflow-y: auto;
+}
+.catalog-menu-item {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  transition: all var(--trans-fast);
 }
-.slot-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
+.catalog-menu-item:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
+.catalog-menu-item.active {
+  border-color: var(--color-blue);
+  background-color: rgba(37, 99, 235, 0.08);
 }
 
 /* Data Tables */
@@ -150,7 +191,7 @@
 }
 
 @media (max-width: 1024px) {
-  .view-grid-two, .view-grid-three {
+  .view-grid-two, .view-grid-three, .view-grid-four {
     grid-template-columns: 1fr;
   }
   .tech-tree-grid {

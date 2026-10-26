@@ -28,6 +28,19 @@ const COMPONENTS_DATA = {
       desc: "Multi-voltage collector capable of dynamic switching between AC and DC networks."
     },
     {
+      id: "panto_freight",
+      name: "Heavy-Duty Dual-Head Freight Collector",
+      type: "pantograph",
+      voltage: "25 Kilovolt Alternating Current",
+      maxSpeed: 160,
+      weight: 560,
+      cost: 65000,
+      leadDays: 11,
+      supplier: "VanderPant Overhead Systems",
+      inHouseTech: null,
+      desc: "Reinforced twin-strip head designed for sustained high current on freight grades."
+    },
+    {
       id: "panto_hs",
       name: "Aerodynamic High-Speed Pantograph",
       type: "pantograph",
@@ -38,7 +51,7 @@ const COMPONENTS_DATA = {
       leadDays: 20,
       supplier: "AeroVolt High-Speed Technologies",
       inHouseTech: "tech_composite_chassis",
-      desc: "Carbon-profile collector engineered for reduced aerodynamic drag at speeds above 300 km/h."
+      desc: "Carbon-profile collector engineered for reduced aerodynamic drag above 300 km/h."
     }
   ],
   transformer: [
@@ -53,7 +66,20 @@ const COMPONENTS_DATA = {
       leadDays: 18,
       supplier: "TrafoTech Global AG",
       inHouseTech: null,
-      desc: "Robust oil-immersed core transformer suited for freight locomotives and sustained load."
+      desc: "Robust oil-immersed core transformer suited for freight locomotives."
+    },
+    {
+      id: "trans_regional",
+      name: "Medium Modular Regional Transformer",
+      type: "transformer",
+      powerRatingKw: 4800,
+      efficiency: 0.94,
+      weight: 4900,
+      cost: 240000,
+      leadDays: 20,
+      supplier: "TrafoTech Global AG",
+      inHouseTech: null,
+      desc: "Balanced footprint transformer engineered for interurban commuter trainsets."
     },
     {
       id: "trans_compact",
@@ -66,7 +92,7 @@ const COMPONENTS_DATA = {
       leadDays: 24,
       supplier: "Helvetia Electric Industries",
       inHouseTech: "tech_compact_transformer",
-      desc: "Low-profile underfloor transformer freeing passenger cabin volume in multiple units."
+      desc: "Low-profile underfloor transformer freeing passenger cabin volume."
     },
     {
       id: "trans_solidstate",
@@ -94,7 +120,20 @@ const COMPONENTS_DATA = {
       leadDays: 10,
       supplier: "StaticPulse Power Systems",
       inHouseTech: null,
-      desc: "Standard dual-level insulated-gate bipolar transistor converter with forced air cooling."
+      desc: "Standard dual-level insulated-gate bipolar transistor converter with air cooling."
+    },
+    {
+      id: "inv_igbt_freight",
+      name: "High-Overload Freight Traction Inverter",
+      type: "inverter",
+      maxKw: 4800,
+      efficiency: 0.93,
+      weight: 2100,
+      cost: 190000,
+      leadDays: 14,
+      supplier: "StaticPulse Power Systems",
+      inHouseTech: null,
+      desc: "Enhanced thermal mass converter capable of sustaining 150% peak starting torque."
     },
     {
       id: "inv_igbt_liquid",
@@ -138,6 +177,19 @@ const COMPONENTS_DATA = {
       desc: "Durable squirrel-cage induction motor with low maintenance requirements."
     },
     {
+      id: "mot_ind_commuter",
+      name: "Lightweight Regional Induction Motor",
+      type: "motor",
+      powerKw: 4200,
+      maxRpmSpeed: 210,
+      weight: 3100,
+      cost: 145000,
+      leadDays: 15,
+      supplier: "Nordic Traction Motors",
+      inHouseTech: null,
+      desc: "Optimized for frequent stop-and-go acceleration profiles."
+    },
+    {
       id: "mot_ind_highoutput",
       name: "High-Output Copper Rotor Induction Motor",
       type: "motor",
@@ -161,7 +213,7 @@ const COMPONENTS_DATA = {
       leadDays: 28,
       supplier: "MagnaDrive Electric",
       inHouseTech: "tech_pmsm_traction",
-      desc: "High-power-density synchronous motor enabling rapid acceleration for express passenger fleets."
+      desc: "High-power-density synchronous motor enabling rapid express acceleration."
     }
   ],
   bogie: [
@@ -180,6 +232,20 @@ const COMPONENTS_DATA = {
       desc: "Six high-capacity wheelsets delivering maximum rail adhesion for heavy mineral transport."
     },
     {
+      id: "bog_bo_bo_standard",
+      name: "Four-Axle Commuter Bogie Assembly",
+      type: "bogie",
+      axles: 4,
+      maxAxleLoadTons: 19.0,
+      maxSafeSpeed: 180,
+      cost: 130000,
+      weight: 12500,
+      leadDays: 14,
+      supplier: "CastIron Engineering Works",
+      inHouseTech: null,
+      desc: "Simple four-axle frame optimized for suburban and regional commuter fleets."
+    },
+    {
       id: "bog_bo_bo",
       name: "Four-Axle Express Flexicoil Bogie Assembly",
       type: "bogie",
@@ -191,7 +257,7 @@ const COMPONENTS_DATA = {
       leadDays: 16,
       supplier: "CastIron Engineering Works",
       inHouseTech: null,
-      desc: "Four-axle secondary air-suspension bogie optimized for smooth high-speed passenger ride."
+      desc: "Secondary air-suspension bogie optimized for smooth high-speed passenger ride."
     },
     {
       id: "bog_articulated",
@@ -224,6 +290,20 @@ const COMPONENTS_DATA = {
       desc: "High-yield structural carbon steel chassis designed for heavy freight locomotives."
     },
     {
+      id: "body_steel_passenger",
+      name: "Stainless Steel Single-Deck Passenger Coach",
+      type: "carbody",
+      dragCd: 0.42,
+      passengerCap: 220,
+      cargoCapacityTons: 10,
+      weight: 19500,
+      cost: 210000,
+      leadDays: 16,
+      supplier: "Standard Industrial Foundry",
+      inHouseTech: null,
+      desc: "Corrosion-resistant corrugated stainless steel shell for commuter service."
+    },
+    {
       id: "body_aluminum",
       name: "Hollow Extruded Aluminum Carbody Shell",
       type: "carbody",
@@ -235,7 +315,7 @@ const COMPONENTS_DATA = {
       leadDays: 20,
       supplier: "AeroAlloy Trainworks",
       inHouseTech: "tech_aluminum_extrusion",
-      desc: "Lightweight extruded aluminum profile body shell built for passenger multiple units."
+      desc: "Lightweight extruded aluminum profile body shell built for multiple units."
     },
     {
       id: "body_aero_cf",
@@ -249,10 +329,23 @@ const COMPONENTS_DATA = {
       leadDays: 30,
       supplier: "AeroAlloy Trainworks",
       inHouseTech: "tech_composite_chassis",
-      desc: "Streamlined aerodynamic front profile engineered to minimize tunnel micro-pressure waves."
+      desc: "Streamlined aerodynamic front profile engineered to minimize tunnel waves."
     }
   ],
   brakes: [
+    {
+      id: "brk_disc_basic",
+      name: "Standard Pneumatic Triple-Valve Disc Brakes",
+      type: "brakes",
+      regenEfficiency: 0.12,
+      safetyIndex: 78,
+      weight: 2600,
+      cost: 45000,
+      leadDays: 7,
+      supplier: "Bremse Systems International",
+      inHouseTech: null,
+      desc: "Traditional pneumatic brake pipe system with mechanical discs."
+    },
     {
       id: "brk_disc_regen",
       name: "Blended Regenerative and Pneumatic Disc Brakes",
@@ -264,7 +357,7 @@ const COMPONENTS_DATA = {
       leadDays: 8,
       supplier: "Bremse Systems International",
       inHouseTech: null,
-      desc: "Recovers electrical kinetic energy to the overhead catenary while maintaining fail-safe discs."
+      desc: "Recovers electrical kinetic energy to the catenary while maintaining fail-safe discs."
     },
     {
       id: "brk_eddy_current",
@@ -277,7 +370,7 @@ const COMPONENTS_DATA = {
       leadDays: 18,
       supplier: "Bremse Systems International",
       inHouseTech: "tech_regenerative_grid",
-      desc: "Frictionless electromagnetic rail brake providing high deceleration rates without wheel wear."
+      desc: "Frictionless electromagnetic rail brake providing high deceleration rates."
     }
   ],
   battery: [
@@ -292,7 +385,7 @@ const COMPONENTS_DATA = {
       leadDays: 0,
       supplier: "Direct Wire Configuration",
       inHouseTech: null,
-      desc: "Locomotive operates exclusively while connected to energized overhead catenary wires."
+      desc: "Locomotive operates exclusively while connected to energized catenary."
     },
     {
       id: "bat_lfp_lastmile",
@@ -305,7 +398,7 @@ const COMPONENTS_DATA = {
       leadDays: 14,
       supplier: "VoltaRail Storage Systems",
       inHouseTech: "tech_battery_traction",
-      desc: "Provides self-propelled last-mile shunting across non-electrified terminals and sidings."
+      desc: "Provides self-propelled last-mile shunting across non-electrified sidings."
     },
     {
       id: "bat_nmc_intercity",
@@ -318,7 +411,7 @@ const COMPONENTS_DATA = {
       leadDays: 24,
       supplier: "VoltaRail Storage Systems",
       inHouseTech: "tech_intercity_battery",
-      desc: "High-energy density module designed to span non-electrified gaps on regional branch corridors."
+      desc: "High-energy density module designed to span non-electrified gaps on branch lines."
     }
   ],
   tcms: [
@@ -359,7 +452,7 @@ const COMPONENTS_DATA = {
       leadDays: 24,
       supplier: "CyberTransit Systems",
       inHouseTech: "tech_driverless_ato",
-      desc: "Full automated train operation with neural adhesion control and optimized energy coasting."
+      desc: "Full automated train operation with neural adhesion control and coasting optimization."
     }
   ]
 };

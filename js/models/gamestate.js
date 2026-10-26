@@ -93,12 +93,10 @@ class GameState {
   }
 
   getInHouseUnitCost(component) {
-    // In-house raw materials and direct labor cost: 58% of external supplier price
     return Math.round(component.cost * 0.58);
   }
 
   getInHouseFabricationDays(component, quantity) {
-    // In-house fabrication time scales with batch quantity
     const baseDays = Math.max(3, Math.round(component.leadDays * 0.65));
     return baseDays + Math.floor(quantity * 0.5);
   }
