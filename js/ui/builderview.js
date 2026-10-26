@@ -15,9 +15,12 @@ class BuilderView {
 
   static currentSlots = {
     pantograph: "panto_std",
+    circuitbreaker: "vcb_vacuum_ac",
     transformer: "trans_heavy",
+    dclink: "dclink_polypropylene_film",
     inverter: "inv_igbt_air",
     motor: "mot_ind_basic",
+    transmission: "transm_quill_hollow",
     auxiliary: "aux_std_static",
     cooling: "cool_oil_radiator",
     compressor: "comp_screw_rotary",
@@ -198,9 +201,12 @@ class BuilderView {
 
     const categories = [
       { key: "pantograph", label: "Pantograph Collector System", required: true },
+      { key: "circuitbreaker", label: "Main Vacuum Circuit Breaker (VCB)", required: true },
       { key: "transformer", label: "Main Traction Transformer / Filter", required: true },
+      { key: "dclink", label: "DC Intermediate Link & Capacitor Bank", required: true },
       { key: "inverter", label: "Traction Inverter / Converter", required: true },
       { key: "motor", label: "Traction Motors", required: true },
+      { key: "transmission", label: "Final Drive Transmission & Gearbox", required: true },
       { key: "cooling", label: "Thermal Cooling & Radiator Loop", required: true },
       { key: "compressor", label: "Pneumatic Air Supply & Drying", required: true },
       { key: "bogie", label: "Bogie & Running Gear Assembly", required: true },

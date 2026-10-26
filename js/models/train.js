@@ -43,7 +43,7 @@ class TrainModelCalc {
       }
     }
 
-    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms, sander, hvac } = baseComponents;
+    const { pantograph: panto, bogie, carbody: body, brakes, battery, tcms, sander, hvac, transmission } = baseComponents;
     const isTrainset = rollingStockType === "trainset" && consistConfig?.carriages?.length > 0;
     const carriageCount = isTrainset ? consistConfig.carriages.length : 1;
 
@@ -96,25 +96,27 @@ class TrainModelCalc {
     const netTractionPowerKw = Math.max(500, availablePowerKw - hotelPowerDrawKw);
     const horsepower = Math.round(netTractionPowerKw * 1.341);
 
-    let totalEfficiency = Number((0.92 + efficiencyBonusTotal).toFixed(3));
+    // Mechanical transmission efficiency directly impacts power transfer to rail
+    const mechEff = transmission?.mechanicalEfficiency || 0.97;
+    let totalEfficiency = Number((mechEff * 0.94 + efficiencyBonusTotal).toFixed(3));
     totalEfficiency = Math.min(0.99, Math.max(0.70, totalEfficiency));
 
     const baseCd = body.dragCd;
     const consistCd = isTrainset ? Number((baseCd + (carriageCount - 1) * 0.035).toFixed(3)) : baseCd;
     let theoreticalSpeed = Math.round(
-      Math.pow((netTractionPowerKw * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
+      Math.pow((netTractionPowerKw * totalEfficiency * 1000) / (0.5 * 1.225 * consistCd * 10.5), 1 / 3) * 3.6
     ) + speedBonusTotal;
 
+    // Apply strict speed limits (Pantograph, Bogie, Motor RPM, Transmission unsprung mass dynamics)
     theoreticalSpeed = Math.min(theoreticalSpeed, diagnostics.strictSpeedLimit + speedBonusTotal);
     if (axleOverloaded) theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
 
-    // Dynamic Adhesion: Base Bogie Adhesion + Rail Sanding Conditioner
     const adhesiveMassTons = isTrainset ? Number(((poweredCarCount * motorCarWeightKg) / 1000).toFixed(1)) : totalMassTons;
     const baseAdhesion = bogie.axles === 6 ? 0.38 : 0.32;
     const totalAdhesionCoeff = baseAdhesion + (sander?.adhesionBonus || 0) + extraAdhesionBonus;
     const maxAdhesionKn = Math.round(adhesiveMassTons * 9.81 * totalAdhesionCoeff);
 
-    const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round(netTractionPowerKw / 8.2));
+    const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round((netTractionPowerKw * mechEff) / 8.2));
     let acceleration = Number((effectiveTractiveForceKn / totalMassTons).toFixed(2));
     acceleration = Math.min(1.35, Math.max(0.18, acceleration));
 

@@ -8,10 +8,12 @@ class AcquisitionView {
   static categories = [
     {
       id: "electrical",
-      label: "Electrical Traction Systems",
+      label: "Electrical Traction & Powertrain",
       subcategories: [
         { id: "pantograph", label: "Pantographs & Current Collectors" },
+        { id: "circuitbreaker", label: "Main Vacuum Circuit Breakers" },
         { id: "transformer", label: "Traction Transformers & DC Chokes" },
+        { id: "dclink", label: "DC Intermediate Links & Capacitor Banks" },
         { id: "inverter", label: "Traction Inverters & Converters" },
         { id: "motor", label: "Traction Motors" },
         { id: "cooling", label: "Thermal Cooling Loops" },
@@ -20,8 +22,9 @@ class AcquisitionView {
     },
     {
       id: "mechanical",
-      label: "Mechanical & Running Gear",
+      label: "Mechanical, Transmission & Running Gear",
       subcategories: [
+        { id: "transmission", label: "Traction Drive Transmissions" },
         { id: "bogie", label: "Bogies & Running Gear" },
         { id: "carbody", label: "Carbodies & Aerodynamics" },
         { id: "coupler", label: "Couplers & Gangways" },
@@ -152,6 +155,7 @@ class AcquisitionView {
               ${isSupplier ? "External Supplier" : (isUnlocked ? "In-House Ready" : "Research Required")}
             </span>
           </div>
+
           <p class="text-muted" style="font-size:10px; line-height:1.35; margin:6px 0 8px;">${comp.desc}</p>
           <div style="background:var(--bg-panel); border:1px solid var(--border-subtle); padding:6px 8px; border-radius:var(--radius-xs); display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
             <div>Warehouse: <strong class="font-mono text-blue">${state.warehouse[comp.id] || 0}</strong></div>
