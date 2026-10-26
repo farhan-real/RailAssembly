@@ -27,6 +27,26 @@
   overflow: hidden;
 }
 
+.stat-card-clickable {
+  cursor: pointer;
+  transition: border-color var(--trans-fast), transform var(--trans-fast), box-shadow var(--trans-fast);
+  user-select: none;
+}
+.stat-card-clickable:hover {
+  border-color: var(--color-blue) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.stat-card-clickable:active {
+  transform: translateY(0);
+}
+.stat-hint-tag {
+  font-size: 8.5px;
+  color: var(--color-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 .variant-indicator-banner {
   display: inline-flex;
   align-items: center;

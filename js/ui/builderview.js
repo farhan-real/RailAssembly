@@ -134,10 +134,10 @@ class BuilderView {
         ` : ""}
 
         <div class="view-grid-four" style="margin-bottom:12px;">
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
+          <div class="stat-card-clickable" data-guide="speed" style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
-              <span class="c-badge badge-blue font-mono" style="font-size:9px;">Adhesion: ${stats.maxAdhesionKn} kN</span>
+              <span class="stat-hint-tag">Inspect &rarr;</span>
             </div>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.theoreticalSpeed} km/h &bull; ${stats.acceleration.toFixed(2)} m/s²
@@ -148,24 +148,33 @@ class BuilderView {
             </div>
           </div>
 
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Net Traction Power</span>
+          <div class="stat-card-clickable" data-guide="power" style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Net Traction Power</span>
+              <span class="stat-hint-tag">Inspect &rarr;</span>
+            </div>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.availablePowerKw.toLocaleString()} kW (${stats.horsepower.toLocaleString()} hp)
             </div>
             <span class="text-muted" style="font-size:9px;">Powertrain Efficiency: ${(stats.totalEfficiency * 100).toFixed(1)}%</span>
           </div>
 
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load &bull; Gross Mass</span>
+          <div class="stat-card-clickable" data-guide="axleload" style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load &bull; Gross Mass</span>
+              <span class="stat-hint-tag">Inspect &rarr;</span>
+            </div>
             <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:13px; margin:2px 0;">
               ${stats.axleLoad.toFixed(2)} t / Axle (Limit: ${stats.maxAllowedAxleLoad.toFixed(1)} t)
             </div>
             <span class="text-muted" style="font-size:9px;">Consist Mass: ${stats.totalMassTons.toFixed(1)} Metric Tons</span>
           </div>
 
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Consist BOM Cost</span>
+          <div class="stat-card-clickable" data-guide="cost" style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Consist BOM Cost</span>
+              <span class="stat-hint-tag">Inspect &rarr;</span>
+            </div>
             <div class="font-mono text-warning" style="font-size:13px; margin:2px 0;">
               $${stats.bomCost.toLocaleString()}
             </div>
@@ -211,6 +220,13 @@ class BuilderView {
       BuilderView.render(document.getElementById("viewport-root"));
     };
     document.getElementById("btn-design-archive").onclick = () => DesignView.openDesignManager(this);
+
+    document.querySelectorAll(".stat-card-clickable").forEach(card => {
+      card.onclick = () => {
+        const guideKey = card.getAttribute("data-guide");
+        StatGuideView.show(guideKey, BuilderView);
+      };
+    });
 
     const btnMakeVar = document.getElementById("btn-toolbar-make-variant");
     if (btnMakeVar) {
