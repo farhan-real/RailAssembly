@@ -1,4 +1,4 @@
-// Central Game State Singleton with Audio Settings, Persistence, and Reset
+// Central Game State Singleton with Time and Money R&D System
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -53,7 +53,7 @@ class GameState {
       return { success: false, reason: "Technology is already developed." };
     }
 
-    const unfulfilledPrereqs = tech.prereq.filter(p => !this.unlockedTechs.has(p));
+    const unfulfilledPrereqs = (tech.prereq || []).filter(p => !this.unlockedTechs.has(p));
     if (unfulfilledPrereqs.length > 0) {
       return { success: false, reason: "Branch locked: complete prerequisite research first." };
     }
@@ -203,6 +203,20 @@ class GameState {
     if (this.longStorage[componentId] === 0) delete this.longStorage[componentId];
     this.addToWarehouse(componentId, count);
     return true;
+  }
+
+  isInHouseAvailable(component) {
+    if (!component.inHouseTech) return true;
+    return this.unlockedTechs.has(component.inHouseTech);
+  }
+
+  getInHouseUnitCost(component) {
+    return Math.round(component.cost * 0.58);
+  }
+
+  getInHouseFabricationDays(component, quantity) {
+    const baseDays = Math.max(3, Math.round(component.leadDays * 0.65));
+    return baseDays + Math.floor(quantity * 0.5);
   }
 
   findCarriageType(typeId) {

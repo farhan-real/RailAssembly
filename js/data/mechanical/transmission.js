@@ -1,4 +1,4 @@
-// Traction Transmissions & Final Drives: Stats, Info, Subcomponents, and Research Metadata
+// Traction Transmissions & Final Drives: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -15,7 +15,7 @@ COMPONENTS_DATA.transmission = [
     cost: 32000,
     leadDays: 10,
     supplier: "Voith Turbo Rail",
-    inHouseTech: null,
+    inHouseTech: "tech_transm_nose_hung",
     desc: "High unsprung mass imposes a hard 140 km/h speed limit to prevent severe track impact."
   },
   {
@@ -29,7 +29,7 @@ COMPONENTS_DATA.transmission = [
     cost: 68000,
     leadDays: 15,
     supplier: "Voith Turbo Rail",
-    inHouseTech: "tech_quill_drive",
+    inHouseTech: "tech_transm_quill_230",
     desc: "Motor is fully suspended on bogie frame with torque transmitted via rubber links. Speed limit: 230 km/h."
   },
   {
@@ -43,7 +43,7 @@ COMPONENTS_DATA.transmission = [
     cost: 135000,
     leadDays: 22,
     supplier: "Voith Turbo Rail",
-    inHouseTech: "tech_radial_bogies",
+    inHouseTech: "tech_transm_cardan_320",
     desc: "Precision balanced cardan drive built for 320 km/h high-speed passenger trainsets."
   },
   {
@@ -57,7 +57,7 @@ COMPONENTS_DATA.transmission = [
     cost: 185000,
     leadDays: 26,
     supplier: "Voith Turbo Rail",
-    inHouseTech: "tech_active_tilting",
+    inHouseTech: "tech_transm_bevel_380",
     desc: "Precision-ground helical gearset with direct oil mist injection for 380 km/h running."
   },
   {
@@ -71,7 +71,7 @@ COMPONENTS_DATA.transmission = [
     cost: 260000,
     leadDays: 32,
     supplier: "Voith Turbo Rail",
-    inHouseTech: "tech_active_tilting",
+    inHouseTech: "tech_transm_direct_420",
     desc: "Gearless hollow rotor shaft eliminating transmission gearbox losses for 400+ km/h sprints."
   }
 ];
@@ -86,13 +86,9 @@ SUBCOMPONENTS_DATA.transmission = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_quill_drive",
-    name: "Hollow-Shaft Flexible Quill Drive",
-    branch: "running_gear",
-    costMoney: 600000,
-    durationDays: 55,
-    unlocks: ["transm_quill_hollow"],
-    desc: "Fully suspends motor on bogie frame, reducing unsprung mass for speeds up to 230 km/h."
-  }
+  { id: "tech_transm_nose_hung", name: "Axle-Hung Nose-Suspended Drive Assembly", branch: "running_gear", costMoney: 180000, durationDays: 30, unlocks: ["transm_nose_hung"], desc: "Robust and economical gear reduction for freight locomotives up to 140 km/h." },
+  { id: "tech_transm_quill_230", name: "Hollow-Shaft Flexible Quill Transmission", branch: "running_gear", costMoney: 600000, durationDays: 55, unlocks: ["transm_quill_hollow"], desc: "Fully suspends motor on bogie frame, cutting unsprung mass for speeds up to 230 km/h." },
+  { id: "tech_transm_cardan_320", name: "High-Speed Tripod Cardan Transmission (320 km/h)", branch: "running_gear", costMoney: 1600000, durationDays: 85, unlocks: ["transm_cardan_tripod_320"], desc: "Precision balanced cardan drive isolated from track impact forces for 320 km/h." },
+  { id: "tech_transm_bevel_380", name: "Precision Helical Bevel Gear Unit (380 km/h)", branch: "running_gear", costMoney: 2900000, durationDays: 120, unlocks: ["transm_hs_direct_380"], desc: "Integrated gearset with pressurized oil spray lubrication rated for 380 km/h." },
+  { id: "tech_transm_direct_420", name: "Gearless Hollow-Shaft Direct Drive (420 km/h)", branch: "running_gear", costMoney: 4400000, durationDays: 150, unlocks: ["transm_hyper_drive_420"], desc: "Direct torque transmission eliminating gear mesh friction for 400+ km/h." }
 );

@@ -1,6 +1,7 @@
-// Air Compressors & Dryers: Stats, Info, Subcomponents, and Research Metadata
+// Air Compressors & Dryers: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
+window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
 
 COMPONENTS_DATA.compressor = [
   {
@@ -13,7 +14,7 @@ COMPONENTS_DATA.compressor = [
     cost: 26000,
     leadDays: 7,
     supplier: "Knorr Air Dynamics",
-    inHouseTech: null,
+    inHouseTech: "tech_comp_piston_basic",
     desc: "Baseline pneumatic supply for brake pipe charging and pantograph elevation. Capacity: 900 L/min."
   },
   {
@@ -26,7 +27,7 @@ COMPONENTS_DATA.compressor = [
     cost: 52000,
     leadDays: 12,
     supplier: "Knorr Air Dynamics",
-    inHouseTech: null,
+    inHouseTech: "tech_comp_screw_rotary",
     desc: "High-volume quiet rotary screw pump with integrated air-dryer. Capacity: 1950 L/min."
   },
   {
@@ -39,7 +40,7 @@ COMPONENTS_DATA.compressor = [
     cost: 92000,
     leadDays: 18,
     supplier: "Knorr Air Dynamics",
-    inHouseTech: "tech_advanced_inverters",
+    inHouseTech: "tech_comp_dual_redundant",
     desc: "Dual independent screw compressors designed for rapid charging of long 10+ carriage trainsets."
   }
 ];
@@ -53,3 +54,9 @@ SUBCOMPONENTS_DATA.compressor = {
     { id: "comp_softstart", name: "Electronic Soft-Start Inverter Drive", cost: 9500, weight: 15, reliabilityBonus: 6, desc: "Eliminates high starting current spikes when air compressor motors cycle on." }
   ]
 };
+
+COMPONENT_RESEARCH.push(
+  { id: "tech_comp_piston_basic", name: "Reciprocating Piston Air Compressor", branch: "automation", costMoney: 140000, durationDays: 25, unlocks: ["comp_piston_basic"], desc: "Reliable mechanical piston pump supplying pneumatic brake and pantograph pressure." },
+  { id: "tech_comp_screw_rotary", name: "Oil-Free Rotary Screw Air Compressor", branch: "automation", costMoney: 280000, durationDays: 45, unlocks: ["comp_screw_rotary"], desc: "Continuous rotary compression delivering 1950 L/min with low cabin acoustic noise." },
+  { id: "tech_comp_dual_redundant", name: "Dual-Channel High-Volume Pneumatics Module", branch: "automation", costMoney: 620000, durationDays: 65, unlocks: ["comp_dual_redundant"], desc: "Dual independent screw compressors for rapid brake charging on long passenger consists." }
+);

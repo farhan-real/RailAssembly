@@ -1,4 +1,4 @@
-// Traction Transformers & DC Chokes: Stats, Info, Subcomponents, and Research Metadata
+// Traction Transformers & DC Chokes: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -15,7 +15,7 @@ COMPONENTS_DATA.transformer = [
     cost: 75000,
     leadDays: 8,
     supplier: "TrafoTech Global AG",
-    inHouseTech: null,
+    inHouseTech: "tech_trans_dc_choke",
     desc: "Direct LC smoothing for DC catenary networks with zero heavy transformer core."
   },
   {
@@ -29,7 +29,7 @@ COMPONENTS_DATA.transformer = [
     cost: 180000,
     leadDays: 18,
     supplier: "TrafoTech Global AG",
-    inHouseTech: null,
+    inHouseTech: "tech_trans_heavy_ac",
     desc: "Robust oil-cooled iron core transformer suited for freight locomotives."
   },
   {
@@ -43,7 +43,7 @@ COMPONENTS_DATA.transformer = [
     cost: 320000,
     leadDays: 24,
     supplier: "Helvetia Electric Industries",
-    inHouseTech: "tech_compact_transformer",
+    inHouseTech: "tech_trans_compact_underfloor",
     desc: "Low-profile underfloor transformer freeing passenger cabin volume."
   },
   {
@@ -57,7 +57,7 @@ COMPONENTS_DATA.transformer = [
     cost: 620000,
     leadDays: 32,
     supplier: "QuantumPower Systems",
-    inHouseTech: "tech_solid_state_trans",
+    inHouseTech: "tech_trans_solid_state",
     desc: "Next-gen electronic high-frequency conversion replacing heavy iron cores."
   }
 ];
@@ -75,22 +75,8 @@ SUBCOMPONENTS_DATA.transformer = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_compact_transformer",
-    name: "Underfloor Compact Transformer",
-    branch: "electronics",
-    costMoney: 850000,
-    durationDays: 70,
-    unlocks: ["trans_compact", "inv_liquid_highpower_320"],
-    desc: "Slim underfloor multi-winding transformer design freeing interior passenger cabin space."
-  },
-  {
-    id: "tech_solid_state_trans",
-    name: "Solid-State High-Frequency Matrix Transformer",
-    branch: "electronics",
-    costMoney: 4900000,
-    durationDays: 180,
-    unlocks: ["trans_solidstate"],
-    desc: "Completely replaces heavy iron cores with microsecond semiconductor high-frequency conversion."
-  }
+  { id: "tech_trans_dc_choke", name: "Direct DC Smoothing Choke & LC Filter", branch: "electronics", costMoney: 190000, durationDays: 30, unlocks: ["trans_none_dc"], desc: "Iron-core inductors eliminating AC conversion mass on dedicated DC networks." },
+  { id: "tech_trans_heavy_ac", name: "Heavy-Duty Multi-Secondary 25kV Transformer", branch: "electronics", costMoney: 340000, durationDays: 45, unlocks: ["trans_heavy"], desc: "High-reliability oil-immersed core for sustained freight locomotive traction." },
+  { id: "tech_trans_compact_underfloor", name: "Low-Profile Underfloor Traction Transformer", branch: "electronics", costMoney: 850000, durationDays: 70, unlocks: ["trans_compact"], desc: "Flat-core multi-winding architecture fitted underneath multiple-unit passenger cars." },
+  { id: "tech_trans_solid_state", name: "Solid-State High-Frequency Power Matrix Transformer", branch: "electronics", costMoney: 4900000, durationDays: 180, unlocks: ["trans_solidstate"], desc: "Electronic multi-stage conversion eliminating copper windings with 9.2 MW throughput." }
 );

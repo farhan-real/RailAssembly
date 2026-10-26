@@ -1,288 +1,240 @@
-// Single-Source Research Tree with Highly Descriptive Industrial Engineering Specifications
+// Research Tree Graph Structure & Single-Source Hierarchy
+// Every single component maps to a dedicated research node stemming from tech_core
 const TREE_STRUCTURE = {
   core: {
     id: "tech_core",
-    name: "Baseline 25kV Industrial Electric Traction Infrastructure",
+    name: "Foundational Electric Traction Core",
     branch: "core",
-    x: 800,
-    y: 550,
+    x: 1400,
+    y: 1000,
     costMoney: 0,
     durationDays: 0,
     prereq: [],
-    unlocks: [
-      "body_steel", "panto_std", "panto_urban_dc", "trans_heavy", "trans_none_dc",
-      "inv_igbt_air", "mot_ind_basic", "mot_ind_commuter", "bog_bo_bo", "bog_tram_light",
-      "transm_nose_hung", "vcb_vacuum_ac", "vcb_dc_highspeed", "dclink_electrolytic",
-      "pwm_sine_triangle_analog", "comp_piston_basic", "cool_forced_air", "coup_scharf_commuter",
-      "brk_disc_regen", "tcms_basic", "wsp_basic"
-    ],
-    desc: "Baseline 25kV 50Hz AC and 1.5kV/3kV DC electrified railway infrastructure. Forms the operational core from which all specialized propulsion and structural lines branch."
+    unlocks: [],
+    desc: "The central electric traction directorate and laboratory foundation. All specialized engineering lines branch outward from this single core."
   },
   branches: [
-    { key: "aerodynamics", label: "Aerodynamics & Lightweight Structural Engineering" },
-    { key: "electronics", label: "Power Semiconductor Electronics & Inverter Modulation" },
-    { key: "motors", label: "High-Torque & High-RPM Traction Propulsion Motors" },
-    { key: "running_gear", label: "Running Gear, Radial Bogies & High-Speed Transmissions" },
-    { key: "power_collection", label: "High-Speed Catenary Current Collection & Adhesion" },
-    { key: "automation", label: "Energy Storage, Signal Protection & Autonomous ATO" }
+    { key: "aerodynamics", label: "Track 1: Aerodynamics, Carbodies & Nose Cones" },
+    { key: "electronics", label: "Track 2: Transformers, Inverters & PWM Modulation" },
+    { key: "motors", label: "Track 3: High-Torque & High-RPM Traction Motors" },
+    { key: "running_gear", label: "Track 4: Bogies, Transmissions, Couplers & Brakes" },
+    { key: "power_collection", label: "Track 5: Pantographs, Circuit Breakers & Cooling" },
+    { key: "automation", label: "Track 6: Pneumatics, Batteries, HVAC & TCMS Automation" }
   ],
-  nodes: [
-    // Track 1: Aerodynamics (Branching Up & Up-Right)
-    {
-      id: "tech_aluminum_extrusion",
-      name: "Aerospace-Grade 6000-Series Hollow Extruded Aluminum Bodyshell",
-      branch: "aerodynamics",
-      x: 800,
-      y: 420,
-      costMoney: 350000,
-      durationDays: 45,
-      prereq: ["tech_core"],
-      unlocks: ["body_aluminum"],
-      desc: "Tooling for hollow extruded aluminum bodyshell sections, lowering vehicle tare mass by 40% while preserving structural rigidity."
-    },
-    {
-      id: "tech_composite_chassis",
-      name: "Carbon-Fiber Reinforced Polymer (CFRP) Monocoque Shell",
-      branch: "aerodynamics",
-      x: 800,
-      y: 290,
-      costMoney: 1200000,
-      durationDays: 75,
-      prereq: ["tech_aluminum_extrusion"],
-      unlocks: ["body_aero_cf"],
-      desc: "Autoclave-cured carbon-composite monocoque construction cutting aerodynamic drag coefficient to Cd 0.22 for 300 km/h operation."
-    },
-    {
-      id: "tech_streamlined_nose_320",
-      name: "320 km/h Shinkansen-Derived Long-Nose Tunnel Shockwave Mitigator",
-      branch: "aerodynamics",
-      x: 700,
-      y: 160,
-      costMoney: 2600000,
-      durationDays: 110,
-      prereq: ["tech_composite_chassis"],
-      unlocks: ["body_bullet_360", "coup_aero_retractable"],
-      desc: "Dual-taper long aerodynamic nose geometry eliminating micro-pressure sonic boom waves when entering tunnels at 320 to 360 km/h."
-    },
-    {
-      id: "tech_ultra_aero_400",
-      name: "420 km/h Boundary-Layer Micro-Slotted Supersonic Wave Fairing",
-      branch: "aerodynamics",
-      x: 700,
-      y: 50,
-      costMoney: 4800000,
-      durationDays: 160,
-      prereq: ["tech_streamlined_nose_320"],
-      unlocks: ["body_hyper_400"],
-      desc: "Boundary-layer suction fairing achieving an ultra-low Cd 0.14 drag coefficient certified for sustained 420 km/h commercial sprints."
-    },
+  coords: {
+    // Track 1: Aerodynamics (Branching Upwards from Core)
+    tech_body_structural_steel: { x: 1400, y: 860 },
+    tech_body_aluminum_extruded: { x: 1400, y: 720 },
+    tech_body_carbon_monocoque: { x: 1400, y: 580 },
+    tech_body_shinkansen_360: { x: 1300, y: 440 },
+    tech_body_supersonic_420: { x: 1300, y: 300 },
+    tech_coup_retractable_nose: { x: 1500, y: 440 },
 
-    // Track 2: Power Electronics (Branching Up & Up-Left)
-    {
-      id: "tech_advanced_inverters",
-      name: "Closed-Loop Liquid-Cooled IGBT Variable Frequency Inverter",
-      branch: "electronics",
-      x: 600,
-      y: 420,
-      costMoney: 450000,
-      durationDays: 50,
-      prereq: ["tech_core"],
-      unlocks: ["inv_igbt_liquid", "pwm_space_vector_svm"],
-      desc: "Liquid-cooled insulated-gate bipolar transistor converter delivering up to 6200 kW smooth variable-frequency traction drive."
-    },
-    {
-      id: "tech_compact_transformer",
-      name: "Low-Profile Multi-Winding High-Speed Underfloor Transformer",
-      branch: "electronics",
-      x: 600,
-      y: 290,
-      costMoney: 850000,
-      durationDays: 70,
-      prereq: ["tech_advanced_inverters"],
-      unlocks: ["trans_compact", "inv_liquid_highpower_320"],
-      desc: "Low-profile multi-secondary underfloor transformer rated for 7500 kW continuous throughput on multi-unit passenger consists."
-    },
-    {
-      id: "tech_sic_power",
-      name: "High-Frequency Silicon Carbide (SiC) MOSFET Power Converter",
-      branch: "electronics",
-      x: 500,
-      y: 160,
-      costMoney: 2400000,
-      durationDays: 120,
-      prereq: ["tech_compact_transformer"],
-      unlocks: ["inv_sic", "pwm_ultrasonic_sic_vector", "dclink_supercap_hybrid"],
-      desc: "Wide-bandgap Silicon Carbide power semiconductors slashing switching thermal loss by 70% and permitting 18 kHz PWM operation."
-    },
-    {
-      id: "tech_solid_state_trans",
-      name: "Solid-State High-Frequency Electronic Matrix Power Transformer",
-      branch: "electronics",
-      x: 500,
-      y: 50,
-      costMoney: 4900000,
-      durationDays: 180,
-      prereq: ["tech_sic_power"],
-      unlocks: ["trans_solidstate", "inv_sic_dual_380"],
-      desc: "Direct semiconductor-based high-frequency matrix power converter replacing heavy oil-filled iron cores with 9.8 MW solid-state throughput."
-    },
+    // Track 2: Power Electronics (Branching Up-Left from Core)
+    tech_trans_heavy_ac: { x: 1180, y: 860 },
+    tech_trans_dc_choke: { x: 1020, y: 860 },
+    tech_dclink_electrolytic: { x: 1180, y: 720 },
+    tech_inv_air_cooled: { x: 1180, y: 580 },
+    tech_pwm_analog_spwm: { x: 1020, y: 580 },
+    tech_pwm_musical_shift: { x: 1020, y: 440 },
+    tech_dclink_film: { x: 860, y: 720 },
+    tech_inv_liquid_vvvf: { x: 860, y: 580 },
+    tech_pwm_space_vector: { x: 860, y: 440 },
+    tech_pwm_she_freight: { x: 700, y: 440 },
+    tech_trans_compact_underfloor: { x: 860, y: 300 },
+    tech_inv_highpower_320: { x: 860, y: 160 },
+    tech_inv_sic_mosfet: { x: 700, y: 160 },
+    tech_pwm_direct_torque: { x: 540, y: 440 },
+    tech_pwm_sopp_express: { x: 540, y: 300 },
+    tech_pwm_ultrasonic_sic: { x: 540, y: 160 },
+    tech_pwm_neural_adaptive: { x: 380, y: 160 },
+    tech_dclink_supercap: { x: 700, y: 300 },
+    tech_trans_solid_state: { x: 700, y: 50 },
+    tech_inv_sic_hyper_380: { x: 540, y: 50 },
+    tech_aux_aps_static: { x: 1020, y: 720 },
+    tech_aux_aps_hvac: { x: 1020, y: 300 },
 
-    // Track 3: Traction Propulsion Motors (Branching Far Right)
-    {
-      id: "tech_high_torque_motors",
-      name: "Reinforced Copper-Endring Squirrel-Cage Asynchronous Motor",
-      branch: "motors",
-      x: 1000,
-      y: 550,
-      costMoney: 750000,
-      durationDays: 60,
-      prereq: ["tech_core"],
-      unlocks: ["mot_ind_highoutput", "pwm_selective_harmonic_she"],
-      desc: "Die-cast pure copper end-rings providing exceptional thermal endurance and sustained tractive effort for heavy freight haulage."
-    },
-    {
-      id: "tech_pmsm_traction",
-      name: "High-RPM Permanent Magnet Synchronous Traction Motor (320 km/h)",
-      branch: "motors",
-      x: 1180,
-      y: 550,
-      costMoney: 2200000,
-      durationDays: 100,
-      prereq: ["tech_high_torque_motors"],
-      unlocks: ["mot_pmsm", "mot_pmsm_express_320", "pwm_direct_torque_dtc"],
-      desc: "Buried Neodymium-Iron-Boron permanent magnets delivering 7600 kW output with 97% motor efficiency at 320 km/h rotational speeds."
-    },
-    {
-      id: "tech_hyper_motors_400",
-      name: "Sinusoidal Halbach Array Ultra-Velocity Traction Motor (420 km/h)",
-      branch: "motors",
-      x: 1360,
-      y: 550,
-      costMoney: 5400000,
-      durationDays: 175,
-      prereq: ["tech_pmsm_traction"],
-      unlocks: ["mot_hs_synchro_360", "mot_hyper_velocity_400", "pwm_neural_adaptive_flux"],
-      desc: "Pure sinusoidal flux Halbach array magnetic rotor engineered for 6000+ RPM without iron losses, outputting 9800 kW."
-    },
+    // Track 3: Motors (Branching Far Right from Core)
+    tech_mot_basic_induction: { x: 1620, y: 1000 },
+    tech_mot_commuter_induction: { x: 1620, y: 880 },
+    tech_mot_copper_rotor: { x: 1820, y: 1000 },
+    tech_mot_pmsm_280: { x: 2020, y: 1000 },
+    tech_mot_pmsm_320: { x: 2220, y: 1000 },
+    tech_mot_synchro_360: { x: 2420, y: 1000 },
+    tech_mot_halbach_420: { x: 2620, y: 1000 },
 
-    // Track 4: Running Gear & Transmissions (Branching Down & Right)
-    {
-      id: "tech_quill_drive",
-      name: "Fully Suspended Hollow-Shaft Flexible Quill Transmission",
-      branch: "running_gear",
-      x: 1000,
-      y: 690,
-      costMoney: 600000,
-      durationDays: 55,
-      prereq: ["tech_core"],
-      unlocks: ["transm_quill_hollow", "bog_bo_bo"],
-      desc: "Frame-mounted traction motor isolating track impact forces via flexible rubber quill couplings for speeds up to 230 km/h."
-    },
-    {
-      id: "tech_radial_bogies",
-      name: "Active Radial Self-Steering Bogie with Tripod Cardan Drive",
-      branch: "running_gear",
-      x: 1180,
-      y: 690,
-      costMoney: 1900000,
-      durationDays: 90,
-      prereq: ["tech_quill_drive"],
-      unlocks: ["bog_radial_320", "transm_cardan_tripod_320", "brk_eddy_current"],
-      desc: "Self-steering wheelsets eliminating flange wear paired with tripod cardan drives balanced for 320 km/h passenger operation."
-    },
-    {
-      id: "tech_active_tilting",
-      name: "Electro-Hydraulic Active Body Tilting & Carbon Articulated Bogie",
-      branch: "running_gear",
-      x: 1360,
-      y: 690,
-      costMoney: 4400000,
-      durationDays: 150,
-      prereq: ["tech_radial_bogies"],
-      unlocks: ["bog_articulated_360", "bog_highspeed_400", "transm_hs_direct_380", "transm_hyper_drive_420"],
-      desc: "Active body cant tilting compensation and ultra-low unsprung mass carbon frames certified for 380 to 420 km/h curves."
-    },
+    // Track 4: Running Gear, Transmissions & Brakes (Branching Down-Right from Core)
+    tech_bog_flexicoil_220: { x: 1620, y: 1140 },
+    tech_bog_light_tram: { x: 1620, y: 1260 },
+    tech_transm_nose_hung: { x: 1820, y: 1140 },
+    tech_bog_coco_freight: { x: 1820, y: 1260 },
+    tech_transm_quill_230: { x: 2020, y: 1140 },
+    tech_coup_scharfenberg: { x: 2020, y: 1260 },
+    tech_brk_blended_regen: { x: 1820, y: 1380 },
+    tech_res_dynamic_roof: { x: 1820, y: 1500 },
+    tech_bog_radial_320: { x: 2220, y: 1140 },
+    tech_transm_cardan_320: { x: 2220, y: 1260 },
+    tech_coup_tightlock: { x: 2020, y: 1380 },
+    tech_brk_eddy_track: { x: 2220, y: 1380 },
+    tech_bog_tilting_360: { x: 2420, y: 1140 },
+    tech_transm_bevel_380: { x: 2420, y: 1260 },
+    tech_coup_heavy_aar: { x: 2020, y: 1500 },
+    tech_bog_composite_420: { x: 2620, y: 1140 },
+    tech_transm_direct_420: { x: 2620, y: 1260 },
 
-    // Track 5: Current Collection & Adhesion (Branching Down)
-    {
-      id: "tech_multisystem",
-      name: "Multi-System 25kV AC / 3kV DC Automatic Voltage Selector",
-      branch: "power_collection",
-      x: 800,
-      y: 690,
-      costMoney: 950000,
-      durationDays: 65,
-      prereq: ["tech_core"],
-      unlocks: ["panto_dual", "vcb_hybrid_multisystem", "panto_stemmann_dsa250_dual"],
-      desc: "High-speed automated phase-break detection and catenary voltage transition between 25kV AC and 3kV DC networks."
-    },
-    {
-      id: "tech_aero_pantograph",
-      name: "Active Aerodynamic Low-Noise Single-Arm Carbon Pantograph",
-      branch: "power_collection",
-      x: 800,
-      y: 820,
-      costMoney: 2400000,
-      durationDays: 105,
-      prereq: ["tech_multisystem"],
-      unlocks: ["panto_hs_320", "panto_bullet_380", "panto_shinkansen_wing", "sand_gravity_basic"],
-      desc: "Aerodynamic wing-strut single-arm collectors with automatic uplift vanes maintaining constant 70N contact up to 380 km/h."
-    },
-    {
-      id: "tech_hyper_collection_420",
-      name: "Piezoelectric Closed-Loop Dynamic Tension Following Collector",
-      branch: "power_collection",
-      x: 800,
-      y: 950,
-      costMoney: 5200000,
-      durationDays: 165,
-      prereq: ["tech_aero_pantograph"],
-      unlocks: ["panto_hyper_420", "sand_plasma_cleaner"],
-      desc: "Microsecond piezoelectric pan-head tracking eliminating contact wire arcing at speeds exceeding 400 km/h."
-    },
+    // Track 5: Power Collection, Circuit Breakers & Cooling (Branching Downwards from Core)
+    tech_panto_baseline_ac: { x: 1400, y: 1140 },
+    tech_panto_urban_dc: { x: 1260, y: 1140 },
+    tech_vcb_vacuum_ac: { x: 1400, y: 1260 },
+    tech_vcb_dc_fast: { x: 1260, y: 1260 },
+    tech_cool_forced_air: { x: 1540, y: 1140 },
+    tech_cool_oil_radiator: { x: 1540, y: 1260 },
+    tech_panto_loco_200: { x: 1400, y: 1380 },
+    tech_panto_dc_highclearance: { x: 1260, y: 1380 },
+    tech_panto_freight_highreach: { x: 1540, y: 1380 },
+    tech_panto_diamond_heavy: { x: 1540, y: 1500 },
+    tech_panto_intercity_230: { x: 1400, y: 1500 },
+    tech_panto_multisystem_250: { x: 1260, y: 1500 },
+    tech_vcb_hybrid_multi: { x: 1260, y: 1620 },
+    tech_sand_pneumatic: { x: 1540, y: 1620 },
+    tech_panto_highspeed_280: { x: 1400, y: 1620 },
+    tech_panto_express_300: { x: 1400, y: 1740 },
+    tech_cool_glycol_chiller: { x: 1540, y: 1740 },
+    tech_panto_hs_320: { x: 1400, y: 1860 },
+    tech_panto_hs_350: { x: 1400, y: 1980 },
+    tech_panto_wing_360: { x: 1260, y: 1860 },
+    tech_panto_ultra_380: { x: 1260, y: 1980 },
+    tech_sand_plasma: { x: 1540, y: 1860 },
+    tech_panto_hyper_420: { x: 1400, y: 2100 },
 
-    // Track 6: Energy Storage & Automation (Branching Left & Down-Left)
-    {
-      id: "tech_battery_traction",
-      name: "Lithium Iron Phosphate (LFP) Auxiliary Traction Storage Pack",
-      branch: "automation",
-      x: 600,
-      y: 690,
-      costMoney: 850000,
-      durationDays: 60,
-      prereq: ["tech_core"],
-      unlocks: ["bat_lfp_lastmile"],
-      desc: "High-safety LFP battery modules providing self-propelled shunting operations across non-electrified sidings."
-    },
-    {
-      id: "tech_etcs_automation",
-      name: "ETCS Level 2 Baseline 3 Radio-Block Cab Signaling & WSP",
-      branch: "automation",
-      x: 440,
-      y: 690,
-      costMoney: 1400000,
-      durationDays: 85,
-      prereq: ["tech_battery_traction"],
-      unlocks: ["tcms_etcs2", "wsp_microprocessor"],
-      desc: "Continuous GSM-R/FRMCS radio-block signaling supervision with multi-channel microprocessor wheel slide protection."
-    },
-    {
-      id: "tech_driverless_ato",
-      name: "Grade-of-Automation 4 (GoA4) Fully Driverless Autonomous Control",
-      branch: "automation",
-      x: 280,
-      y: 690,
-      costMoney: 4600000,
-      durationDays: 150,
-      prereq: ["tech_etcs_automation"],
-      unlocks: ["tcms_cbtc_ai", "wsp_integrated_surge", "bat_nmc_intercity"],
-      desc: "Fully autonomous neural-network train operation with predictive tractive adhesion control and regenerative coasting."
-    }
-  ]
+    // Track 6: Automation, Pneumatics & Safety (Branching Down-Left from Core)
+    tech_comp_piston_basic: { x: 1180, y: 1140 },
+    tech_tcms_baseline: { x: 1020, y: 1140 },
+    tech_safe_wsp_pneumatic: { x: 1020, y: 1260 },
+    tech_bat_lfp_lastmile: { x: 860, y: 1140 },
+    tech_comp_screw_rotary: { x: 1180, y: 1380 },
+    tech_hvac_standard: { x: 1020, y: 1380 },
+    tech_tcms_etcs_l2: { x: 860, y: 1260 },
+    tech_safe_wsp_electronic: { x: 700, y: 1260 },
+    tech_hvac_pressurized: { x: 1020, y: 1500 },
+    tech_comp_dual_redundant: { x: 1180, y: 1500 },
+    tech_bat_nmc_intercity: { x: 700, y: 1380 },
+    tech_safe_surge_integrated: { x: 700, y: 1500 },
+    tech_tcms_cbtc_goa4: { x: 540, y: 1380 }
+  },
+  prerequisites: {
+    // Track 1
+    tech_body_structural_steel: ["tech_core"],
+    tech_body_aluminum_extruded: ["tech_body_structural_steel"],
+    tech_body_carbon_monocoque: ["tech_body_aluminum_extruded"],
+    tech_body_shinkansen_360: ["tech_body_carbon_monocoque"],
+    tech_coup_retractable_nose: ["tech_body_carbon_monocoque"],
+    tech_body_supersonic_420: ["tech_body_shinkansen_360"],
+
+    // Track 2
+    tech_trans_heavy_ac: ["tech_core"],
+    tech_trans_dc_choke: ["tech_core"],
+    tech_dclink_electrolytic: ["tech_trans_heavy_ac"],
+    tech_inv_air_cooled: ["tech_dclink_electrolytic"],
+    tech_pwm_analog_spwm: ["tech_inv_air_cooled"],
+    tech_pwm_musical_shift: ["tech_pwm_analog_spwm"],
+    tech_aux_aps_static: ["tech_dclink_electrolytic"],
+    tech_dclink_film: ["tech_dclink_electrolytic"],
+    tech_inv_liquid_vvvf: ["tech_inv_air_cooled", "tech_dclink_film"],
+    tech_pwm_space_vector: ["tech_inv_liquid_vvvf"],
+    tech_pwm_she_freight: ["tech_pwm_space_vector"],
+    tech_trans_compact_underfloor: ["tech_inv_liquid_vvvf"],
+    tech_aux_aps_hvac: ["tech_trans_compact_underfloor"],
+    tech_inv_highpower_320: ["tech_trans_compact_underfloor"],
+    tech_inv_sic_mosfet: ["tech_inv_highpower_320"],
+    tech_dclink_supercap: ["tech_inv_sic_mosfet"],
+    tech_pwm_direct_torque: ["tech_pwm_space_vector"],
+    tech_pwm_sopp_express: ["tech_pwm_direct_torque"],
+    tech_pwm_ultrasonic_sic: ["tech_inv_sic_mosfet"],
+    tech_pwm_neural_adaptive: ["tech_pwm_ultrasonic_sic"],
+    tech_trans_solid_state: ["tech_inv_sic_mosfet"],
+    tech_inv_sic_hyper_380: ["tech_trans_solid_state"],
+
+    // Track 3
+    tech_mot_basic_induction: ["tech_core"],
+    tech_mot_commuter_induction: ["tech_core"],
+    tech_mot_copper_rotor: ["tech_mot_basic_induction"],
+    tech_mot_pmsm_280: ["tech_mot_copper_rotor"],
+    tech_mot_pmsm_320: ["tech_mot_pmsm_280"],
+    tech_mot_synchro_360: ["tech_mot_pmsm_320"],
+    tech_mot_halbach_420: ["tech_mot_synchro_360"],
+
+    // Track 4
+    tech_bog_flexicoil_220: ["tech_core"],
+    tech_bog_light_tram: ["tech_core"],
+    tech_transm_nose_hung: ["tech_core"],
+    tech_bog_coco_freight: ["tech_transm_nose_hung"],
+    tech_transm_quill_230: ["tech_transm_nose_hung", "tech_bog_flexicoil_220"],
+    tech_coup_scharfenberg: ["tech_bog_flexicoil_220"],
+    tech_brk_blended_regen: ["tech_bog_flexicoil_220"],
+    tech_res_dynamic_roof: ["tech_brk_blended_regen"],
+    tech_bog_radial_320: ["tech_transm_quill_230"],
+    tech_transm_cardan_320: ["tech_bog_radial_320"],
+    tech_coup_tightlock: ["tech_coup_scharfenberg"],
+    tech_brk_eddy_track: ["tech_bog_radial_320"],
+    tech_bog_tilting_360: ["tech_bog_radial_320"],
+    tech_transm_bevel_380: ["tech_bog_tilting_360"],
+    tech_coup_heavy_aar: ["tech_bog_coco_freight"],
+    tech_bog_composite_420: ["tech_bog_tilting_360"],
+    tech_transm_direct_420: ["tech_bog_composite_420"],
+
+    // Track 5
+    tech_panto_baseline_ac: ["tech_core"],
+    tech_panto_urban_dc: ["tech_core"],
+    tech_vcb_vacuum_ac: ["tech_panto_baseline_ac"],
+    tech_vcb_dc_fast: ["tech_panto_urban_dc"],
+    tech_cool_forced_air: ["tech_core"],
+    tech_cool_oil_radiator: ["tech_cool_forced_air"],
+    tech_panto_loco_200: ["tech_panto_baseline_ac", "tech_vcb_vacuum_ac"],
+    tech_panto_dc_highclearance: ["tech_panto_urban_dc", "tech_vcb_dc_fast"],
+    tech_panto_freight_highreach: ["tech_panto_loco_200"],
+    tech_panto_diamond_heavy: ["tech_panto_freight_highreach"],
+    tech_panto_intercity_230: ["tech_panto_loco_200"],
+    tech_panto_multisystem_250: ["tech_panto_intercity_230"],
+    tech_vcb_hybrid_multi: ["tech_panto_multisystem_250"],
+    tech_sand_pneumatic: ["tech_panto_loco_200"],
+    tech_panto_highspeed_280: ["tech_panto_intercity_230"],
+    tech_panto_express_300: ["tech_panto_highspeed_280"],
+    tech_cool_glycol_chiller: ["tech_cool_oil_radiator"],
+    tech_panto_hs_320: ["tech_panto_express_300"],
+    tech_panto_hs_350: ["tech_panto_hs_320"],
+    tech_panto_wing_360: ["tech_panto_hs_320"],
+    tech_panto_ultra_380: ["tech_panto_hs_350"],
+    tech_sand_plasma: ["tech_sand_pneumatic"],
+    tech_panto_hyper_420: ["tech_panto_ultra_380"],
+
+    // Track 6
+    tech_comp_piston_basic: ["tech_core"],
+    tech_tcms_baseline: ["tech_core"],
+    tech_safe_wsp_pneumatic: ["tech_tcms_baseline"],
+    tech_bat_lfp_lastmile: ["tech_core"],
+    tech_comp_screw_rotary: ["tech_comp_piston_basic"],
+    tech_hvac_standard: ["tech_comp_piston_basic"],
+    tech_tcms_etcs_l2: ["tech_tcms_baseline", "tech_safe_wsp_pneumatic"],
+    tech_safe_wsp_electronic: ["tech_tcms_etcs_l2"],
+    tech_hvac_pressurized: ["tech_hvac_standard"],
+    tech_comp_dual_redundant: ["tech_comp_screw_rotary"],
+    tech_bat_nmc_intercity: ["tech_bat_lfp_lastmile"],
+    tech_safe_surge_integrated: ["tech_safe_wsp_electronic"],
+    tech_tcms_cbtc_goa4: ["tech_tcms_etcs_l2"]
+  }
 };
 
-// Compile master TECH_DATA list
+// Build master TECH_DATA array by combining root, registered component nodes, and hierarchy
 const TECH_DATA = [
   TREE_STRUCTURE.core,
-  ...TREE_STRUCTURE.nodes
+  ...(window.COMPONENT_RESEARCH || []).map(node => {
+    const coords = TREE_STRUCTURE.coords[node.id] || { x: 1400, y: 1000 };
+    return {
+      ...node,
+      x: coords.x,
+      y: coords.y,
+      prereq: TREE_STRUCTURE.prerequisites[node.id] || ["tech_core"]
+    };
+  })
 ];

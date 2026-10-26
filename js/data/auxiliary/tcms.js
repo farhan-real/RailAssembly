@@ -1,4 +1,4 @@
-// Train Control & Monitoring Networks (TCMS) & WSP: Stats, Info, Subcomponents, and Research Metadata
+// Train Control & Monitoring Networks (TCMS) & WSP: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -14,7 +14,7 @@ COMPONENTS_DATA.tcms = [
     cost: 50000,
     leadDays: 7,
     supplier: "RailLogic Electronics Group",
-    inHouseTech: null,
+    inHouseTech: "tech_tcms_baseline",
     desc: "Standard train control and monitoring architecture with hardware relay logic."
   },
   {
@@ -27,7 +27,7 @@ COMPONENTS_DATA.tcms = [
     cost: 180000,
     leadDays: 15,
     supplier: "RailLogic Electronics Group",
-    inHouseTech: "tech_etcs_automation",
+    inHouseTech: "tech_tcms_etcs_l2",
     desc: "Continuous radio-block signaling supervision and automatic cab speed enforcement."
   },
   {
@@ -40,15 +40,15 @@ COMPONENTS_DATA.tcms = [
     cost: 390000,
     leadDays: 24,
     supplier: "CyberTransit Systems",
-    inHouseTech: "tech_driverless_ato",
+    inHouseTech: "tech_tcms_cbtc_goa4",
     desc: "Full automated train operation with neural adhesion control and coasting optimization."
   }
 ];
 
 COMPONENTS_DATA.safety = [
-  { id: "wsp_basic", name: "Pneumatic Mechanical Anti-Skid Valves", type: "safety", safetyScoreBonus: 4, weight: 110, cost: 22000, leadDays: 7, supplier: "Bremse Systems International", inHouseTech: null, desc: "Standard differential wheel deceleration sensing." },
-  { id: "wsp_microprocessor", name: "Multi-Channel Microprocessor Wheel Slide Protection", type: "safety", safetyScoreBonus: 10, weight: 80, cost: 48000, leadDays: 14, supplier: "Bremse Systems International", inHouseTech: "tech_etcs_automation", desc: "Independent axle wheel speed regulation shortening emergency braking distances." },
-  { id: "wsp_integrated_surge", name: "Integrated High-Speed WSP with Metal-Oxide Surge Diverter", type: "safety", safetyScoreBonus: 18, weight: 125, cost: 88000, leadDays: 20, supplier: "Bremse Systems International", inHouseTech: "tech_driverless_ato", desc: "Combines Doppler radar slip compensation with 25kV roof surge arresters." }
+  { id: "wsp_basic", name: "Pneumatic Mechanical Anti-Skid Valves", type: "safety", safetyScoreBonus: 4, weight: 110, cost: 22000, leadDays: 7, supplier: "Bremse Systems International", inHouseTech: "tech_safe_wsp_pneumatic", desc: "Standard differential wheel deceleration sensing." },
+  { id: "wsp_microprocessor", name: "Multi-Channel Microprocessor Wheel Slide Protection", type: "safety", safetyScoreBonus: 10, weight: 80, cost: 48000, leadDays: 14, supplier: "Bremse Systems International", inHouseTech: "tech_safe_wsp_electronic", desc: "Independent axle wheel speed regulation shortening emergency braking distances." },
+  { id: "wsp_integrated_surge", name: "Integrated High-Speed WSP with Metal-Oxide Surge Diverter", type: "safety", safetyScoreBonus: 18, weight: 125, cost: 88000, leadDays: 20, supplier: "Bremse Systems International", inHouseTech: "tech_safe_surge_integrated", desc: "Combines Doppler radar slip compensation with 25kV roof surge arresters." }
 ];
 
 SUBCOMPONENTS_DATA.tcms = {
@@ -72,22 +72,10 @@ SUBCOMPONENTS_DATA.safety = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_etcs_automation",
-    name: "ETCS Level 2 Cab Signaling & WSP",
-    branch: "automation",
-    costMoney: 1400000,
-    durationDays: 85,
-    unlocks: ["tcms_etcs2", "wsp_microprocessor"],
-    desc: "Radio-block continuous cab signaling and electronic anti-skid protection."
-  },
-  {
-    id: "tech_driverless_ato",
-    name: "Autonomous GoA4 ATO Systems",
-    branch: "automation",
-    costMoney: 4600000,
-    durationDays: 150,
-    unlocks: ["tcms_cbtc_ai", "wsp_integrated_surge", "bat_nmc_intercity"],
-    desc: "Unattended driverless automation with neural tractive adhesion and predictive braking."
-  }
+  { id: "tech_tcms_baseline", name: "Microprocessor Vehicle Bus Control Unit", branch: "automation", costMoney: 190000, durationDays: 30, unlocks: ["tcms_basic"], desc: "Distributed train diagnostic bus and cab instrumentation display controller." },
+  { id: "tech_tcms_etcs_l2", name: "ETCS Level 2 Baseline 3 Radio-Block Automation", branch: "automation", costMoney: 850000, durationDays: 65, unlocks: ["tcms_etcs2"], desc: "Continuous cab speed supervision under GSM-R and Eurobalise track links." },
+  { id: "tech_tcms_cbtc_goa4", name: "Grade-of-Automation 4 Driverless Autonomous Network", branch: "automation", costMoney: 3200000, durationDays: 130, unlocks: ["tcms_cbtc_ai"], desc: "Unattended driverless automation maximizing energy coasting and adhesion control." },
+  { id: "tech_safe_wsp_pneumatic", name: "Pneumatic Mechanical Wheel Anti-Skid Valves", branch: "automation", costMoney: 120000, durationDays: 20, unlocks: ["wsp_basic"], desc: "Differential pressure exhaust valves preventing wheel flats during hard braking." },
+  { id: "tech_safe_wsp_electronic", name: "Electronic Multi-Channel Wheel Slide Protection", branch: "automation", costMoney: 320000, durationDays: 45, unlocks: ["wsp_microprocessor"], desc: "Axle sensor microprocessors maximizing adhesion grip in wet rail conditions." },
+  { id: "tech_safe_surge_integrated", name: "High-Speed WSP with Metal-Oxide Surge Arresters", branch: "automation", costMoney: 950000, durationDays: 75, unlocks: ["wsp_integrated_surge"], desc: "Combines Doppler radar velocity monitoring with 25kV roof surge protection." }
 );

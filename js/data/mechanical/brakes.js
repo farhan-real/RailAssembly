@@ -1,4 +1,4 @@
-// Brakes & Energy Recovery Systems: Stats, Info, Subcomponents, and Research Metadata
+// Brakes & Energy Recovery Systems: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -14,7 +14,7 @@ COMPONENTS_DATA.brakes = [
     cost: 60000,
     leadDays: 8,
     supplier: "Bremse Systems International",
-    inHouseTech: null,
+    inHouseTech: "tech_brk_blended_regen",
     desc: "Recovers electrical kinetic energy to the catenary while maintaining fail-safe mechanical discs."
   },
   {
@@ -27,14 +27,14 @@ COMPONENTS_DATA.brakes = [
     cost: 190000,
     leadDays: 18,
     supplier: "Bremse Systems International",
-    inHouseTech: "tech_radial_bogies",
+    inHouseTech: "tech_brk_eddy_track",
     desc: "Wear-free electromagnetic rail brake providing high deceleration rates above 320 km/h."
   }
 ];
 
 COMPONENTS_DATA.resistor = [
   { id: "res_none", name: "None (Regenerative Line Feed Only)", type: "resistor", isOptional: true, weight: 0, cost: 0, leadDays: 0, supplier: "Direct Wire Configuration", inHouseTech: null, desc: "Braking energy is returned to catenary. If the grid is non-receptive, mechanical brakes engage." },
-  { id: "res_dynamic_roof", name: "Roof-Mounted Dynamic Braking Resistor Grid", type: "resistor", isOptional: true, weight: 650, cost: 42000, leadDays: 9, supplier: "StaticPulse Power Systems", inHouseTech: null, desc: "Safely dissipates 2500 kW of braking energy into thermal heat when descending mountain grades." }
+  { id: "res_dynamic_roof", name: "Roof-Mounted Dynamic Braking Resistor Grid", type: "resistor", isOptional: true, weight: 650, cost: 42000, leadDays: 9, supplier: "StaticPulse Power Systems", inHouseTech: "tech_res_dynamic_roof", desc: "Safely dissipates 2500 kW of braking energy into thermal heat when descending mountain grades." }
 ];
 
 SUBCOMPONENTS_DATA.brakes = {
@@ -47,3 +47,9 @@ SUBCOMPONENTS_DATA.brakes = {
     { id: "disc_carbonceramic", name: "Carbon-Silicon Carbide Ceramic Brake Discs", cost: 46000, weight: 140, safetyBonus: 18, desc: "Fade-free braking capability with extreme heat tolerance up to 1000°C." }
   ]
 };
+
+COMPONENT_RESEARCH.push(
+  { id: "tech_brk_blended_regen", name: "Blended Regenerative Electro-Dynamic Braking", branch: "running_gear", costMoney: 240000, durationDays: 35, unlocks: ["brk_disc_regen"], desc: "Combines pneumatic friction discs with regenerative line-feed energy recovery." },
+  { id: "tech_brk_eddy_track", name: "Linear Track Eddy-Current Non-Friction Brakes", branch: "running_gear", costMoney: 1200000, durationDays: 80, unlocks: ["brk_eddy_current"], desc: "Electromagnetic railhead braking operating free of friction wear at 350+ km/h." },
+  { id: "tech_res_dynamic_roof", name: "Roof-Mounted Rheostatic Dynamic Resistor Grid", branch: "running_gear", costMoney: 280000, durationDays: 40, unlocks: ["res_dynamic_roof"], desc: "Thermal dissipation grids protecting inverters when catenary is non-receptive." }
+);

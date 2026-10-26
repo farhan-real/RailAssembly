@@ -1,4 +1,4 @@
-// Traction Inverters & Auxiliary APS: Stats, Info, Subcomponents, and Research Metadata
+// Traction Inverters & Auxiliary APS: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -14,7 +14,7 @@ COMPONENTS_DATA.inverter = [
     cost: 120000,
     leadDays: 10,
     supplier: "StaticPulse Power Systems",
-    inHouseTech: null,
+    inHouseTech: "tech_inv_air_cooled",
     desc: "Baseline air-cooled inverter. Power limited to 3600 kW; bottlenecks larger motors."
   },
   {
@@ -27,7 +27,7 @@ COMPONENTS_DATA.inverter = [
     cost: 260000,
     leadDays: 16,
     supplier: "StaticPulse Power Systems",
-    inHouseTech: "tech_advanced_inverters",
+    inHouseTech: "tech_inv_liquid_vvvf",
     desc: "Smooth VVVF liquid-cooled converter delivering up to 6200 kW motor drive power."
   },
   {
@@ -40,7 +40,7 @@ COMPONENTS_DATA.inverter = [
     cost: 360000,
     leadDays: 20,
     supplier: "Helvetia Electric Industries",
-    inHouseTech: "tech_compact_transformer",
+    inHouseTech: "tech_inv_highpower_320",
     desc: "Engineered to deliver 7500 kW continuous power for 320 km/h passenger consists."
   },
   {
@@ -53,7 +53,7 @@ COMPONENTS_DATA.inverter = [
     cost: 510000,
     leadDays: 26,
     supplier: "Semiconductor Rail Dynamics",
-    inHouseTech: "tech_sic_power",
+    inHouseTech: "tech_inv_sic_mosfet",
     desc: "Next-gen SiC MOSFET converter with minimal thermal loss and full 8800 kW throughput."
   },
   {
@@ -66,15 +66,15 @@ COMPONENTS_DATA.inverter = [
     cost: 680000,
     leadDays: 30,
     supplier: "Semiconductor Rail Dynamics",
-    inHouseTech: "tech_solid_state_trans",
+    inHouseTech: "tech_inv_sic_hyper_380",
     desc: "Dual-core silicon carbide modules supplying 9.8 MW for 380+ km/h sustained sprints."
   }
 ];
 
 COMPONENTS_DATA.auxiliary = [
   { id: "aux_none", name: "None (Direct Low-Voltage Line Taps)", type: "auxiliary", isOptional: true, powerKw: 0, weight: 0, cost: 0, leadDays: 0, supplier: "Internal Standard", inHouseTech: null, desc: "No auxiliary converter." },
-  { id: "aux_std_static", name: "Static Auxiliary Inverter (180 kVA)", type: "auxiliary", isOptional: true, powerKw: 180, weight: 480, cost: 35000, leadDays: 8, supplier: "StaticPulse Power Systems", inHouseTech: null, desc: "Supplies stable low-voltage AC/DC power." },
-  { id: "aux_hvac_commercial", name: "High-Capacity Dual-Channel APS (450 kVA)", type: "auxiliary", isOptional: true, powerKw: 450, weight: 920, cost: 85000, leadDays: 14, supplier: "Helvetia Electric Industries", inHouseTech: "tech_advanced_inverters", desc: "Powers multi-coach passenger air conditioning." }
+  { id: "aux_std_static", name: "Static Auxiliary Inverter (180 kVA)", type: "auxiliary", isOptional: true, powerKw: 180, weight: 480, cost: 35000, leadDays: 8, supplier: "StaticPulse Power Systems", inHouseTech: "tech_aux_aps_static", desc: "Supplies stable low-voltage AC/DC power." },
+  { id: "aux_hvac_commercial", name: "High-Capacity Dual-Channel APS (450 kVA)", type: "auxiliary", isOptional: true, powerKw: 450, weight: 920, cost: 85000, leadDays: 14, supplier: "Helvetia Electric Industries", inHouseTech: "tech_aux_aps_hvac", desc: "Powers multi-coach passenger air conditioning." }
 ];
 
 SUBCOMPONENTS_DATA.inverter = {
@@ -89,22 +89,11 @@ SUBCOMPONENTS_DATA.inverter = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_advanced_inverters",
-    name: "Liquid-Cooled VVVF Converters",
-    branch: "electronics",
-    costMoney: 450000,
-    durationDays: 50,
-    unlocks: ["inv_igbt_liquid", "aux_hvac_commercial"],
-    desc: "Variable-frequency liquid-cooled inverter engineering delivering smooth motor acceleration."
-  },
-  {
-    id: "tech_sic_power",
-    name: "Silicon Carbide (SiC) Power Semiconductors",
-    branch: "electronics",
-    costMoney: 2400000,
-    durationDays: 120,
-    unlocks: ["inv_sic", "dclink_supercap_hybrid"],
-    desc: "SiC MOSFET semiconductors slashing switching heat loss and enabling ultrasonic 18 kHz PWM."
-  }
+  { id: "tech_inv_air_cooled", name: "Forced-Air Two-Level IGBT Inverter", branch: "electronics", costMoney: 220000, durationDays: 35, unlocks: ["inv_igbt_air"], desc: "Baseline 3600 kW insulated-gate bipolar transistor module with forced convection." },
+  { id: "tech_inv_liquid_vvvf", name: "Closed-Loop Liquid-Cooled VVVF Inverter", branch: "electronics", costMoney: 450000, durationDays: 50, unlocks: ["inv_igbt_liquid"], desc: "Deionized water-glycol cooling maintaining 6200 kW continuous motor output." },
+  { id: "tech_inv_highpower_320", name: "High-Throughput 7500 kW Inverter (320 km/h)", branch: "electronics", costMoney: 1100000, durationDays: 75, unlocks: ["inv_liquid_highpower_320"], desc: "High-density multi-channel converter engineered for 320 km/h passenger operations." },
+  { id: "tech_inv_sic_mosfet", name: "Silicon Carbide (SiC) MOSFET Power Converter", branch: "electronics", costMoney: 2400000, durationDays: 120, unlocks: ["inv_sic"], desc: "Wide-bandgap semiconductors cutting switching losses by 70% with 8.8 MW power." },
+  { id: "tech_inv_sic_hyper_380", name: "Hyper-Velocity 9.8 MW Dual-Core SiC Converter", branch: "electronics", costMoney: 4600000, durationDays: 160, unlocks: ["inv_sic_dual_380"], desc: "Dual parallel SiC arrays delivering 9800 kW for 380+ km/h sustained sprints." },
+  { id: "tech_aux_aps_static", name: "Solid-State Static Auxiliary Inverter (180 kVA)", branch: "electronics", costMoney: 140000, durationDays: 25, unlocks: ["aux_std_static"], desc: "Provides regulated 400V 50Hz and 110V DC power for cabin lighting and controls." },
+  { id: "tech_aux_aps_hvac", name: "High-Capacity Dual-Channel APS (450 kVA)", branch: "electronics", costMoney: 320000, durationDays: 45, unlocks: ["aux_hvac_commercial"], desc: "Heavy auxiliary power supply powering multiple-coach HVAC and galley equipment." }
 );

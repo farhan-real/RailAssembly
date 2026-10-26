@@ -1,6 +1,7 @@
-// Pulse-Width Modulation (PWM) & Gate Drive Systems: Stats, Info, Subcomponents, and Research Metadata
+// Pulse-Width Modulation (PWM) & Gate Drive Systems: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
+window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
 
 COMPONENTS_DATA.pwm = [
   {
@@ -15,7 +16,7 @@ COMPONENTS_DATA.pwm = [
     cost: 18000,
     leadDays: 6,
     supplier: "StaticPulse Power Systems",
-    inHouseTech: null,
+    inHouseTech: "tech_pwm_analog_spwm",
     desc: "Fixed 750 Hz analog carrier. Produces classic acoustic motor tones and moderate torque ripple. Speed limit: 160 km/h."
   },
   {
@@ -30,7 +31,7 @@ COMPONENTS_DATA.pwm = [
     cost: 34000,
     leadDays: 9,
     supplier: "Helvetia Electric Industries",
-    inHouseTech: null,
+    inHouseTech: "tech_pwm_musical_shift",
     desc: "Changes carrier frequency in stepped musical intervals during acceleration to avoid mechanical resonance. Speed limit: 230 km/h."
   },
   {
@@ -45,7 +46,7 @@ COMPONENTS_DATA.pwm = [
     cost: 52000,
     leadDays: 12,
     supplier: "Helvetia Electric Industries",
-    inHouseTech: "tech_advanced_inverters",
+    inHouseTech: "tech_pwm_space_vector",
     desc: "Delivers 15% higher DC bus voltage utilization with reduced total harmonic distortion. Speed limit: 280 km/h."
   },
   {
@@ -60,7 +61,7 @@ COMPONENTS_DATA.pwm = [
     cost: 65000,
     leadDays: 14,
     supplier: "StaticPulse Power Systems",
-    inHouseTech: "tech_high_torque_motors",
+    inHouseTech: "tech_pwm_she_freight",
     desc: "Pre-calculated switching angles completely cancel 5th and 7th current harmonics with minimal heat. Ideal for heavy freight."
   },
   {
@@ -75,7 +76,7 @@ COMPONENTS_DATA.pwm = [
     cost: 98000,
     leadDays: 18,
     supplier: "ABB Rail Automation",
-    inHouseTech: "tech_pmsm_traction",
+    inHouseTech: "tech_pwm_direct_torque",
     desc: "Sub-millisecond direct flux hysteresis response providing instant wheel-slip torque reduction in wet rail conditions."
   },
   {
@@ -90,7 +91,7 @@ COMPONENTS_DATA.pwm = [
     cost: 135000,
     leadDays: 22,
     supplier: "ABB Rail Automation",
-    inHouseTech: "tech_radial_bogies",
+    inHouseTech: "tech_pwm_sopp_express",
     desc: "Seamless hand-off into six-step square-wave over-modulation at express speeds up to 360 km/h."
   },
   {
@@ -105,7 +106,7 @@ COMPONENTS_DATA.pwm = [
     cost: 185000,
     leadDays: 26,
     supplier: "Semiconductor Rail Dynamics",
-    inHouseTech: "tech_sic_power",
+    inHouseTech: "tech_pwm_ultrasonic_sic",
     desc: "Operates at 18 kHz above human hearing threshold for silent operation, zero motor torque ripple, and 400 km/h capability."
   },
   {
@@ -120,7 +121,7 @@ COMPONENTS_DATA.pwm = [
     cost: 240000,
     leadDays: 30,
     supplier: "CyberTransit Systems",
-    inHouseTech: "tech_driverless_ato",
+    inHouseTech: "tech_pwm_neural_adaptive",
     desc: "AI predictive gate switching calculating motor core magnetic saturation in real time. Maximum tractive grip and energy coasting."
   }
 ];
@@ -135,3 +136,14 @@ SUBCOMPONENTS_DATA.pwm = {
     { id: "pwm_overmod_sixstep", name: "Synchronous Six-Step Over-Modulation Transition Logic", cost: 24000, weight: 3, speedBonus: 20, desc: "Maximizes fundamental output voltage to motor windings at high RPM by transitioning cleanly into square-wave drive." }
   ]
 };
+
+COMPONENT_RESEARCH.push(
+  { id: "tech_pwm_analog_spwm", name: "Sinusoidal Analog PWM Carrier Generator", branch: "electronics", costMoney: 95000, durationDays: 20, unlocks: ["pwm_sine_triangle_analog"], desc: "Hardware analog comparator generating 750 Hz triangular carrier modulation." },
+  { id: "tech_pwm_musical_shift", name: "Musical Frequency Shifting Gate Controller", branch: "electronics", costMoney: 180000, durationDays: 30, unlocks: ["pwm_musical_multistage"], desc: "Stepped carrier shifting mitigating acoustic vibration resonances during acceleration." },
+  { id: "tech_pwm_space_vector", name: "Digital Space Vector PWM (SVPWM) Modulator", branch: "electronics", costMoney: 340000, durationDays: 45, unlocks: ["pwm_space_vector_svm"], desc: "Microcontroller vector math maximizing DC link voltage utilization with low harmonic loss." },
+  { id: "tech_pwm_she_freight", name: "Selective Harmonic Elimination (SHE-PWM)", branch: "electronics", costMoney: 520000, durationDays: 55, unlocks: ["pwm_selective_harmonic_she"], desc: "Pre-calculated switching angles canceling 5th and 7th harmonics for heavy freight torque." },
+  { id: "tech_pwm_direct_torque", name: "Direct Torque Control (DTC) Hysteresis Modulator", branch: "electronics", costMoney: 890000, durationDays: 70, unlocks: ["pwm_direct_torque_dtc"], desc: "Instantaneous torque and magnetic flux hysteresis regulation for sub-millisecond anti-slip." },
+  { id: "tech_pwm_sopp_express", name: "Synchronized Optimal Pulse Pattern Drive", branch: "electronics", costMoney: 1450000, durationDays: 95, unlocks: ["pwm_synchronized_optimal_sop"], desc: "Optimized switching transitions blending into square-wave over-modulation at 360 km/h." },
+  { id: "tech_pwm_ultrasonic_sic", name: "Ultrasonic 18 kHz Silicon Carbide Vector Modulator", branch: "electronics", costMoney: 2600000, durationDays: 125, unlocks: ["pwm_ultrasonic_sic_vector"], desc: "Inaudible 18 kHz carrier modulation eliminating torque ripple for 400 km/h operations." },
+  { id: "tech_pwm_neural_adaptive", name: "Neural-Adaptive Real-Time Saturation Modulator", branch: "electronics", costMoney: 4200000, durationDays: 155, unlocks: ["pwm_neural_adaptive_flux"], desc: "Artificial intelligence optimizing individual gate pulse widths against rail adhesion." }
+);

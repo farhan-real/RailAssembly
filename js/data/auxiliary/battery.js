@@ -1,4 +1,4 @@
-// Auxiliary Battery Buffers: Stats, Info, Subcomponents, and Research Metadata
+// Auxiliary Battery Buffers: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -29,7 +29,7 @@ COMPONENTS_DATA.battery = [
     cost: 130000,
     leadDays: 14,
     supplier: "VoltaRail Storage Systems",
-    inHouseTech: "tech_battery_traction",
+    inHouseTech: "tech_bat_lfp_lastmile",
     desc: "Provides self-propelled last-mile shunting across non-electrified sidings."
   },
   {
@@ -43,7 +43,7 @@ COMPONENTS_DATA.battery = [
     cost: 380000,
     leadDays: 24,
     supplier: "VoltaRail Storage Systems",
-    inHouseTech: "tech_driverless_ato",
+    inHouseTech: "tech_bat_nmc_intercity",
     desc: "High-energy density module designed to span non-electrified gaps on branch lines."
   }
 ];
@@ -60,13 +60,6 @@ SUBCOMPONENTS_DATA.battery = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_battery_traction",
-    name: "Auxiliary Last-Mile Traction Packs",
-    branch: "automation",
-    costMoney: 850000,
-    durationDays: 60,
-    unlocks: ["bat_lfp_lastmile"],
-    desc: "LFP battery modules powering non-electrified terminal and shunting maneuvers."
-  }
+  { id: "tech_bat_lfp_lastmile", name: "Lithium Iron Phosphate (LFP) Last-Mile Pack", branch: "automation", costMoney: 450000, durationDays: 50, unlocks: ["bat_lfp_lastmile"], desc: "Thermal-runaway proof LFP chemistry powering depot and terminal shunting." },
+  { id: "tech_bat_nmc_intercity", name: "High-Density NMC Intercity Traction Battery", branch: "automation", costMoney: 1450000, durationDays: 85, unlocks: ["bat_nmc_intercity"], desc: "High-energy NMC cells providing 1100 kWh to span non-electrified corridor gaps." }
 );

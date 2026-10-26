@@ -1,6 +1,7 @@
-// Rail Adhesion & Sanding Equipment: Stats, Info, Subcomponents, and Research Metadata
+// Rail Adhesion & Sanding Equipment: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
+window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
 
 COMPONENTS_DATA.sander = [
   {
@@ -26,7 +27,7 @@ COMPONENTS_DATA.sander = [
     cost: 21000,
     leadDays: 6,
     supplier: "GripMaster Rail Systems",
-    inHouseTech: null,
+    inHouseTech: "tech_sand_pneumatic",
     desc: "Pneumatic nozzles blasting silica sand onto railheads. Increases adhesion by +0.05."
   },
   {
@@ -39,7 +40,7 @@ COMPONENTS_DATA.sander = [
     cost: 78000,
     leadDays: 16,
     supplier: "GripMaster Rail Systems",
-    inHouseTech: "tech_hyper_collection_420",
+    inHouseTech: "tech_sand_plasma",
     desc: "Vaporizes organic leaf grease and ice directly before wheelsets. Increases adhesion by +0.11."
   }
 ];
@@ -52,3 +53,8 @@ SUBCOMPONENTS_DATA.sander = {
     { id: "sand_metering_flow", name: "Speed-Proportional Pulse Air Metering", cost: 12000, weight: 10, adhesionBonus: 0.02, desc: "Dispenses precise sand grain volumes matched to ground speed, preventing track fouling." }
   ]
 };
+
+COMPONENT_RESEARCH.push(
+  { id: "tech_sand_pneumatic", name: "Electro-Pneumatic Directional Sanding System", branch: "power_collection", costMoney: 160000, durationDays: 30, unlocks: ["sand_gravity_basic"], desc: "High-velocity air nozzles dispensing silica sand to prevent wheel slip on grades." },
+  { id: "tech_sand_plasma", name: "Laser-Plasma Railhead Conditioning System", branch: "power_collection", costMoney: 950000, durationDays: 75, unlocks: ["sand_plasma_cleaner"], desc: "Plasma descalers vaporizing moisture and organic film, boosting adhesion by +0.11." }
+);

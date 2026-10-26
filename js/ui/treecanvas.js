@@ -7,10 +7,10 @@ class TreeCanvas {
     this.svgLayer = null;
     this.selectedNodeId = "tech_core";
 
-    // Viewport transform coordinates
-    this.panX = -200;
-    this.panY = -150;
-    this.scale = 0.95;
+    // Viewport transform coordinates centered on core
+    this.panX = -500;
+    this.panY = -450;
+    this.scale = 0.85;
     this.isDragging = false;
     this.startX = 0;
     this.startY = 0;
@@ -23,6 +23,8 @@ class TreeCanvas {
 
     this.surface = document.createElement("div");
     this.surface.className = "tree-canvas-surface";
+    this.surface.style.width = "3400px";
+    this.surface.style.height = "2600px";
 
     this.svgLayer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     this.svgLayer.setAttribute("class", "tree-svg-layer");
@@ -60,7 +62,7 @@ class TreeCanvas {
     this.viewport.onwheel = (e) => {
       e.preventDefault();
       const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-      this.scale = Math.min(1.8, Math.max(0.45, this.scale * zoomFactor));
+      this.scale = Math.min(1.8, Math.max(0.35, this.scale * zoomFactor));
       this.updateTransform();
     };
   }
@@ -75,9 +77,9 @@ class TreeCanvas {
     if (!node) return;
     const viewW = this.viewport.clientWidth || 800;
     const viewH = this.viewport.clientHeight || 600;
-    this.scale = 1.0;
-    this.panX = (viewW / 2) - node.x;
-    this.panY = (viewH / 2) - node.y;
+    this.scale = 0.9;
+    this.panX = (viewW / 2) - (node.x * this.scale);
+    this.panY = (viewH / 2) - (node.y * this.scale);
     this.updateTransform();
   }
 
@@ -89,7 +91,7 @@ class TreeCanvas {
   }
 
   zoomBy(factor) {
-    this.scale = Math.min(1.8, Math.max(0.45, this.scale * factor));
+    this.scale = Math.min(1.8, Math.max(0.35, this.scale * factor));
     this.updateTransform();
   }
 

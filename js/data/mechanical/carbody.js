@@ -1,4 +1,4 @@
-// Carbodies & Aerodynamics: Stats, Info, Subcomponents, and Research Metadata
+// Carbodies & Aerodynamics: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -15,7 +15,7 @@ COMPONENTS_DATA.carbody = [
     cost: 160000,
     leadDays: 14,
     supplier: "Standard Industrial Foundry",
-    inHouseTech: null,
+    inHouseTech: "tech_body_structural_steel",
     desc: "Heavy carbon-steel chassis for locomotives and heavy haulage routes."
   },
   {
@@ -29,7 +29,7 @@ COMPONENTS_DATA.carbody = [
     cost: 290000,
     leadDays: 20,
     supplier: "AeroAlloy Trainworks",
-    inHouseTech: "tech_aluminum_extrusion",
+    inHouseTech: "tech_body_aluminum_extruded",
     desc: "Lightweight extruded aluminum profile built for passenger multiple units."
   },
   {
@@ -43,7 +43,7 @@ COMPONENTS_DATA.carbody = [
     cost: 650000,
     leadDays: 30,
     supplier: "AeroAlloy Trainworks",
-    inHouseTech: "tech_composite_chassis",
+    inHouseTech: "tech_body_carbon_monocoque",
     desc: "Streamlined low-drag aerodynamic profile designed for express trains up to 300 km/h."
   },
   {
@@ -57,7 +57,7 @@ COMPONENTS_DATA.carbody = [
     cost: 780000,
     leadDays: 34,
     supplier: "AeroAlloy Trainworks",
-    inHouseTech: "tech_streamlined_nose_320",
+    inHouseTech: "tech_body_shinkansen_360",
     desc: "Extended long-nose aerodynamic fairing eliminating tunnel sonic booms at 360 km/h."
   },
   {
@@ -71,7 +71,7 @@ COMPONENTS_DATA.carbody = [
     cost: 960000,
     leadDays: 38,
     supplier: "AeroAlloy Trainworks",
-    inHouseTech: "tech_ultra_aero_400",
+    inHouseTech: "tech_body_supersonic_420",
     desc: "Ultra-low drag coefficient shell (Cd 0.14) engineered for 400+ km/h express service."
   }
 ];
@@ -88,40 +88,9 @@ SUBCOMPONENTS_DATA.carbody = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_aluminum_extrusion",
-    name: "Aluminum Extrusions",
-    branch: "aerodynamics",
-    costMoney: 350000,
-    durationDays: 45,
-    unlocks: ["body_aluminum"],
-    desc: "Develop tooling and extrusion dies for hollow profile aluminum carbodies reducing passenger trainset tare mass."
-  },
-  {
-    id: "tech_composite_chassis",
-    name: "Carbon-Fiber Monocoque Construction",
-    branch: "aerodynamics",
-    costMoney: 1200000,
-    durationDays: 75,
-    unlocks: ["body_aero_cf"],
-    desc: "Establish autoclave vacuum-infusion tooling for carbon composite shells minimizing aerodynamic drag."
-  },
-  {
-    id: "tech_streamlined_nose_320",
-    name: "320 km/h Bullet Nose Aerodynamics",
-    branch: "aerodynamics",
-    costMoney: 2600000,
-    durationDays: 110,
-    unlocks: ["body_bullet_360"],
-    desc: "Wind-tunnel optimization of micro-pressure nose geometry preventing tunnel sonic boom shocks above 320 km/h."
-  },
-  {
-    id: "tech_ultra_aero_400",
-    name: "400+ km/h Boundary Layer Wave Reducer",
-    branch: "aerodynamics",
-    costMoney: 4800000,
-    durationDays: 160,
-    unlocks: ["body_hyper_400"],
-    desc: "Ultra-low drag coefficient profile (Cd 0.14) engineered for 400+ km/h high-speed express corridors."
-  }
+  { id: "tech_body_structural_steel", name: "High-Tensile Carbon Steel Monocoque Shell", branch: "aerodynamics", costMoney: 180000, durationDays: 30, unlocks: ["body_steel"], desc: "Welded high-yield steel box structure for freight locomotives and utility sets." },
+  { id: "tech_body_aluminum_extruded", name: "6000-Series Welded Aluminum Modular Shell", branch: "aerodynamics", costMoney: 350000, durationDays: 45, unlocks: ["body_aluminum"], desc: "Hollow extruded aluminum coach bodies cutting vehicle mass by 40%." },
+  { id: "tech_body_carbon_monocoque", name: "Carbon-Fiber Reinforced Monocoque (300 km/h)", branch: "aerodynamics", costMoney: 1200000, durationDays: 75, unlocks: ["body_aero_cf"], desc: "Autoclave carbon composite shell minimizing drag to Cd 0.22." },
+  { id: "tech_body_shinkansen_360", name: "Long-Nose Aerodynamic Shockwave Mitigator (360 km/h)", branch: "aerodynamics", costMoney: 2600000, durationDays: 110, unlocks: ["body_bullet_360"], desc: "Dual-taper nose fairing preventing tunnel micro-pressure waves at 360 km/h." },
+  { id: "tech_body_supersonic_420", name: "Boundary-Layer Supersonic Wave Shell (420 km/h)", branch: "aerodynamics", costMoney: 4800000, durationDays: 160, unlocks: ["body_hyper_400"], desc: "Ultra-low drag aerodynamic profile (Cd 0.14) certified for commercial 420 km/h." }
 );

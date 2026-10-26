@@ -1,4 +1,4 @@
-// Traction Motors: Stats, Info, Subcomponents, and Research Metadata
+// Traction Motors: All Models Researchable with Detailed Metadata
 window.COMPONENTS_DATA = window.COMPONENTS_DATA || {};
 window.SUBCOMPONENTS_DATA = window.SUBCOMPONENTS_DATA || {};
 window.COMPONENT_RESEARCH = window.COMPONENT_RESEARCH || [];
@@ -14,7 +14,7 @@ COMPONENTS_DATA.motor = [
     cost: 80000,
     leadDays: 10,
     supplier: "Nordic Traction Motors",
-    inHouseTech: null,
+    inHouseTech: "tech_mot_commuter_induction",
     desc: "Compact asynchronous motor suited for frequent station starts. Max speed limit: 170 km/h."
   },
   {
@@ -27,7 +27,7 @@ COMPONENTS_DATA.motor = [
     cost: 95000,
     leadDays: 12,
     supplier: "Nordic Traction Motors",
-    inHouseTech: null,
+    inHouseTech: "tech_mot_basic_induction",
     desc: "Sturdy induction motor requiring at least 3600 kW inverter output. Max speed limit: 190 km/h."
   },
   {
@@ -40,7 +40,7 @@ COMPONENTS_DATA.motor = [
     cost: 210000,
     leadDays: 18,
     supplier: "Nordic Traction Motors",
-    inHouseTech: "tech_high_torque_motors",
+    inHouseTech: "tech_mot_copper_rotor",
     desc: "Heavy-duty copper rotor delivering high tractive force. Max speed limit: 230 km/h."
   },
   {
@@ -53,7 +53,7 @@ COMPONENTS_DATA.motor = [
     cost: 380000,
     leadDays: 22,
     supplier: "MagnaDrive Electric",
-    inHouseTech: "tech_pmsm_traction",
+    inHouseTech: "tech_mot_pmsm_280",
     desc: "High power-density permanent magnet traction motor. Speed ceiling: 280 km/h."
   },
   {
@@ -66,7 +66,7 @@ COMPONENTS_DATA.motor = [
     cost: 470000,
     leadDays: 25,
     supplier: "MagnaDrive Electric",
-    inHouseTech: "tech_pmsm_traction",
+    inHouseTech: "tech_mot_pmsm_320",
     desc: "Buried NdFeB magnets engineered specifically for sustained 320 km/h passenger corridors."
   },
   {
@@ -79,7 +79,7 @@ COMPONENTS_DATA.motor = [
     cost: 620000,
     leadDays: 28,
     supplier: "MagnaDrive Electric",
-    inHouseTech: "tech_hyper_motors_400",
+    inHouseTech: "tech_mot_synchro_360",
     desc: "Direct liquid-cooled stator with low rotor inertia certified for 360 km/h operation."
   },
   {
@@ -92,7 +92,7 @@ COMPONENTS_DATA.motor = [
     cost: 850000,
     leadDays: 32,
     supplier: "MagnaDrive Electric",
-    inHouseTech: "tech_hyper_motors_400",
+    inHouseTech: "tech_mot_halbach_420",
     desc: "Halbach array rotor delivering 9.8 MW with zero harmonic losses at 6000+ RPM."
   }
 ];
@@ -110,31 +110,11 @@ SUBCOMPONENTS_DATA.motor = {
 };
 
 COMPONENT_RESEARCH.push(
-  {
-    id: "tech_high_torque_motors",
-    name: "Copper-Rotor Turbo Induction Motors",
-    branch: "motors",
-    costMoney: 750000,
-    durationDays: 60,
-    unlocks: ["mot_ind_highoutput"],
-    desc: "Cast copper rotors offering superior thermal endurance and heavy starting tractive torque."
-  },
-  {
-    id: "tech_pmsm_traction",
-    name: "Permanent Magnet Synchronous Motors (320 km/h)",
-    branch: "motors",
-    costMoney: 2200000,
-    durationDays: 100,
-    unlocks: ["mot_pmsm", "mot_pmsm_express_320"],
-    desc: "High-density permanent magnet synchronous traction delivering sustained 320 km/h speeds."
-  },
-  {
-    id: "tech_hyper_motors_400",
-    name: "Synchronous Halbach Ultra-Velocity Motors (360-420 km/h)",
-    branch: "motors",
-    costMoney: 5400000,
-    durationDays: 175,
-    unlocks: ["mot_hs_synchro_360", "mot_hyper_velocity_400"],
-    desc: "Sinusoidal flux Halbach array motors running up to 6000 RPM with negligible iron losses."
-  }
+  { id: "tech_mot_commuter_induction", name: "Lightweight Commuter Asynchronous Motor", branch: "motors", costMoney: 180000, durationDays: 30, unlocks: ["mot_ind_commuter"], desc: "Fast acceleration 2800 kW induction drive for high-frequency suburban routes." },
+  { id: "tech_mot_basic_induction", name: "Standard 3-Phase Induction Traction Motor", branch: "motors", costMoney: 260000, durationDays: 40, unlocks: ["mot_ind_basic"], desc: "High-durability 3600 kW induction motor with proven squirrel-cage geometry." },
+  { id: "tech_mot_copper_rotor", name: "Heavy-Duty Copper-Endring Turbo Motor", branch: "motors", costMoney: 750000, durationDays: 60, unlocks: ["mot_ind_highoutput"], desc: "Cast copper end-rings providing exceptional thermal endurance for heavy freight." },
+  { id: "tech_mot_pmsm_280", name: "280 km/h Permanent Magnet Synchronous Motor", branch: "motors", costMoney: 1400000, durationDays: 80, unlocks: ["mot_pmsm"], desc: "Neodymium permanent magnet rotor delivering 6800 kW output with 97% efficiency." },
+  { id: "tech_mot_pmsm_320", name: "320 km/h High-RPM Buried Magnet Motor", branch: "motors", costMoney: 2200000, durationDays: 100, unlocks: ["mot_pmsm_express_320"], desc: "Buried NdFeB magnets engineered specifically for sustained 320 km/h running." },
+  { id: "tech_mot_synchro_360", name: "360 km/h Distributed Liquid-Cooled Motor", branch: "motors", costMoney: 3800000, durationDays: 140, unlocks: ["mot_hs_synchro_360"], desc: "Direct liquid cooling permitting sustained 8600 kW sprints without thermal derating." },
+  { id: "tech_mot_halbach_420", name: "420 km/h Halbach Array Hyper-Velocity Drive", branch: "motors", costMoney: 5400000, durationDays: 175, unlocks: ["mot_hyper_velocity_400"], desc: "Halbach array sinusoidal flux rotor operating at 6000+ RPM without iron losses." }
 );
