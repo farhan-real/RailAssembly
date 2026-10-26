@@ -1,4 +1,4 @@
-// Government Rolling Stock Contracts with Rich Multi-Parameter Requirements
+// Procedural Contract Generation Engine Scaled to Player Tech Progression
 const COMPETITORS_DATA = [
   {
     id: "comp_veloce",
@@ -32,262 +32,153 @@ const COMPETITORS_DATA = [
   }
 ];
 
-const CONTRACT_TEMPLATES = [
-  {
-    type: "grand_highspeed_350",
-    title: "Trans-Continental High-Speed Bullet Corridor",
-    agency: "Federal High-Speed Rail Directorate",
-    unitsRequired: 24,
-    batchSizePerQuarter: 3,
-    budgetPerUnit: 5800000,
-    mobilizationDays: 60,
-    delayToleranceDays: 30,
-    strictnessTier: "Extreme Precision",
-    premiumMarkupFactor: 1.65,
-    description: "Flagship 350 km/h aerodynamic passenger bullet trainset with high continuous power and strict drag limits.",
-    requirements: [
-      { key: "speed", label: "Operating Speed", value: 350, unit: "km/h", compare: "min" },
-      { key: "acceleration", label: "Starting Acceleration", value: 0.65, unit: "m/s²", compare: "min" },
-      { key: "passengerCap", label: "Seating Capacity", value: 320, unit: "Seats", compare: "min" },
-      { key: "aerodynamics", label: "Max Aerodynamic Drag (Cd)", value: 0.22, unit: "Cd", compare: "max" }
-    ]
-  },
-  {
-    type: "mineral_basin_heavy",
-    title: "Mountain Basin Mineral Haul Locomotives",
-    agency: "Ministry of Heavy Transport & Logistics",
-    unitsRequired: 28,
-    batchSizePerQuarter: 4,
-    budgetPerUnit: 4400000,
-    mobilizationDays: 60,
-    delayToleranceDays: 60,
-    strictnessTier: "Extreme Precision",
-    premiumMarkupFactor: 1.70,
-    description: "Severe gradient mineral routes demanding massive starting tractive adhesion and strict axle load compliance.",
-    requirements: [
-      { key: "tractiveEffort", label: "Tractive Effort Adhesion", value: 500, unit: "kN", compare: "min" },
-      { key: "horsepower", label: "Continuous Traction Power", value: 7500, unit: "hp", compare: "min" },
-      { key: "maxAxleLoad", label: "Max Permissible Axle Load", value: 25.0, unit: "t/Axle", compare: "max" }
-    ]
-  },
-  {
-    type: "metropolitan_commuter_emu",
-    title: "Metropolitan Suburban Commuter Rolling Stock",
-    agency: "Urban Transit Authority",
-    unitsRequired: 36,
-    batchSizePerQuarter: 4,
-    budgetPerUnit: 2500000,
-    mobilizationDays: 45,
-    delayToleranceDays: 45,
-    strictnessTier: "Demanding Specification",
-    premiumMarkupFactor: 1.35,
-    description: "High-frequency urban network requiring rapid station dwell sprint acceleration and tight cost control.",
-    requirements: [
-      { key: "acceleration", label: "Starting Acceleration", value: 0.88, unit: "m/s²", compare: "min" },
-      { key: "passengerCap", label: "Passenger Seating Capacity", value: 260, unit: "Passengers", compare: "min" },
-      { key: "unitCost", label: "Unit Production Cost Ceiling", value: 2250000, unit: "USD", compare: "max" }
-    ]
-  },
-  {
-    type: "cross_border_multisystem",
-    title: "Trans-European Dual-Voltage Cross-Border Express",
-    agency: "International Railway Union",
-    unitsRequired: 16,
-    batchSizePerQuarter: 2,
-    budgetPerUnit: 4900000,
-    mobilizationDays: 60,
-    delayToleranceDays: 40,
-    strictnessTier: "Demanding Specification",
-    premiumMarkupFactor: 1.50,
-    description: "Inter-capital corridor requiring multi-system AC/DC catenary flexibility and high powertrain efficiency.",
-    requirements: [
-      { key: "speed", label: "Operating Speed", value: 240, unit: "km/h", compare: "min" },
-      { key: "multiSystem", label: "Multi-Voltage Grid Compatibility", value: "Multi-System", unit: "System", compare: "bool" },
-      { key: "efficiency", label: "Total Powertrain Efficiency", value: 93, unit: "%", compare: "min" },
-      { key: "safetyScore", label: "Integrated Safety Index", value: 92, unit: "Pts", compare: "min" }
-    ]
-  },
-  {
-    type: "zero_emission_lastmile",
-    title: "Deep-Sea Port Battery Last-Mile Freight Shunters",
-    agency: "National Maritime & Port Authority",
-    unitsRequired: 18,
-    batchSizePerQuarter: 3,
-    budgetPerUnit: 3600000,
-    mobilizationDays: 50,
-    delayToleranceDays: 45,
-    strictnessTier: "Standard Specification",
-    premiumMarkupFactor: 1.40,
-    description: "Zero-emission shunting locomotives with onboard auxiliary battery energy storage for non-electrified docks.",
-    requirements: [
-      { key: "batteryRange", label: "Zero-Emission Battery Range", value: 30, unit: "km", compare: "min" },
-      { key: "tractiveEffort", label: "Tractive Effort Adhesion", value: 420, unit: "kN", compare: "min" },
-      { key: "horsepower", label: "Continuous Traction Power", value: 4600, unit: "hp", compare: "min" }
-    ]
-  },
-  {
-    type: "airport_direct_link",
-    title: "Capital International Airport High-Frequency Express",
-    agency: "Aviation Corridor Transit Directorate",
-    unitsRequired: 20,
-    batchSizePerQuarter: 4,
-    budgetPerUnit: 2900000,
-    mobilizationDays: 45,
-    delayToleranceDays: 35,
-    strictnessTier: "Demanding Specification",
-    premiumMarkupFactor: 1.45,
-    description: "Dedicated non-stop airport connector prioritizing punctuality, passenger capacity, and rapid sprint speed.",
-    requirements: [
-      { key: "speed", label: "Operating Speed", value: 180, unit: "km/h", compare: "min" },
-      { key: "acceleration", label: "Starting Acceleration", value: 0.85, unit: "m/s²", compare: "min" },
-      { key: "passengerCap", label: "Passenger Seating Capacity", value: 280, unit: "Passengers", compare: "min" }
-    ]
-  },
-  {
-    type: "ultra_speed_sprint",
-    title: "Next-Gen 400 km/h National High-Speed Prototype Fleet",
-    agency: "Ministry of Science & Rail Innovation",
-    unitsRequired: 12,
-    batchSizePerQuarter: 2,
-    budgetPerUnit: 6900000,
-    mobilizationDays: 75,
-    delayToleranceDays: 45,
-    strictnessTier: "Extreme Precision",
-    premiumMarkupFactor: 1.85,
-    description: "Boundary-pushing ultra high-speed express trainsets requiring supreme aerodynamics and flawless safety systems.",
-    requirements: [
-      { key: "speed", label: "Operating Speed", value: 380, unit: "km/h", compare: "min" },
-      { key: "aerodynamics", label: "Aerodynamic Drag Coefficient", value: 0.18, unit: "Cd", compare: "max" },
-      { key: "safetyScore", label: "Composite Safety Score", value: 98, unit: "Pts", compare: "min" },
-      { key: "efficiency", label: "Powertrain Efficiency", value: 95, unit: "%", compare: "min" }
-    ]
-  },
-  {
-    type: "alpine_gradient_express",
-    title: "Alpine Pass High-Gradient Passenger Trainsets",
-    agency: "Mountain Transit Confederation",
-    unitsRequired: 15,
-    batchSizePerQuarter: 3,
-    budgetPerUnit: 3900000,
-    mobilizationDays: 50,
-    delayToleranceDays: 45,
-    strictnessTier: "Demanding Specification",
-    premiumMarkupFactor: 1.45,
-    description: "Steep mountain grade operations demanding elevated adhesion force and strict axle-load compliance.",
-    requirements: [
-      { key: "tractiveEffort", label: "Starting Adhesion Force", value: 450, unit: "kN", compare: "min" },
-      { key: "maxAxleLoad", label: "Max Axle Load Ceiling", value: 18.5, unit: "t/Axle", compare: "max" },
-      { key: "safetyScore", label: "Braking & Safety Index", value: 94, unit: "Pts", compare: "min" }
-    ]
-  },
-  {
-    type: "intermodal_time_freight",
-    title: "Express Intermodal Container Electric Locomotives",
-    agency: "National Freight Logistics Corporation",
-    unitsRequired: 30,
-    batchSizePerQuarter: 5,
-    budgetPerUnit: 3750000,
-    mobilizationDays: 50,
-    delayToleranceDays: 50,
-    strictnessTier: "Standard Specification",
-    premiumMarkupFactor: 1.25,
-    description: "High-speed container freight moving goods across intercity corridors at express freight timetables.",
-    requirements: [
-      { key: "speed", label: "Operating Speed", value: 160, unit: "km/h", compare: "min" },
-      { key: "horsepower", label: "Continuous Traction Power", value: 6800, unit: "hp", compare: "min" },
-      { key: "unitCost", label: "Production Cost Ceiling", value: 3100000, unit: "USD", compare: "max" }
-    ]
-  },
-  {
-    type: "green_branch_bemu",
-    title: "Regional Branch Line Battery-Electric Trainsets",
-    agency: "Provincial Rural Transport Bureau",
-    unitsRequired: 22,
-    batchSizePerQuarter: 3,
-    budgetPerUnit: 3300000,
-    mobilizationDays: 55,
-    delayToleranceDays: 50,
-    strictnessTier: "Demanding Specification",
-    premiumMarkupFactor: 1.40,
-    description: "Dual-mode battery electric trainsets bridging rural branch line gaps without catenary wiring.",
-    requirements: [
-      { key: "batteryRange", label: "Wire-Free Battery Range", value: 80, unit: "km", compare: "min" },
-      { key: "passengerCap", label: "Passenger Seating Capacity", value: 240, unit: "Passengers", compare: "min" },
-      { key: "efficiency", label: "Powertrain Efficiency", value: 92, unit: "%", compare: "min" }
-    ]
-  },
-  {
-    type: "autonomous_goa4_metro",
-    title: "Grade-of-Automation 4 Autonomous Metro Consists",
-    agency: "Capital City Automated Metro Directorate",
-    unitsRequired: 25,
-    batchSizePerQuarter: 4,
-    budgetPerUnit: 3100000,
-    mobilizationDays: 60,
-    delayToleranceDays: 40,
-    strictnessTier: "Extreme Precision",
-    premiumMarkupFactor: 1.60,
-    description: "Driverless automated urban trains featuring high redundancy, advanced WSP, and responsive acceleration.",
-    requirements: [
-      { key: "acceleration", label: "Starting Acceleration", value: 0.92, unit: "m/s²", compare: "min" },
-      { key: "safetyScore", label: "Automation Safety Rating", value: 100, unit: "Pts", compare: "min" },
-      { key: "passengerCap", label: "Passenger Capacity", value: 280, unit: "Passengers", compare: "min" }
-    ]
-  },
-  {
-    type: "trans_provincial_intercity",
-    title: "Cross-Provincial High-Density Intercity Fleet",
-    agency: "State Passenger & Parcel Service",
-    unitsRequired: 24,
-    batchSizePerQuarter: 3,
-    budgetPerUnit: 3500000,
-    mobilizationDays: 45,
-    delayToleranceDays: 45,
-    strictnessTier: "Standard Specification",
-    premiumMarkupFactor: 1.20,
-    description: "Balanced interurban corridor requiring steady 200+ km/h cruising, low unit costs, and high passenger seating.",
-    requirements: [
-      { key: "speed", label: "Operating Speed", value: 210, unit: "km/h", compare: "min" },
-      { key: "passengerCap", label: "Passenger Seating Capacity", value: 300, unit: "Passengers", compare: "min" },
-      { key: "unitCost", label: "Production Cost Ceiling", value: 2950000, unit: "USD", compare: "max" }
-    ]
-  },
-  {
-    type: "luxury_night_sleeper",
-    title: "Trans-National Grand Sleeper Hotel Express",
-    agency: "Continental Tourist Rail Alliance",
-    unitsRequired: 14,
-    batchSizePerQuarter: 2,
-    budgetPerUnit: 4800000,
-    mobilizationDays: 60,
-    delayToleranceDays: 50,
-    strictnessTier: "Demanding Specification",
-    premiumMarkupFactor: 1.55,
-    description: "Long passenger consist offering quiet ride comfort, high total power, and premium passenger amenities.",
-    requirements: [
-      { key: "carriageCount", label: "Consist Train Length", value: 6, unit: "Carriages", compare: "min" },
-      { key: "speed", label: "Operating Speed", value: 220, unit: "km/h", compare: "min" },
-      { key: "safetyScore", label: "Ride Quality & Safety Index", value: 92, unit: "Pts", compare: "min" }
-    ]
-  },
-  {
-    type: "arctic_corridor_freight",
-    title: "Sub-Zero Arctic Tundra Industrial Freight Locomotives",
-    agency: "Northern Polar Development Authority",
-    unitsRequired: 20,
-    batchSizePerQuarter: 3,
-    budgetPerUnit: 4600000,
-    mobilizationDays: 65,
-    delayToleranceDays: 60,
-    strictnessTier: "Extreme Precision",
-    premiumMarkupFactor: 1.65,
-    description: "High-power freight haulage engineered for ice-covered railheads and extreme thermal mechanical endurance.",
-    requirements: [
-      { key: "tractiveEffort", label: "Tractive Effort Adhesion", value: 480, unit: "kN", compare: "min" },
-      { key: "horsepower", label: "Continuous Traction Power", value: 7200, unit: "hp", compare: "min" },
-      { key: "safetyScore", label: "Pneumatics & Safety System", value: 90, unit: "Pts", compare: "min" }
-    ]
-  }
-];
+class ContractGenerator {
+  static REGIONS = [
+    "Northern Atlantic", "Trans-Alpine", "Pacific Coastal", "Great Lakes", "Kyushu Western",
+    "Danube Basin", "Rhine-Westphalia", "Appalachian", "Adriatic Express", "Bavarian Southern",
+    "Midlands Industrial", "Nordic Arctic", "Iberian Central", "High-Desert", "Baltic Maritime",
+    "Kanto Metro", "Fennoscandian", "Laurentian Corridor", "Cascadia Corridor", "Carpathian"
+  ];
 
+  static AGENCIES = [
+    "Transit Directorate", "Department of Rail Transport", "Corridor Commission",
+    "Intercity Passenger Corporation", "Heavy Industrial Logistics Authority",
+    "High-Speed Rail Bureau", "Metropolitan Transit Union", "Provincial Railway Administration"
+  ];
+
+  static MISSIONS = {
+    highspeed: ["Shinkansen Bullet Link", "Grand Express Line", "Velocity Corridor", "Arrow Aerodynamic Sprints", "Express Inter-Capital Route"],
+    freight: ["Heavy Mineral Haulage", "Mountain Basin Ore Line", "Intermodal Container Express", "Heavy Haul Mainline Shuttle", "Arctic Tundra Freight"],
+    commuter: ["Suburban Rapid Transit", "Airport Express Link", "High-Frequency Metro EMU", "Metropolitan Outer Ring", "Urban S-Bahn Connector"],
+    regional: ["Cross-Provincial Link", "Eco-Corridor Branch Line", "Mountain Valley Connector", "Alpine Pass Tilting Route", "Inter-City Parcel Fleet"]
+  };
+
+  static getPlayerTechProfile(gameState) {
+    const unlocked = gameState?.unlockedTechs || new Set();
+    const hasTech = (id) => {
+      if (!unlocked) return false;
+      if (typeof unlocked.has === "function") return unlocked.has(id);
+      if (Array.isArray(unlocked)) return unlocked.includes(id);
+      return false;
+    };
+
+    let maxSpeed = 160;
+    if (hasTech("tech_body_supersonic_420") || hasTech("tech_mot_halbach_420") || hasTech("tech_panto_hyper_420")) maxSpeed = 420;
+    else if (hasTech("tech_body_shinkansen_360") || hasTech("tech_mot_synchro_360") || hasTech("tech_bog_tilting_360")) maxSpeed = 360;
+    else if (hasTech("tech_panto_hs_320") || hasTech("tech_mot_pmsm_320") || hasTech("tech_bog_radial_320")) maxSpeed = 320;
+    else if (hasTech("tech_mot_pmsm_280") || hasTech("tech_body_carbon_monocoque") || hasTech("tech_panto_highspeed_280")) maxSpeed = 280;
+    else if (hasTech("tech_transm_quill_230") || hasTech("tech_mot_copper_rotor") || hasTech("tech_bog_flexicoil_220")) maxSpeed = 230;
+
+    let maxHp = 5200;
+    if (hasTech("tech_mot_halbach_420") || hasTech("tech_inv_sic_hyper_380")) maxHp = 13000;
+    else if (hasTech("tech_mot_synchro_360") || hasTech("tech_inv_sic_mosfet")) maxHp = 11500;
+    else if (hasTech("tech_mot_pmsm_320") || hasTech("tech_inv_highpower_320")) maxHp = 10000;
+    else if (hasTech("tech_mot_pmsm_280") || hasTech("tech_inv_liquid_vvvf")) maxHp = 8800;
+    else if (hasTech("tech_mot_copper_rotor")) maxHp = 7200;
+
+    let maxAdhesion = 380;
+    if (hasTech("tech_sand_plasma") || hasTech("tech_bog_coco_freight")) maxAdhesion = 750;
+    else if (hasTech("tech_sand_pneumatic") || hasTech("tech_pwm_direct_torque")) maxAdhesion = 520;
+
+    const hasMultiSystem = hasTech("tech_panto_multisystem_250") || hasTech("tech_vcb_hybrid_multi");
+    const hasBattery = hasTech("tech_bat_lfp_lastmile") || hasTech("tech_bat_nmc_intercity");
+    const maxBatteryKm = hasTech("tech_bat_nmc_intercity") ? 110 : (hasTech("tech_bat_lfp_lastmile") ? 35 : 0);
+
+    return { maxSpeed, maxHp, maxAdhesion, hasMultiSystem, hasBattery, maxBatteryKm };
+  }
+
+  static generateContract(gameState) {
+    const profile = this.getPlayerTechProfile(gameState);
+    const techCount = gameState?.unlockedTechs ? (typeof gameState.unlockedTechs.size === "number" ? gameState.unlockedTechs.size : gameState.unlockedTechs.length || 1) : 1;
+    const year = gameState?.year || 1;
+    const reputation = gameState?.reputation || 70;
+
+    const progressLevel = Math.min(5, Math.max(1, Math.floor(techCount / 4) + Math.floor(year / 2)));
+    const budgetScale = 1 + (progressLevel - 1) * 0.28 + (reputation - 70) * 0.008;
+
+    const categories = ["highspeed", "freight", "commuter", "regional"];
+    const category = categories[Math.floor(Math.random() * categories.length)];
+
+    const region = ContractGenerator.REGIONS[Math.floor(Math.random() * ContractGenerator.REGIONS.length)];
+    const agencyName = ContractGenerator.AGENCIES[Math.floor(Math.random() * ContractGenerator.AGENCIES.length)];
+    const agency = `${region} ${agencyName}`;
+    const missionName = ContractGenerator.MISSIONS[category][Math.floor(Math.random() * ContractGenerator.MISSIONS[category].length)];
+    const title = `${region} ${missionName}`;
+
+    const minUnits = 8 + progressLevel * 8;
+    const maxUnits = 14 + progressLevel * 16;
+    const units = minUnits + Math.floor(Math.random() * (maxUnits - minUnits + 1));
+    const batch = Math.max(2, Math.min(8, Math.round(units / (5 + Math.floor(Math.random() * 3)))));
+    const isChallenging = Math.random() < 0.35;
+
+    let budget = 3200000;
+    let mobDays = 45;
+    let delayDays = 45;
+    let markupFactor = 1.25 + (progressLevel - 1) * 0.06;
+    let strictness = progressLevel >= 4 ? "Extreme Precision" : (progressLevel >= 2 ? "Demanding Specification" : "Standard Specification");
+    const reqs = [];
+
+    if (category === "highspeed") {
+      let targetSpeed = isChallenging ? Math.min(420, profile.maxSpeed + 30) : Math.max(200, profile.maxSpeed - 15);
+      budget = (4800000 + (targetSpeed - 200) * 14000) * budgetScale;
+      mobDays = 55 + progressLevel * 4;
+      delayDays = 35 + progressLevel * 5;
+
+      reqs.push({ key: "speed", label: "Operating Speed", value: targetSpeed, unit: "km/h", compare: "min" });
+      reqs.push({ key: "acceleration", label: "Starting Acceleration", value: Number((0.60 + Math.random() * 0.22).toFixed(2)), unit: "m/s²", compare: "min" });
+      reqs.push({ key: "passengerCap", label: "Seating Capacity", value: 260 + progressLevel * 20, unit: "Seats", compare: "min" });
+      if (targetSpeed >= 320) reqs.push({ key: "aerodynamics", label: "Max Aerodynamic Drag (Cd)", value: 0.22, unit: "Cd", compare: "max" });
+    } else if (category === "freight") {
+      let targetAdhesion = isChallenging ? Math.min(850, profile.maxAdhesion + 80) : Math.max(340, profile.maxAdhesion - 40);
+      let targetHp = isChallenging ? Math.min(13000, profile.maxHp + 1600) : Math.max(5000, profile.maxHp - 500);
+      budget = (3900000 + (targetHp - 5000) * 280) * budgetScale;
+      mobDays = 50 + progressLevel * 5;
+      delayDays = 50 + progressLevel * 5;
+
+      reqs.push({ key: "tractiveEffort", label: "Tractive Effort Adhesion", value: targetAdhesion, unit: "kN", compare: "min" });
+      reqs.push({ key: "horsepower", label: "Continuous Traction Power", value: targetHp, unit: "hp", compare: "min" });
+      reqs.push({ key: "maxAxleLoad", label: "Max Permissible Axle Load", value: 25.0, unit: "t/Axle", compare: "max" });
+    } else if (category === "commuter") {
+      budget = (2500000 + progressLevel * 450000) * budgetScale;
+      mobDays = 45 + progressLevel * 3;
+      delayDays = 40 + progressLevel * 4;
+
+      reqs.push({ key: "acceleration", label: "Starting Acceleration", value: Number((0.85 + Math.random() * 0.20).toFixed(2)), unit: "m/s²", compare: "min" });
+      reqs.push({ key: "passengerCap", label: "Passenger Seating Capacity", value: 280 + progressLevel * 25, unit: "Passengers", compare: "min" });
+      reqs.push({ key: "unitCost", label: "Unit Production Cost Ceiling", value: Math.round(budget * 0.88), unit: "USD", compare: "max" });
+    } else {
+      budget = (3400000 + progressLevel * 500000) * budgetScale;
+      mobDays = 50 + progressLevel * 4;
+      delayDays = 45 + progressLevel * 5;
+
+      reqs.push({ key: "speed", label: "Operating Speed", value: Math.max(160, profile.maxSpeed - 25), unit: "km/h", compare: "min" });
+      reqs.push({ key: "passengerCap", label: "Passenger Capacity", value: 250 + progressLevel * 20, unit: "Passengers", compare: "min" });
+      reqs.push({ key: "efficiency", label: "Powertrain Efficiency", value: isChallenging ? 94 : 92, unit: "%", compare: "min" });
+      if (isChallenging && profile.hasBattery) {
+        reqs.push({ key: "batteryRange", label: "Wire-Free Battery Range", value: profile.maxBatteryKm || 30, unit: "km", compare: "min" });
+        budget += 850000;
+      }
+    }
+
+    const description = `${agency} has opened procurement for ${units} units of rolling stock for the ${region} network. Full test track certification is required.`;
+
+    return {
+      type: `${category}_${Math.random().toString(36).substring(2, 6)}`,
+      category,
+      title,
+      agency,
+      unitsRequired: units,
+      batchSizePerQuarter: batch,
+      budgetPerUnit: Math.round(budget),
+      mobilizationDays: mobDays,
+      delayToleranceDays: delayDays,
+      strictnessTier: strictness,
+      premiumMarkupFactor: Number(markupFactor.toFixed(2)),
+      description,
+      requirements: reqs
+    };
+  }
+}
+
+const CONTRACT_TEMPLATES = [];
 const TENDER_TEMPLATES = CONTRACT_TEMPLATES;

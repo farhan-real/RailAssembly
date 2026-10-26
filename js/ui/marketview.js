@@ -1,32 +1,43 @@
 // Ministry Rolling Stock Contracts Board & Proposal Bidding View
 class MarketView {
+  static activeCategoryFilter = "all";
+
   static render(container) {
-    const contractCount = state.marketTenders.length;
+    let contracts = state.marketTenders || [];
+    if (contracts.length === 0) {
+      OrderEngine.evaluateGovernmentBids();
+      contracts = state.marketTenders || [];
+    }
+
+    const filtered = this.getFilteredContracts(contracts);
 
     container.innerHTML = `
       <div class="view-grid-two">
         <div class="c-card">
           <div class="card-header">
             <span class="card-title">Ministry Contracts Directorate</span>
-            <span class="c-badge ${contractCount > 0 ? "badge-green" : "badge-amber"}" id="contracts-count-badge">
-              ${contractCount} Open Opportunities
+            <span class="c-badge ${contracts.length > 0 ? "badge-green" : "badge-amber"}" id="contracts-count-badge">
+              ${contracts.length} Open Opportunities
             </span>
           </div>
 
-          <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-            The Ministry of Transportation and federal rail authorities release multi-year procurement contracts. Each contract provides an initial mobilization grace period to order components from suppliers before delivery quotas begin.
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
+            Dynamic government procurement opportunities scaled to your enterprise standing and technical maturity. Order volumes and financial budgets increase as your capabilities expand.
           </div>
 
-          <div id="contract-slot-area" style="display:flex; flex-direction:column; gap:12px;">
-            ${contractCount === 0 ? `
+          <div class="market-filter-bar">
+            <button class="market-filter-btn ${this.activeCategoryFilter === "all" ? "active" : ""}" data-cat="all">All (${contracts.length})</button>
+            <button class="market-filter-btn ${this.activeCategoryFilter === "highspeed" ? "active" : ""}" data-cat="highspeed">High-Speed</button>
+            <button class="market-filter-btn ${this.activeCategoryFilter === "freight" ? "active" : ""}" data-cat="freight">Heavy Freight</button>
+            <button class="market-filter-btn ${this.activeCategoryFilter === "commuter" ? "active" : ""}" data-cat="commuter">Commuter</button>
+            <button class="market-filter-btn ${this.activeCategoryFilter === "regional" ? "active" : ""}" data-cat="regional">Regional</button>
+          </div>
+
+          <div id="contract-slot-area" style="display:flex; flex-direction:column; gap:10px; max-height:calc(100vh - 230px); overflow-y:auto; padding-right:4px;">
+            ${filtered.length === 0 ? `
               <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:24px; text-align:center;">
-                <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS CURRENTLY OPEN FOR BIDDING</div>
-                <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
-                  Federal transit authorities are evaluating upcoming route schedules.
-                </p>
-                <div class="font-mono text-blue" style="font-size:11px;">
-                  Next contract round opening in: <strong id="contract-next-countdown">${Math.max(1, state.nextTenderCountdown)} Days</strong>
-                </div>
+                <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS IN THIS CATEGORY</div>
+                <p class="text-muted" style="font-size:11px;">Select another category or wait for new opportunities to open.</p>
               </div>
             ` : ""}
           </div>
@@ -60,57 +71,64 @@ class MarketView {
       </div>
     `;
 
-    if (contractCount > 0) {
+    this.bindFilterEvents(container);
+
+    if (filtered.length > 0) {
       const area = document.getElementById("contract-slot-area");
-      state.marketTenders.forEach(c => {
-        area.appendChild(this.buildContractCard(c));
-      });
+      filtered.forEach(c => area.appendChild(this.buildContractCard(c)));
     }
   }
 
+  static getFilteredContracts(contracts) {
+    if (!Array.isArray(contracts)) return [];
+    if (this.activeCategoryFilter === "all") return contracts;
+    return contracts.filter(c => {
+      if (!c) return false;
+      const cat = c.category || (c.type ? c.type.split("_")[0] : "regional");
+      return cat === this.activeCategoryFilter;
+    });
+  }
+
+  static bindFilterEvents(container) {
+    container.querySelectorAll(".market-filter-btn").forEach(btn => {
+      btn.onclick = () => {
+        this.activeCategoryFilter = btn.getAttribute("data-cat");
+        MarketView.render(container);
+      };
+    });
+  }
+
   static updateLive() {
+    const contracts = state.marketTenders || [];
     const countBadge = document.getElementById("contracts-count-badge");
     if (countBadge) {
-      countBadge.textContent = `${state.marketTenders.length} Open Opportunities`;
-      countBadge.className = `c-badge ${state.marketTenders.length > 0 ? "badge-green" : "badge-amber"}`;
-    }
-
-    const countdownEl = document.getElementById("contract-next-countdown");
-    if (countdownEl) {
-      countdownEl.textContent = `${Math.max(1, state.nextTenderCountdown)} Days`;
+      countBadge.textContent = `${contracts.length} Open Opportunities`;
+      countBadge.className = `c-badge ${contracts.length > 0 ? "badge-green" : "badge-amber"}`;
     }
 
     const slotArea = document.getElementById("contract-slot-area");
     if (!slotArea) return;
 
+    const filtered = this.getFilteredContracts(contracts);
     const existingCardIds = Array.from(slotArea.querySelectorAll("[data-contract-id]")).map(el => el.getAttribute("data-contract-id"));
-    const currentTenderIds = state.marketTenders.map(t => t.id);
+    const currentFilteredIds = filtered.map(t => t.id);
 
-    // If contracts list changed, rebuild slot area
-    if (existingCardIds.length !== currentTenderIds.length || existingCardIds.some((id, i) => id !== currentTenderIds[i])) {
+    if (existingCardIds.length !== currentFilteredIds.length || existingCardIds.some((id, i) => id !== currentFilteredIds[i])) {
       slotArea.innerHTML = "";
-      if (state.marketTenders.length === 0) {
+      if (filtered.length === 0) {
         slotArea.innerHTML = `
           <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:24px; text-align:center;">
-            <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS CURRENTLY OPEN FOR BIDDING</div>
-            <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
-              Federal transit authorities are evaluating upcoming route schedules.
-            </p>
-            <div class="font-mono text-blue" style="font-size:11px;">
-              Next contract round opening in: <strong id="contract-next-countdown">${Math.max(1, state.nextTenderCountdown)} Days</strong>
-            </div>
+            <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS IN THIS CATEGORY</div>
+            <p class="text-muted" style="font-size:11px;">Select another category or wait for new opportunities to open.</p>
           </div>
         `;
       } else {
-        state.marketTenders.forEach(c => {
-          slotArea.appendChild(this.buildContractCard(c));
-        });
+        filtered.forEach(c => slotArea.appendChild(this.buildContractCard(c)));
       }
       return;
     }
 
-    // In-place update of remaining countdown window badges
-    state.marketTenders.forEach(c => {
+    filtered.forEach(c => {
       const card = slotArea.querySelector(`[data-contract-id="${c.id}"]`);
       if (card) {
         const badge = card.querySelector(".contract-window-badge");
@@ -126,32 +144,35 @@ class MarketView {
     const card = document.createElement("div");
     card.setAttribute("data-contract-id", c.id);
     card.style.background = "var(--bg-surface)";
-    card.style.padding = "12px 14px";
+    card.style.padding = "10px 12px";
     card.style.borderRadius = "var(--radius-xs)";
     card.style.border = "1px solid var(--border-strong)";
 
-    const daysRemaining = Math.max(0, c.expiresDay - state.day);
+    const daysRemaining = Math.max(0, (c.expiresDay || state.day + 60) - state.day);
     const mobDays = c.mobilizationDays || 45;
+    const unitsReq = c.unitsRequired || 12;
+    const budgetUnit = c.budgetPerUnit || 3200000;
+    const totalContractValue = unitsReq * budgetUnit;
 
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <h4 style="font-size:13px; font-weight:700; color:var(--text-main);">${c.title}</h4>
-            <span class="c-badge badge-blue">${c.strictnessTier}</span>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+        <div style="min-width:0; flex:1;">
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <h4 style="font-size:12px; font-weight:700; color:var(--text-main);">${c.title || "Government Rolling Stock Contract"}</h4>
+            <span class="c-badge badge-blue">${c.strictnessTier || "Standard Specification"}</span>
           </div>
-          <span class="text-blue font-mono" style="font-size:10px;">${c.agency}</span>
+          <span class="text-blue font-mono" style="font-size:9.5px;">${c.agency || "Regional Transit Authority"}</span>
         </div>
-        <span class="c-badge badge-amber font-mono contract-window-badge">${daysRemaining} Days Window</span>
+        <span class="c-badge badge-amber font-mono contract-window-badge" style="font-size:9px; flex-shrink:0;">${daysRemaining} Days Window</span>
       </div>
 
-      <p class="text-muted" style="font-size:11px; margin-bottom:10px; line-height:1.35;">${c.description}</p>
+      <p class="text-muted" style="font-size:10px; margin-bottom:8px; line-height:1.35;">${c.description || "Official fleet procurement tender."}</p>
 
-      <div style="margin-bottom:10px;">
-        <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Mandatory Contract Specifications</span>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
+      <div style="margin-bottom:8px;">
+        <span class="text-muted" style="font-size:9px; text-transform:uppercase; font-weight:700;">Mandatory Contract Specifications</span>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:3px;">
           ${(c.requirements || []).map(req => `
-            <div style="background:var(--bg-panel); padding:5px 8px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; font-size:10.5px;">
+            <div style="background:var(--bg-panel); padding:4px 6px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; font-size:10px;">
               <span class="text-secondary">${req.label}:</span>
               <strong class="font-mono text-blue">${req.compare === "min" ? "Min" : (req.compare === "max" ? "Max" : "")} ${req.value.toLocaleString()} ${req.unit}</strong>
             </div>
@@ -159,22 +180,20 @@ class MarketView {
         </div>
       </div>
 
-      <div class="view-grid-two" style="gap:6px; font-size:11px; margin-bottom:10px; background:rgba(0,0,0,0.2); padding:6px 8px; border-radius:var(--radius-xs);">
-        <div><span class="text-muted">Total Fleet Order:</span> <strong class="font-mono">${c.unitsRequired} Units</strong></div>
-        <div><span class="text-muted">Quarterly Delivery:</span> <strong class="font-mono text-blue">${c.batchSizePerQuarter} Units / Qtr</strong></div>
-        <div><span class="text-muted">Unit Budget Ceiling:</span> <strong class="font-mono text-positive">$${c.budgetPerUnit.toLocaleString()}</strong></div>
-        <div><span class="text-muted">Procurement Grace:</span> <strong class="font-mono text-blue">${mobDays} Days Initial Window</strong></div>
+      <div class="view-grid-two" style="gap:4px; font-size:10px; margin-bottom:8px; background:rgba(0,0,0,0.2); padding:5px 8px; border-radius:var(--radius-xs);">
+        <div><span class="text-muted">Total Fleet Order:</span> <strong class="font-mono">${unitsReq} Units</strong></div>
+        <div><span class="text-muted">Quarterly Delivery:</span> <strong class="font-mono text-blue">${c.batchSizePerQuarter || 2} Units / Qtr</strong></div>
+        <div><span class="text-muted">Unit Budget:</span> <strong class="font-mono text-positive">$${budgetUnit.toLocaleString()}</strong></div>
+        <div><span class="text-muted">Total Order Value:</span> <strong class="font-mono text-positive">$${totalContractValue.toLocaleString()}</strong></div>
+        <div><span class="text-muted">Procurement Grace:</span> <strong class="font-mono text-blue">${mobDays} Days Window</strong></div>
       </div>
 
       <div style="display:flex; justify-content:flex-end;">
-        <button class="c-btn btn-primary btn-sm btn-submit-bid">Select Model &amp; Submit Contract Proposal</button>
+        <button class="c-btn btn-primary btn-sm btn-submit-bid">Select Model &amp; Submit Proposal</button>
       </div>
     `;
 
-    card.querySelector(".btn-submit-bid").onclick = () => {
-      this.openBidModal(c);
-    };
-
+    card.querySelector(".btn-submit-bid").onclick = () => this.openBidModal(c);
     return card;
   }
 
@@ -204,7 +223,7 @@ class MarketView {
 
               <div style="font-size:10px; margin-bottom:8px;">
                 ${check.valid 
-                  ? `<span class="text-positive">All ${contract.requirements.length} mandatory specifications fully satisfied.</span>` 
+                  ? `<span class="text-positive">All ${contract.requirements ? contract.requirements.length : 0} mandatory specifications fully satisfied.</span>` 
                   : `<span class="text-negative">${check.errors[0]}</span>`
                 }
               </div>

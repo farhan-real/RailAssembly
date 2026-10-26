@@ -1,6 +1,8 @@
 // Government Contracts Engine, Multi-Parameter Validation & Scaled Performance Pricing
 class OrderEngine {
   static evaluateGovernmentBids() {
+    if (!state || !Array.isArray(state.marketTenders)) return;
+
     state.marketTenders.forEach(t => {
       if (state.day >= t.expiresDay) {
         t.expired = true;
@@ -14,39 +16,29 @@ class OrderEngine {
     const hadExpired = state.marketTenders.some(t => t.expired);
     state.marketTenders = state.marketTenders.filter(t => !t.expired);
 
-    state.nextTenderCountdown -= 1;
-    const targetConcurrentContracts = 5;
+    state.nextTenderCountdown = (state.nextTenderCountdown || 0) - 1;
+    const targetConcurrentContracts = 12;
 
-    // If completely empty, open opportunities immediately with zero delay
-    if (state.marketTenders.length === 0) {
-      state.nextTenderCountdown = 0;
-    }
-
-    // Generate new contract opportunities frequently and without delay
-    if (state.marketTenders.length < targetConcurrentContracts && state.nextTenderCountdown <= 0) {
+    if (state.marketTenders.length < targetConcurrentContracts && (state.nextTenderCountdown <= 0 || state.marketTenders.length === 0)) {
       const needed = state.marketTenders.length === 0
-        ? 4
-        : Math.min(2, targetConcurrentContracts - state.marketTenders.length);
+        ? 8
+        : Math.min(3, targetConcurrentContracts - state.marketTenders.length);
 
-      const activeTypes = new Set(state.marketTenders.map(t => t.type));
-      const availableTemplates = CONTRACT_TEMPLATES.filter(tpl => !activeTypes.has(tpl.type));
-      const pool = availableTemplates.length >= needed ? availableTemplates : CONTRACT_TEMPLATES;
-      const shuffled = [...pool].sort(() => 0.5 - Math.random());
-
-      for (let i = 0; i < needed && i < shuffled.length; i++) {
-        const template = shuffled[i];
+      for (let i = 0; i < needed; i++) {
+        const generated = ContractGenerator.generateContract(state);
         state.marketTenders.push({
           id: "cnt_" + Math.random().toString(36).substring(2, 8),
-          ...template,
+          ...generated,
           issuedDay: state.day,
-          expiresDay: state.day + 60 + Math.floor(Math.random() * 30),
+          expiresDay: state.day + 65 + Math.floor(Math.random() * 35),
           awarded: false
         });
       }
-      state.nextTenderCountdown = 10 + Math.floor(Math.random() * 6);
+
+      state.nextTenderCountdown = 8 + Math.floor(Math.random() * 6);
       state.saveToStorage();
       Events.emit("toast", {
-        text: `New Ministry Contracts: Directorate published fresh rolling stock procurement opportunities.`,
+        text: `New Ministry Contracts: Directorate published ${needed} fresh rolling stock procurement opportunities.`,
         type: "success"
       });
       Events.emit("marketChanged");
@@ -55,40 +47,41 @@ class OrderEngine {
       Events.emit("marketChanged");
     }
 
-    // Process Active Contract Mobilization & Quotas
-    state.activeContracts.forEach(contract => {
-      if (contract.isMobilizing) {
-        contract.mobilizationDaysLeft -= 1;
-        if (contract.mobilizationDaysLeft <= 0) {
-          contract.isMobilizing = false;
-          contract.mobilizationDaysLeft = 0;
-          contract.quarterStartDay = state.day;
-          Events.emit("toast", {
-            text: `Procurement Grace Ended: "${contract.title}" has entered active quarterly delivery quota schedule.`,
-            type: "normal"
-          });
+    if (Array.isArray(state.activeContracts)) {
+      state.activeContracts.forEach(contract => {
+        if (contract.isMobilizing) {
+          contract.mobilizationDaysLeft -= 1;
+          if (contract.mobilizationDaysLeft <= 0) {
+            contract.isMobilizing = false;
+            contract.mobilizationDaysLeft = 0;
+            contract.quarterStartDay = state.day;
+            Events.emit("toast", {
+              text: `Procurement Grace Ended: "${contract.title}" has entered active quarterly delivery quota schedule.`,
+              type: "normal"
+            });
+          }
+          return;
         }
-        return;
-      }
 
-      const daysIntoCurrentQuarter = (state.day - contract.quarterStartDay);
-      const daysPerBatch = 90;
+        const daysIntoCurrentQuarter = (state.day - contract.quarterStartDay);
+        const daysPerBatch = 90;
 
-      if (daysIntoCurrentQuarter > daysPerBatch && contract.deliveredThisQuarter < contract.batchSizePerQuarter) {
-        contract.delayDaysAccrued += 1;
-        if (contract.delayDaysAccrued > contract.delayToleranceDays) {
-          const forfeitedUnits = contract.totalUnits - contract.totalDelivered;
-          state.reputation = Math.max(10, state.reputation - 20);
-          Events.emit("toast", {
-            text: `Contract Default: "${contract.title}" terminated due to delivery delays. Remaining ${forfeitedUnits} units transferred to competitors.`,
-            type: "danger"
-          });
-          contract.terminated = true;
+        if (daysIntoCurrentQuarter > daysPerBatch && contract.deliveredThisQuarter < contract.batchSizePerQuarter) {
+          contract.delayDaysAccrued += 1;
+          if (contract.delayDaysAccrued > contract.delayToleranceDays) {
+            const forfeitedUnits = contract.totalUnits - contract.totalDelivered;
+            state.reputation = Math.max(10, state.reputation - 20);
+            Events.emit("toast", {
+              text: `Contract Default: "${contract.title}" terminated due to delivery delays. Remaining ${forfeitedUnits} units transferred to competitors.`,
+              type: "danger"
+            });
+            contract.terminated = true;
+          }
         }
-      }
-    });
+      });
 
-    state.activeContracts = state.activeContracts.filter(c => !c.terminated && c.totalDelivered < c.totalUnits);
+      state.activeContracts = state.activeContracts.filter(c => !c.terminated && c.totalDelivered < c.totalUnits);
+    }
   }
 
   static validateVariantRequirements(variant, contract) {
@@ -168,13 +161,13 @@ class OrderEngine {
   }
 
   static evaluateVariantSwap(contract, newVariant) {
-    const originalTemplate = CONTRACT_TEMPLATES.find(t => t.title === contract.title) || { requirements: [] };
-    const check = this.validateVariantRequirements(newVariant, originalTemplate);
+    const check = this.validateVariantRequirements(newVariant, contract);
     if (!check.valid) return { eligible: false, reason: check.errors[0] };
 
     const budgetCeiling = contract.budgetPerUnit || (contract.unitSalePrice * 1.35);
     let proposedPrice = Math.max(contract.unitSalePrice, newVariant.salePrice);
-    if (newVariant.stats.theoreticalSpeed > (originalTemplate.requirements?.find(r => r.key === "speed")?.value || 0)) {
+    const speedReq = contract.requirements?.find(r => r.key === "speed")?.value || 0;
+    if (newVariant.stats.theoreticalSpeed > speedReq && speedReq > 0) {
       proposedPrice = Math.round(proposedPrice * 1.06);
     }
     const approvedPrice = Math.min(budgetCeiling, proposedPrice);
@@ -246,7 +239,8 @@ class OrderEngine {
         totalRevenueEarned: 0,
         mobilizationDaysTotal: mobDays,
         mobilizationDaysLeft: mobDays,
-        isMobilizing: true
+        isMobilizing: true,
+        requirements: JSON.parse(JSON.stringify(contract.requirements || []))
       };
 
       state.activeContracts.push(activeContract);
