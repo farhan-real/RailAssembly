@@ -23,17 +23,19 @@
   margin-bottom: 14px;
 }
 
-/* Rolling Stock Type & Consist Bar */
-.type-segmented-control {
-  display: inline-flex;
+/* Categorized Component Acquisition Navigation */
+.acquisition-cat-bar {
+  display: flex;
+  gap: 4px;
   background-color: var(--bg-surface);
+  padding: 4px;
+  border-radius: var(--radius-xs);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 2px;
-  gap: 2px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
-.type-segmented-btn {
-  padding: 5px 14px;
+.acquisition-cat-btn {
+  padding: 6px 12px;
   font-size: 11px;
   font-weight: 600;
   border-radius: var(--radius-xs);
@@ -43,33 +45,60 @@
   border: none;
   transition: all var(--trans-fast);
 }
-.type-segmented-btn.active {
+.acquisition-cat-btn.active {
   background-color: var(--color-primary);
   color: #ffffff;
 }
 
-.consist-summary-banner {
-  background-color: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  padding: 10px 14px;
+.acquisition-subcat-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.acquisition-subcat-btn {
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--trans-fast);
+}
+.acquisition-subcat-btn.active {
+  border-color: var(--color-blue);
+  color: var(--text-main);
+  background-color: rgba(37, 99, 235, 0.15);
 }
 
-.c-input-custom {
-  background-color: var(--bg-panel);
-  border: 1px solid var(--border-strong);
+/* Component Acquisition Alternative Cards */
+.component-buy-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  color: var(--text-main);
-  padding: 6px 10px;
-  font-size: 11px;
-  width: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: border-color var(--trans-fast);
 }
-.c-input-custom:focus {
-  border-color: var(--color-blue);
+.component-buy-card:hover {
+  border-color: var(--border-strong);
+}
+
+.discount-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-positive);
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 /* Consist Modal Toolbar and Reorder Rows */
@@ -109,10 +138,6 @@
   border-radius: var(--radius-xs);
   cursor: pointer;
 }
-.carriage-reorder-btn:hover {
-  color: var(--text-main);
-  border-color: var(--border-strong);
-}
 
 /* Subsystem Configuration Cards */
 .subsystem-card {
@@ -138,7 +163,7 @@
   color: var(--text-secondary);
 }
 
-/* Menu Trigger Rows (Replacing Dropdowns) */
+/* Menu Trigger Rows */
 .menu-trigger-box {
   background-color: rgba(0, 0, 0, 0.22);
   border: 1px solid var(--border-subtle);
@@ -174,34 +199,6 @@
   font-size: 10px;
   color: var(--color-blue);
   font-family: var(--font-mono);
-}
-
-/* Menu Modal Selection Cards */
-.catalog-menu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 520px;
-  overflow-y: auto;
-}
-.catalog-menu-item {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  padding: 10px 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: all var(--trans-fast);
-}
-.catalog-menu-item:hover {
-  background-color: var(--bg-surface-hover);
-  border-color: var(--border-strong);
-}
-.catalog-menu-item.active {
-  border-color: var(--color-blue);
-  background-color: rgba(37, 99, 235, 0.08);
 }
 
 /* Data Tables */
