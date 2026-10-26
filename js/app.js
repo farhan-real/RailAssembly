@@ -91,6 +91,15 @@ class App {
         DashboardView.render(document.getElementById("viewport-root"));
       } else if (this.currentTab === "research") {
         ResearchView.updateLiveProgress();
+      } else if (this.currentTab === "market") {
+        MarketView.updateLive();
+      }
+    });
+
+    Events.on("marketChanged", () => {
+      if (this.currentTab === "market") {
+        const root = document.getElementById("viewport-root");
+        if (root) MarketView.render(root);
       }
     });
 

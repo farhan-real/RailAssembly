@@ -103,6 +103,9 @@ class SimulationRunner {
     });
     state.productionLines = state.productionLines.filter(l => !l.done);
 
+    // Daily Ministry Contract Evaluation, Countdown & Mobilization
+    OrderEngine.evaluateGovernmentBids();
+
     // Quarter Check (Every 90 days)
     if (state.day % 90 === 0) {
       state.quarter = (state.quarter % 4) + 1;
@@ -114,8 +117,6 @@ class SimulationRunner {
           c.deliveredThisQuarter = 0;
         }
       });
-
-      OrderEngine.evaluateGovernmentBids();
     }
 
     // Periodic simulation persistence every 3 days

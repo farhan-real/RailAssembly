@@ -10,14 +10,24 @@ class OrderEngine {
         });
       }
     });
+
+    const hadExpired = state.marketTenders.some(t => t.expired);
     state.marketTenders = state.marketTenders.filter(t => !t.expired);
 
     state.nextTenderCountdown -= 1;
     const targetConcurrentContracts = 5;
 
-    // Generate new contract opportunities frequently
+    // If completely empty, open opportunities immediately with zero delay
+    if (state.marketTenders.length === 0) {
+      state.nextTenderCountdown = 0;
+    }
+
+    // Generate new contract opportunities frequently and without delay
     if (state.marketTenders.length < targetConcurrentContracts && state.nextTenderCountdown <= 0) {
-      const needed = Math.min(3, targetConcurrentContracts - state.marketTenders.length);
+      const needed = state.marketTenders.length === 0
+        ? 4
+        : Math.min(2, targetConcurrentContracts - state.marketTenders.length);
+
       const activeTypes = new Set(state.marketTenders.map(t => t.type));
       const availableTemplates = CONTRACT_TEMPLATES.filter(tpl => !activeTypes.has(tpl.type));
       const pool = availableTemplates.length >= needed ? availableTemplates : CONTRACT_TEMPLATES;
@@ -29,21 +39,24 @@ class OrderEngine {
           id: "cnt_" + Math.random().toString(36).substring(2, 8),
           ...template,
           issuedDay: state.day,
-          expiresDay: state.day + 65 + Math.floor(Math.random() * 35),
+          expiresDay: state.day + 60 + Math.floor(Math.random() * 30),
           awarded: false
         });
       }
-      state.nextTenderCountdown = 14 + Math.floor(Math.random() * 8);
+      state.nextTenderCountdown = 10 + Math.floor(Math.random() * 6);
       state.saveToStorage();
       Events.emit("toast", {
         text: `New Ministry Contracts: Directorate published fresh rolling stock procurement opportunities.`,
         type: "success"
       });
       Events.emit("marketChanged");
+    } else if (hadExpired) {
+      state.saveToStorage();
+      Events.emit("marketChanged");
     }
 
+    // Process Active Contract Mobilization & Quotas
     state.activeContracts.forEach(contract => {
-      // 1. Initial Component Procurement & Factory Mobilization Waiting Period
       if (contract.isMobilizing) {
         contract.mobilizationDaysLeft -= 1;
         if (contract.mobilizationDaysLeft <= 0) {
@@ -55,10 +68,9 @@ class OrderEngine {
             type: "normal"
           });
         }
-        return; // Zero delay penalties accrue during the mobilization window
+        return;
       }
 
-      // 2. Active Quarterly Delivery Quota Tracking
       const daysIntoCurrentQuarter = (state.day - contract.quarterStartDay);
       const daysPerBatch = 90;
 

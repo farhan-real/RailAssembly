@@ -8,7 +8,7 @@ class MarketView {
         <div class="c-card">
           <div class="card-header">
             <span class="card-title">Ministry Contracts Directorate</span>
-            <span class="c-badge ${contractCount > 0 ? "badge-green" : "badge-amber"}">
+            <span class="c-badge ${contractCount > 0 ? "badge-green" : "badge-amber"}" id="contracts-count-badge">
               ${contractCount} Open Opportunities
             </span>
           </div>
@@ -25,7 +25,7 @@ class MarketView {
                   Federal transit authorities are evaluating upcoming route schedules.
                 </p>
                 <div class="font-mono text-blue" style="font-size:11px;">
-                  Next contract round opening in: <strong>${Math.max(1, state.nextTenderCountdown)} Days</strong>
+                  Next contract round opening in: <strong id="contract-next-countdown">${Math.max(1, state.nextTenderCountdown)} Days</strong>
                 </div>
               </div>
             ` : ""}
@@ -68,8 +68,63 @@ class MarketView {
     }
   }
 
+  static updateLive() {
+    const countBadge = document.getElementById("contracts-count-badge");
+    if (countBadge) {
+      countBadge.textContent = `${state.marketTenders.length} Open Opportunities`;
+      countBadge.className = `c-badge ${state.marketTenders.length > 0 ? "badge-green" : "badge-amber"}`;
+    }
+
+    const countdownEl = document.getElementById("contract-next-countdown");
+    if (countdownEl) {
+      countdownEl.textContent = `${Math.max(1, state.nextTenderCountdown)} Days`;
+    }
+
+    const slotArea = document.getElementById("contract-slot-area");
+    if (!slotArea) return;
+
+    const existingCardIds = Array.from(slotArea.querySelectorAll("[data-contract-id]")).map(el => el.getAttribute("data-contract-id"));
+    const currentTenderIds = state.marketTenders.map(t => t.id);
+
+    // If contracts list changed, rebuild slot area
+    if (existingCardIds.length !== currentTenderIds.length || existingCardIds.some((id, i) => id !== currentTenderIds[i])) {
+      slotArea.innerHTML = "";
+      if (state.marketTenders.length === 0) {
+        slotArea.innerHTML = `
+          <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:24px; text-align:center;">
+            <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS CURRENTLY OPEN FOR BIDDING</div>
+            <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
+              Federal transit authorities are evaluating upcoming route schedules.
+            </p>
+            <div class="font-mono text-blue" style="font-size:11px;">
+              Next contract round opening in: <strong id="contract-next-countdown">${Math.max(1, state.nextTenderCountdown)} Days</strong>
+            </div>
+          </div>
+        `;
+      } else {
+        state.marketTenders.forEach(c => {
+          slotArea.appendChild(this.buildContractCard(c));
+        });
+      }
+      return;
+    }
+
+    // In-place update of remaining countdown window badges
+    state.marketTenders.forEach(c => {
+      const card = slotArea.querySelector(`[data-contract-id="${c.id}"]`);
+      if (card) {
+        const badge = card.querySelector(".contract-window-badge");
+        if (badge) {
+          const daysRemaining = Math.max(0, c.expiresDay - state.day);
+          badge.textContent = `${daysRemaining} Days Window`;
+        }
+      }
+    });
+  }
+
   static buildContractCard(c) {
     const card = document.createElement("div");
+    card.setAttribute("data-contract-id", c.id);
     card.style.background = "var(--bg-surface)";
     card.style.padding = "12px 14px";
     card.style.borderRadius = "var(--radius-xs)";
@@ -87,7 +142,7 @@ class MarketView {
           </div>
           <span class="text-blue font-mono" style="font-size:10px;">${c.agency}</span>
         </div>
-        <span class="c-badge badge-amber font-mono">${daysRemaining} Days Window</span>
+        <span class="c-badge badge-amber font-mono contract-window-badge">${daysRemaining} Days Window</span>
       </div>
 
       <p class="text-muted" style="font-size:11px; margin-bottom:10px; line-height:1.35;">${c.description}</p>
