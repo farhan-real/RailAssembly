@@ -13,7 +13,7 @@ const TRACTION_COMPONENTS_DATA = {
       leadDays: 6,
       supplier: "VanderPant Overhead Systems",
       inHouseTech: null,
-      desc: "Low-mass collector designed for suburban 1.5kV DC catenary networks. Speed ceiling: 120 km/h."
+      desc: "Low-mass collector for 1.5kV DC suburban wires. Speed ceiling: 120 km/h."
     },
     {
       id: "panto_std",
@@ -41,7 +41,7 @@ const TRACTION_COMPONENTS_DATA = {
       leadDays: 11,
       supplier: "VanderPant Overhead Systems",
       inHouseTech: null,
-      desc: "Twin-strip heavy contact head providing sustained 2600A current for mineral freight. Speed ceiling: 140 km/h."
+      desc: "Heavy twin-strip head sustaining 2600A current for mineral freight. Speed ceiling: 140 km/h."
     },
     {
       id: "panto_dual",
@@ -55,21 +55,63 @@ const TRACTION_COMPONENTS_DATA = {
       leadDays: 14,
       supplier: "Catenary Dynamics Corporation",
       inHouseTech: "tech_multisystem",
-      desc: "Pneumatically actuated collector capable of dynamic switching between AC and DC. Speed ceiling: 280 km/h."
+      desc: "Dynamic switching between AC and DC networks. Speed ceiling: 280 km/h."
     },
     {
       id: "panto_hs",
-      name: "Aerodynamic High-Speed Pantograph",
+      name: "Aerodynamic High-Speed Pantograph (300 km/h)",
+      type: "pantograph",
+      voltage: "25kV AC",
+      maxSpeed: 300,
+      maxCurrentAmps: 1250,
+      weight: 310,
+      cost: 145000,
+      leadDays: 18,
+      supplier: "AeroVolt High-Speed Technologies",
+      inHouseTech: "tech_aero_pantograph",
+      desc: "Low-noise aerodynamic collector for 300 km/h corridors."
+    },
+    {
+      id: "panto_hs_320",
+      name: "Precision Airfoil Express Collector (320 km/h)",
+      type: "pantograph",
+      voltage: "25kV AC",
+      maxSpeed: 320,
+      maxCurrentAmps: 1350,
+      weight: 290,
+      cost: 175000,
+      leadDays: 20,
+      supplier: "AeroVolt High-Speed Technologies",
+      inHouseTech: "tech_aero_pantograph",
+      desc: "Integrated carbon-strip airfoil sustaining uninterrupted contact at 320 km/h."
+    },
+    {
+      id: "panto_bullet_380",
+      name: "Shinkansen-Profile Low-Noise Pantograph (380 km/h)",
       type: "pantograph",
       voltage: "25kV AC",
       maxSpeed: 380,
-      maxCurrentAmps: 1300,
-      weight: 290,
-      cost: 160000,
-      leadDays: 20,
+      maxCurrentAmps: 1400,
+      weight: 260,
+      cost: 230000,
+      leadDays: 24,
       supplier: "AeroVolt High-Speed Technologies",
-      inHouseTech: "tech_composite_chassis",
-      desc: "Carbon-profile ultra-low drag collector engineered for 380 km/h high-speed express corridors."
+      inHouseTech: "tech_aero_pantograph",
+      desc: "Vortex-shedding single-strut pantograph engineered for 380 km/h express services."
+    },
+    {
+      id: "panto_hyper_420",
+      name: "Active Piezo-Follower Hyper Collector (420 km/h)",
+      type: "pantograph",
+      voltage: "25kV AC",
+      maxSpeed: 420,
+      maxCurrentAmps: 1550,
+      weight: 240,
+      cost: 320000,
+      leadDays: 30,
+      supplier: "AeroVolt High-Speed Technologies",
+      inHouseTech: "tech_hyper_collection_420",
+      desc: "Closed-loop piezoelectric wire tracking eliminating micro-arcs at speeds exceeding 400 km/h."
     }
   ],
   transformer: [
@@ -85,7 +127,7 @@ const TRACTION_COMPONENTS_DATA = {
       leadDays: 8,
       supplier: "TrafoTech Global AG",
       inHouseTech: null,
-      desc: "Eliminates heavy AC magnetic cores for DC catenary networks with direct LC smoothing."
+      desc: "Direct LC smoothing for DC catenary networks with zero heavy transformer core."
     },
     {
       id: "trans_heavy",
@@ -99,7 +141,7 @@ const TRACTION_COMPONENTS_DATA = {
       leadDays: 18,
       supplier: "TrafoTech Global AG",
       inHouseTech: null,
-      desc: "Robust mineral-oil cooled iron core transformer suited for freight locomotives."
+      desc: "Robust oil-cooled iron core transformer suited for freight locomotives."
     },
     {
       id: "trans_compact",
@@ -113,35 +155,21 @@ const TRACTION_COMPONENTS_DATA = {
       leadDays: 24,
       supplier: "Helvetia Electric Industries",
       inHouseTech: "tech_compact_transformer",
-      desc: "Low-profile underfloor transformer freeing passenger cabin volume in multiple units."
-    },
-    {
-      id: "trans_freight_mega",
-      name: "Mega-Watt High-Traction Transformer",
-      type: "transformer",
-      powerRatingKw: 7500,
-      supportedVoltage: "25kV AC",
-      efficiency: 0.94,
-      weight: 7100,
-      cost: 410000,
-      leadDays: 26,
-      supplier: "TrafoTech Global AG",
-      inHouseTech: "tech_high_torque_motors",
-      desc: "Massive 7.5 MW core capable of supplying continuous full current to six traction inverters."
+      desc: "Low-profile underfloor transformer freeing passenger cabin volume."
     },
     {
       id: "trans_solidstate",
       name: "Solid-State Electronic Matrix Transformer",
       type: "transformer",
-      powerRatingKw: 8800,
+      powerRatingKw: 9200,
       supportedVoltage: "Multi-System (25kV AC / 3kV DC)",
-      efficiency: 0.98,
-      weight: 2600,
-      cost: 580000,
+      efficiency: 0.985,
+      weight: 2500,
+      cost: 620000,
       leadDays: 32,
       supplier: "QuantumPower Systems",
       inHouseTech: "tech_solid_state_trans",
-      desc: "Electronic high-frequency switching matrix transformer eliminating oil-core weight."
+      desc: "Next-gen electronic high-frequency conversion replacing heavy iron cores."
     }
   ],
   inverter: [
@@ -159,19 +187,6 @@ const TRACTION_COMPONENTS_DATA = {
       desc: "Baseline air-cooled inverter. Power limited to 3600 kW; bottlenecks larger motors."
     },
     {
-      id: "inv_igbt_freight",
-      name: "High-Overload Freight Traction Inverter",
-      type: "inverter",
-      maxKw: 4800,
-      efficiency: 0.93,
-      weight: 2100,
-      cost: 190000,
-      leadDays: 14,
-      supplier: "StaticPulse Power Systems",
-      inHouseTech: null,
-      desc: "Reinforced copper heat-sink inverter sustaining 150% peak starting current for heavy loads."
-    },
-    {
       id: "inv_igbt_liquid",
       name: "Liquid-Cooled Variable Frequency Inverter",
       type: "inverter",
@@ -185,6 +200,19 @@ const TRACTION_COMPONENTS_DATA = {
       desc: "Smooth VVVF liquid-cooled converter delivering up to 6200 kW motor drive power."
     },
     {
+      id: "inv_liquid_highpower_320",
+      name: "High-Throughput Dual-Drive Inverter (320 km/h)",
+      type: "inverter",
+      maxKw: 7500,
+      efficiency: 0.965,
+      weight: 1750,
+      cost: 360000,
+      leadDays: 20,
+      supplier: "Helvetia Electric Industries",
+      inHouseTech: "tech_compact_transformer",
+      desc: "Engineered to deliver 7500 kW continuous power for 320 km/h passenger consists."
+    },
+    {
       id: "inv_sic",
       name: "Silicon Carbide Power Module Inverter",
       type: "inverter",
@@ -196,6 +224,19 @@ const TRACTION_COMPONENTS_DATA = {
       supplier: "Semiconductor Rail Dynamics",
       inHouseTech: "tech_sic_power",
       desc: "Next-gen SiC MOSFET converter with minimal thermal loss and full 8800 kW throughput."
+    },
+    {
+      id: "inv_sic_dual_380",
+      name: "Hyper-Velocity Dual-Core SiC Converter (380+ km/h)",
+      type: "inverter",
+      maxKw: 9800,
+      efficiency: 0.99,
+      weight: 1100,
+      cost: 680000,
+      leadDays: 30,
+      supplier: "Semiconductor Rail Dynamics",
+      inHouseTech: "tech_solid_state_trans",
+      desc: "Dual-core silicon carbide modules supplying 9.8 MW for 380+ km/h sustained sprints."
     }
   ],
   motor: [
@@ -240,16 +281,55 @@ const TRACTION_COMPONENTS_DATA = {
     },
     {
       id: "mot_pmsm",
-      name: "Permanent Magnet Synchronous Traction Motor",
+      name: "Permanent Magnet Synchronous Motor (280 km/h)",
       type: "motor",
-      powerKw: 7600,
-      maxRpmSpeed: 360,
-      weight: 2700,
-      cost: 440000,
-      leadDays: 28,
+      powerKw: 6800,
+      maxRpmSpeed: 280,
+      weight: 2900,
+      cost: 380000,
+      leadDays: 22,
       supplier: "MagnaDrive Electric",
       inHouseTech: "tech_pmsm_traction",
-      desc: "Ultra-high power density motor for high-speed express trainsets. Max speed limit: 360 km/h."
+      desc: "High power-density permanent magnet traction motor. Speed ceiling: 280 km/h."
+    },
+    {
+      id: "mot_pmsm_express_320",
+      name: "High-RPM Synchronous Motor (320 km/h)",
+      type: "motor",
+      powerKw: 7600,
+      maxRpmSpeed: 320,
+      weight: 2650,
+      cost: 470000,
+      leadDays: 25,
+      supplier: "MagnaDrive Electric",
+      inHouseTech: "tech_pmsm_traction",
+      desc: "Buried NdFeB magnets engineered specifically for sustained 320 km/h passenger corridors."
+    },
+    {
+      id: "mot_hs_synchro_360",
+      name: "Ultra-Light Distributed Traction Motor (360 km/h)",
+      type: "motor",
+      powerKw: 8600,
+      maxRpmSpeed: 360,
+      weight: 2400,
+      cost: 620000,
+      leadDays: 28,
+      supplier: "MagnaDrive Electric",
+      inHouseTech: "tech_hyper_motors_400",
+      desc: "Direct liquid-cooled stator with low rotor inertia certified for 360 km/h operation."
+    },
+    {
+      id: "mot_hyper_velocity_400",
+      name: "Halbach-Array Hyper-Velocity Motor (420 km/h)",
+      type: "motor",
+      powerKw: 9800,
+      maxRpmSpeed: 420,
+      weight: 2150,
+      cost: 850000,
+      leadDays: 32,
+      supplier: "MagnaDrive Electric",
+      inHouseTech: "tech_hyper_motors_400",
+      desc: "Halbach array rotor delivering 9.8 MW with zero harmonic losses at 6000+ RPM."
     }
   ],
   auxiliary: [

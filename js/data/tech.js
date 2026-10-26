@@ -1,146 +1,226 @@
-// Research graph nodes with prerequisites and unlocked manufacturing abilities
+// Single-Source Research Tree branching exclusively from Core Traction Directorate
 const TECH_DATA = [
+  // Central Core Root
+  {
+    id: "tech_core",
+    name: "Foundational Electric Traction Core",
+    branch: "core",
+    costScience: 0,
+    costMoney: 0,
+    prereq: [],
+    unlocks: ["body_steel", "panto_std", "trans_heavy", "inv_igbt_air", "mot_ind_basic", "bog_bo_bo"],
+    desc: "Foundational multi-system electric traction baseline. The primary root from which all specialized engineering branches originate."
+  },
+
+  // Track 1: High-Speed Aerodynamics & Lightweight Structures
   {
     id: "tech_aluminum_extrusion",
     name: "Aluminum Extrusions",
-    tier: 1,
+    branch: "aerodynamics",
     costScience: 150,
     costMoney: 300000,
-    prereq: [],
+    prereq: ["tech_core"],
     unlocks: ["body_aluminum"],
-    inHouseUnlock: "body_aluminum",
-    desc: "Enables production of lightweight aluminum bodies for passenger trainsets."
-  },
-  {
-    id: "tech_advanced_inverters",
-    name: "Liquid-Cooled VVVF",
-    tier: 1,
-    costScience: 200,
-    costMoney: 450000,
-    prereq: [],
-    unlocks: ["inv_igbt_liquid", "comp_dual_redundant"],
-    inHouseUnlock: "inv_igbt_liquid",
-    desc: "Unlocks 6200kW liquid-cooled inverters with regenerative frequency logic."
-  },
-  {
-    id: "tech_compact_transformer",
-    name: "Underfloor Traction Trafo",
-    tier: 1,
-    costScience: 220,
-    costMoney: 500000,
-    prereq: [],
-    unlocks: ["trans_compact"],
-    inHouseUnlock: "trans_compact",
-    desc: "Pioneers compact underfloor transformers freeing car interior space."
-  },
-  {
-    id: "tech_battery_traction",
-    name: "BEMU Last-Mile Batteries",
-    tier: 2,
-    costScience: 400,
-    costMoney: 900000,
-    prereq: ["tech_advanced_inverters"],
-    unlocks: ["bat_lfp_lastmile"],
-    inHouseUnlock: "bat_lfp_lastmile",
-    desc: "Integrates lithium-iron-phosphate traction packs for wire-free depot runs."
-  },
-  {
-    id: "tech_high_torque_motors",
-    name: "Heavy Turbo Induction",
-    tier: 2,
-    costScience: 380,
-    costMoney: 800000,
-    prereq: [],
-    unlocks: ["mot_ind_highoutput", "trans_freight_mega"],
-    inHouseUnlock: "mot_ind_highoutput",
-    desc: "High tractive effort motors capable of hauling immense freight loads."
-  },
-  {
-    id: "tech_etcs_automation",
-    name: "ETCS Level 2 Signaling",
-    tier: 2,
-    costScience: 450,
-    costMoney: 1100000,
-    prereq: [],
-    unlocks: ["tcms_etcs2", "wsp_microprocessor"],
-    inHouseUnlock: "tcms_etcs2",
-    desc: "Radio block signaling and automatic train protection algorithms."
-  },
-  {
-    id: "tech_multisystem",
-    name: "Dual-Voltage Catenary",
-    tier: 2,
-    costScience: 500,
-    costMoney: 1200000,
-    prereq: ["tech_compact_transformer"],
-    unlocks: ["panto_dual"],
-    inHouseUnlock: "panto_dual",
-    desc: "Allows trains to transition between 25kV AC and 3kV DC catenary networks."
-  },
-  {
-    id: "tech_sic_power",
-    name: "Silicon Carbide (SiC) Power",
-    tier: 3,
-    costScience: 800,
-    costMoney: 2200000,
-    prereq: ["tech_advanced_inverters"],
-    unlocks: ["inv_sic", "cool_glycol_chiller"],
-    inHouseUnlock: "inv_sic",
-    desc: "SiC MOSFET modules boosting traction efficiency to 98.5%."
-  },
-  {
-    id: "tech_pmsm_traction",
-    name: "Permanent Magnet Motors",
-    tier: 3,
-    costScience: 850,
-    costMoney: 2400000,
-    prereq: ["tech_high_torque_motors"],
-    unlocks: ["mot_pmsm"],
-    inHouseUnlock: "mot_pmsm",
-    desc: "Lightweight synchronous motors enabling rapid sprint acceleration."
-  },
-  {
-    id: "tech_radial_bogies",
-    name: "Radial Steering Bogies",
-    tier: 3,
-    costScience: 750,
-    costMoney: 1800000,
-    prereq: ["tech_aluminum_extrusion"],
-    unlocks: ["bog_articulated"],
-    inHouseUnlock: "bog_articulated",
-    desc: "Steerable axles navigating curves with minimal flange friction."
+    desc: "Hollow profile aluminum carbodies reducing tare mass for passenger multiple-units."
   },
   {
     id: "tech_composite_chassis",
-    name: "Carbon Bullet Nose Aerodynamics",
-    tier: 4,
-    costScience: 1300,
-    costMoney: 3800000,
-    prereq: ["tech_radial_bogies"],
-    unlocks: ["body_aero_cf", "panto_hs", "coup_aero_retractable"],
-    inHouseUnlock: "body_aero_cf",
-    desc: "Carbon-fiber composite nose cones achieving drag coefficients below 0.23."
+    name: "Carbon-Fiber Monocoque Construction",
+    branch: "aerodynamics",
+    costScience: 500,
+    costMoney: 1200000,
+    prereq: ["tech_aluminum_extrusion"],
+    unlocks: ["body_aero_cf"],
+    desc: "Vacuum-infused carbon composite shells minimizing aerodynamic drag and structural mass."
+  },
+  {
+    id: "tech_streamlined_nose_320",
+    name: "320 km/h Bullet Nose Aerodynamics",
+    branch: "aerodynamics",
+    costScience: 950,
+    costMoney: 2400000,
+    prereq: ["tech_composite_chassis"],
+    unlocks: ["body_bullet_360", "coup_aero_retractable"],
+    desc: "Longitudinal micro-pressure nose geometry preventing tunnel sonic boom pressure shocks above 320 km/h."
+  },
+  {
+    id: "tech_ultra_aero_400",
+    name: "400+ km/h Boundary Layer Wave Reducer",
+    branch: "aerodynamics",
+    costScience: 1600,
+    costMoney: 4500000,
+    prereq: ["tech_streamlined_nose_320"],
+    unlocks: ["body_hyper_400"],
+    desc: "Ultra-low drag coefficient profile (Cd 0.14) engineered for extreme high-speed passenger corridors."
+  },
+
+  // Track 2: Power Electronics & Inverter Modulation
+  {
+    id: "tech_advanced_inverters",
+    name: "Liquid-Cooled VVVF Converters",
+    branch: "electronics",
+    costScience: 200,
+    costMoney: 450000,
+    prereq: ["tech_core"],
+    unlocks: ["inv_igbt_liquid", "pwm_space_vector_svm"],
+    desc: "Variable-frequency liquid-cooled inverters delivering smooth motor acceleration."
+  },
+  {
+    id: "tech_compact_transformer",
+    name: "Underfloor Compact Transformer",
+    branch: "electronics",
+    costScience: 350,
+    costMoney: 800000,
+    prereq: ["tech_advanced_inverters"],
+    unlocks: ["trans_compact", "inv_liquid_highpower_320"],
+    desc: "Slim underfloor multi-winding transformer freeing interior passenger cabin space."
+  },
+  {
+    id: "tech_sic_power",
+    name: "Silicon Carbide (SiC) Power Semiconductor Modules",
+    branch: "electronics",
+    costScience: 850,
+    costMoney: 2200000,
+    prereq: ["tech_compact_transformer"],
+    unlocks: ["inv_sic", "pwm_ultrasonic_sic_vector", "dclink_supercap_hybrid"],
+    desc: "SiC MOSFET semiconductors slashing switching heat loss and enabling ultrasonic 18 kHz PWM."
   },
   {
     id: "tech_solid_state_trans",
-    name: "Solid-State Matrix Trafo",
-    tier: 4,
-    costScience: 1500,
-    costMoney: 4500000,
+    name: "Solid-State High-Frequency Matrix Transformer",
+    branch: "electronics",
+    costScience: 1550,
+    costMoney: 4600000,
     prereq: ["tech_sic_power"],
-    unlocks: ["trans_solidstate"],
-    inHouseUnlock: "trans_solidstate",
-    desc: "Eliminates heavy oil cores using microsecond switching transformers."
+    unlocks: ["trans_solidstate", "inv_sic_dual_380"],
+    desc: "Completely replaces heavy iron cores with microsecond semiconductor high-frequency conversion."
+  },
+
+  // Track 3: High-Torque & High-RPM Traction Propulsion Motors
+  {
+    id: "tech_high_torque_motors",
+    name: "Copper-Rotor Turbo Induction Motors",
+    branch: "motors",
+    costScience: 320,
+    costMoney: 750000,
+    prereq: ["tech_core"],
+    unlocks: ["mot_ind_highoutput", "pwm_selective_harmonic_she"],
+    desc: "Cast copper rotors offering superior thermal endurance and heavy starting tractive torque."
+  },
+  {
+    id: "tech_pmsm_traction",
+    name: "Permanent Magnet Synchronous Motors (320 km/h)",
+    branch: "motors",
+    costScience: 800,
+    costMoney: 2100000,
+    prereq: ["tech_high_torque_motors"],
+    unlocks: ["mot_pmsm", "mot_pmsm_express_320", "pwm_direct_torque_dtc"],
+    desc: "High-density permanent magnet synchronous traction delivering sustained 320 km/h speeds."
+  },
+  {
+    id: "tech_hyper_motors_400",
+    name: "Synchronous Halbach Ultra-Velocity Motors (360-420 km/h)",
+    branch: "motors",
+    costScience: 1650,
+    costMoney: 5200000,
+    prereq: ["tech_pmsm_traction"],
+    unlocks: ["mot_hs_synchro_360", "mot_hyper_velocity_400", "pwm_neural_adaptive_flux"],
+    desc: "Sinusoidal flux Halbach array motors running up to 6000 RPM with negligible iron losses."
+  },
+
+  // Track 4: Running Gear, High-Speed Bogies & Transmissions
+  {
+    id: "tech_quill_drive",
+    name: "Hollow-Shaft Flexible Quill Drive",
+    branch: "running_gear",
+    costScience: 250,
+    costMoney: 600000,
+    prereq: ["tech_core"],
+    unlocks: ["transm_quill_hollow", "bog_express_air"],
+    desc: "Fully suspends motor on bogie frame, reducing unsprung mass for speeds up to 230 km/h."
+  },
+  {
+    id: "tech_radial_bogies",
+    name: "Radial Steering Bogies & Cardan Drives (320 km/h)",
+    branch: "running_gear",
+    costScience: 750,
+    costMoney: 1800000,
+    prereq: ["tech_quill_drive"],
+    unlocks: ["bog_radial_320", "transm_cardan_tripod", "transm_cardan_tripod_320"],
+    desc: "Self-steering axles reducing flange wear combined with tripod cardan drives for 320 km/h."
+  },
+  {
+    id: "tech_active_tilting",
+    name: "Active Cant Tilting & 380+ km/h Running Gear",
+    branch: "running_gear",
+    costScience: 1500,
+    costMoney: 4200000,
+    prereq: ["tech_radial_bogies"],
+    unlocks: ["bog_articulated_360", "bog_highspeed_400", "transm_hs_direct_380", "transm_hyper_drive_420"],
+    desc: "Computerized electro-hydraulic cant compensation and carbon-frame bogies certified above 380 km/h."
+  },
+
+  // Track 5: Current Collection, Multi-Voltage & Adhesion
+  {
+    id: "tech_multisystem",
+    name: "Dual-Voltage Catenary Collection",
+    branch: "power_collection",
+    costScience: 400,
+    costMoney: 950000,
+    prereq: ["tech_core"],
+    unlocks: ["panto_dual", "vcb_hybrid_multisystem"],
+    desc: "Seamless transition between 25kV AC and 3kV DC catenary networks."
+  },
+  {
+    id: "tech_aero_pantograph",
+    name: "320-380 km/h High-Speed Pantographs",
+    branch: "power_collection",
+    costScience: 900,
+    costMoney: 2300000,
+    prereq: ["tech_multisystem"],
+    unlocks: ["panto_hs", "panto_hs_320", "panto_bullet_380", "sand_gravity_basic"],
+    desc: "Aerodynamically stabilized collectors preventing wire arcing and contact loss at 380 km/h."
+  },
+  {
+    id: "tech_hyper_collection_420",
+    name: "Active Piezoelectric 420 km/h Collectors",
+    branch: "power_collection",
+    costScience: 1700,
+    costMoney: 5100000,
+    prereq: ["tech_aero_pantograph"],
+    unlocks: ["panto_hyper_420", "sand_plasma_cleaner"],
+    desc: "Closed-loop piezoelectric wire tension followers and plasma rail-head cleaning."
+  },
+
+  // Track 6: Energy Storage & Autonomous Automation
+  {
+    id: "tech_battery_traction",
+    name: "Auxiliary Last-Mile Traction Packs",
+    branch: "automation",
+    costScience: 350,
+    costMoney: 850000,
+    prereq: ["tech_core"],
+    unlocks: ["bat_lfp_lastmile"],
+    desc: "LFP battery modules powering non-electrified terminal and shunting maneuvers."
+  },
+  {
+    id: "tech_etcs_automation",
+    name: "ETCS Level 2 Cab Signaling & WSP",
+    branch: "automation",
+    costScience: 550,
+    costMoney: 1300000,
+    prereq: ["tech_battery_traction"],
+    unlocks: ["tcms_etcs2", "wsp_microprocessor"],
+    desc: "Radio-block continuous cab signaling and electronic anti-skid protection."
   },
   {
     id: "tech_driverless_ato",
     name: "Autonomous GoA4 ATO Systems",
-    tier: 4,
-    costScience: 1600,
-    costMoney: 5000000,
+    branch: "automation",
+    costScience: 1450,
+    costMoney: 4400000,
     prereq: ["tech_etcs_automation"],
-    unlocks: ["tcms_cbtc_ai", "wsp_integrated_surge", "sand_plasma_cleaner"],
-    inHouseUnlock: "tcms_cbtc_ai",
-    desc: "Full automated train operation with adaptive traction predictive braking."
+    unlocks: ["tcms_cbtc_ai", "wsp_integrated_surge", "bat_nmc_intercity"],
+    desc: "Unattended driverless automation with neural tractive adhesion and predictive braking."
   }
 ];

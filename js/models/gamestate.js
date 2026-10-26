@@ -11,9 +11,9 @@ class GameState {
     this.dailyResearchBudget = 10000;
     this.activeResearchId = "tech_aluminum_extrusion";
     this.researchProgress = 0;
-    this.unlockedTechs = new Set(["tech_aluminum_extrusion"]);
+    // Central core node unlocked by default as the single-source root
+    this.unlockedTechs = new Set(["tech_core"]);
 
-    // Sound & Audio Settings
     this.masterVolume = 80;
     this.sfxVolume = 80;
     this.audioMuted = false;
@@ -82,7 +82,8 @@ class GameState {
         day: this.day,
         masterVolume: this.masterVolume,
         sfxVolume: this.sfxVolume,
-        audioMuted: this.audioMuted
+        audioMuted: this.audioMuted,
+        unlockedTechs: Array.from(this.unlockedTechs)
       };
       localStorage.setItem("rail_assembly_save", JSON.stringify(data));
     } catch (e) { /* Safe fallback */ }
@@ -96,6 +97,7 @@ class GameState {
       if (Array.isArray(data.variants)) this.variants = data.variants;
       if (Array.isArray(data.customCarriageTypes)) this.customCarriageTypes = data.customCarriageTypes;
       if (Array.isArray(data.savedDesigns)) this.savedDesigns = data.savedDesigns;
+      if (Array.isArray(data.unlockedTechs)) this.unlockedTechs = new Set(data.unlockedTechs);
       if (data.masterVolume !== undefined) this.masterVolume = data.masterVolume;
       if (data.sfxVolume !== undefined) this.sfxVolume = data.sfxVolume;
       if (data.audioMuted !== undefined) this.audioMuted = data.audioMuted;
@@ -103,9 +105,7 @@ class GameState {
   }
 
   resetAllData() {
-    try {
-      localStorage.removeItem("rail_assembly_save");
-    } catch (e) { /* Safe fallback */ }
+    try { localStorage.removeItem("rail_assembly_save"); } catch (e) { }
 
     this.funds = 14500000;
     this.reputation = 72;
@@ -117,7 +117,7 @@ class GameState {
     this.dailyResearchBudget = 10000;
     this.activeResearchId = "tech_aluminum_extrusion";
     this.researchProgress = 0;
-    this.unlockedTechs = new Set(["tech_aluminum_extrusion"]);
+    this.unlockedTechs = new Set(["tech_core"]);
 
     this.warehouse = {
       panto_std: 12, trans_heavy: 6, inv_igbt_air: 10,
@@ -178,7 +178,7 @@ class GameState {
 
   findComponentById(id) {
     for (const cat in COMPONENTS_DATA) {
-      const match = COMPONENTS_DATA[cat].find(c => c.id === id);
+      const match = COMPONENTS_DATA[cat]?.find(c => c.id === id);
       if (match) return match;
     }
     return null;

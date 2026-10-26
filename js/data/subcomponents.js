@@ -146,31 +146,25 @@ const SUBCOMPONENTS_DATA = {
         desc: "Standard ratio reduction built for regional passenger trainsets."
       },
       {
-        id: "gb_freight",
-        name: "Dual-Reduction High-Torque Freight Gearbox",
+        id: "mot_stator_polyimide_220",
+        name: "Class 220 Polyimide Corona-Resistant Stator Insulation",
         cost: 28000,
-        weight: 560,
-        speedBonus: -25,
-        desc: "Deep gear reduction multiplying tractive effort for heavy freight."
+        weight: -40,
+        speedBonus: 15,
+        efficiencyBonus: 0.008,
+        desc: "Handles steep SiC high-frequency voltage rise without partial dielectric breakdown."
       },
       {
-        id: "gb_direct",
-        name: "Hollow-Shaft High-Speed Direct Drive",
-        cost: 48000,
-        weight: 290,
-        speedBonus: 40,
-        desc: "Unsprung mass reduction optimized for express speeds above 250 km/h."
+        id: "mot_rotor_halbach",
+        name: "Sintered NdFeB Halbach-Array Magnetic Rotor",
+        cost: 52000,
+        weight: -80,
+        speedBonus: 35,
+        efficiencyBonus: 0.018,
+        desc: "Pure sinusoidal flux distribution eliminating high-RPM magnetic eddy losses for 320+ km/h."
       }
     ],
     modifications: [
-      {
-        id: "brg_steel",
-        name: "Sealed Forged Steel Roller Bearings",
-        cost: 6000,
-        weight: 45,
-        reliabilityBonus: 0,
-        desc: "Standard heavy industrial bearing assembly."
-      },
       {
         id: "brg_ceramic",
         name: "Silicon Nitride Hybrid Ceramic Bearings",
@@ -178,6 +172,15 @@ const SUBCOMPONENTS_DATA = {
         weight: 20,
         reliabilityBonus: 15,
         desc: "Zero electrical fluting erosion and lower frictional heat buildup."
+      },
+      {
+        id: "mot_cool_rotor_oiljet",
+        name: "Hollow-Shaft Pressurized Rotor Oil Jet Cooling",
+        cost: 26000,
+        weight: 25,
+        speedBonus: 20,
+        reliabilityBonus: 10,
+        desc: "Direct oil jet cooling through rotor interior permitting sustained 320+ km/h runs."
       }
     ]
   },

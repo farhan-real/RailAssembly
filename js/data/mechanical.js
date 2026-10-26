@@ -13,7 +13,7 @@ const MECHANICAL_COMPONENTS_DATA = {
       leadDays: 10,
       supplier: "CastIron Engineering Works",
       inHouseTech: null,
-      desc: "Low axle-load bogie designed for regional light-rail and commuter sets. Safe speed limit: 120 km/h."
+      desc: "Low axle-load bogie designed for regional light-rail sets. Speed limit: 120 km/h."
     },
     {
       id: "bog_bo_bo",
@@ -27,7 +27,7 @@ const MECHANICAL_COMPONENTS_DATA = {
       leadDays: 16,
       supplier: "CastIron Engineering Works",
       inHouseTech: null,
-      desc: "Secondary air-suspension bogie optimized for smooth passenger rides. Safe speed limit: 220 km/h."
+      desc: "Secondary air-suspension bogie for smooth passenger rides. Speed limit: 220 km/h."
     },
     {
       id: "bog_co_co",
@@ -41,21 +41,49 @@ const MECHANICAL_COMPONENTS_DATA = {
       leadDays: 15,
       supplier: "CastIron Engineering Works",
       inHouseTech: null,
-      desc: "Six heavy axles delivering immense tractive adhesion for freight. Safe speed limit: 140 km/h."
+      desc: "Six heavy axles delivering immense tractive adhesion for freight. Speed limit: 140 km/h."
     },
     {
-      id: "bog_articulated",
-      name: "Four-Axle Radial Steering High-Speed Bogie",
+      id: "bog_radial_320",
+      name: "Active Radial High-Speed Bogie (320 km/h)",
       type: "bogie",
       axles: 4,
-      maxAxleLoadTons: 17.5,
-      maxSafeSpeed: 360,
-      cost: 380000,
-      weight: 8500,
-      leadDays: 25,
+      maxAxleLoadTons: 18.0,
+      maxSafeSpeed: 320,
+      cost: 340000,
+      weight: 9200,
+      leadDays: 22,
       supplier: "Stadler Dynamics AG",
       inHouseTech: "tech_radial_bogies",
-      desc: "Self-steering axles reducing rail wear and permitting high cant speeds. Safe speed limit: 360 km/h."
+      desc: "Self-steering radial axles reducing wheel-rail friction at 320 km/h."
+    },
+    {
+      id: "bog_articulated_360",
+      name: "Hydraulic Active-Cant Tilting Bogie (360 km/h)",
+      type: "bogie",
+      axles: 4,
+      maxAxleLoadTons: 17.0,
+      maxSafeSpeed: 360,
+      cost: 440000,
+      weight: 8600,
+      leadDays: 26,
+      supplier: "Stadler Dynamics AG",
+      inHouseTech: "tech_active_tilting",
+      desc: "Active body tilting compensation allowing high curving speeds up to 360 km/h."
+    },
+    {
+      id: "bog_highspeed_400",
+      name: "Carbon-Composite Articulated Bogie (420 km/h)",
+      type: "bogie",
+      axles: 4,
+      maxAxleLoadTons: 15.5,
+      maxSafeSpeed: 420,
+      cost: 580000,
+      weight: 7400,
+      leadDays: 32,
+      supplier: "Stadler Dynamics AG",
+      inHouseTech: "tech_active_tilting",
+      desc: "Ultra-low unsprung mass composite frame certified for speeds exceeding 400 km/h."
     }
   ],
   carbody: [
@@ -89,7 +117,7 @@ const MECHANICAL_COMPONENTS_DATA = {
     },
     {
       id: "body_aero_cf",
-      name: "Carbon-Fiber Composite Aerodynamic Nose Body",
+      name: "Carbon-Fiber Composite Aerodynamic Body (300 km/h)",
       type: "carbody",
       dragCd: 0.22,
       passengerCap: 340,
@@ -99,7 +127,35 @@ const MECHANICAL_COMPONENTS_DATA = {
       leadDays: 30,
       supplier: "AeroAlloy Trainworks",
       inHouseTech: "tech_composite_chassis",
-      desc: "Streamlined low-drag aerodynamic profile designed for express trains over 300 km/h."
+      desc: "Streamlined low-drag aerodynamic profile designed for express trains up to 300 km/h."
+    },
+    {
+      id: "body_bullet_360",
+      name: "Dual-Taper Shinkansen Aerodynamic Nose (360 km/h)",
+      type: "carbody",
+      dragCd: 0.18,
+      passengerCap: 320,
+      cargoCapacityTons: 8,
+      weight: 9800,
+      cost: 780000,
+      leadDays: 34,
+      supplier: "AeroAlloy Trainworks",
+      inHouseTech: "tech_streamlined_nose_320",
+      desc: "Extended long-nose aerodynamic fairing eliminating tunnel sonic booms at 360 km/h."
+    },
+    {
+      id: "body_hyper_400",
+      name: "Boundary-Layer Supersonic Wave Shell (420 km/h)",
+      type: "carbody",
+      dragCd: 0.14,
+      passengerCap: 290,
+      cargoCapacityTons: 5,
+      weight: 8900,
+      cost: 960000,
+      leadDays: 38,
+      supplier: "AeroAlloy Trainworks",
+      inHouseTech: "tech_ultra_aero_400",
+      desc: "Ultra-low drag coefficient shell (Cd 0.14) engineered for 400+ km/h express service."
     }
   ],
   brakes: [
@@ -118,7 +174,7 @@ const MECHANICAL_COMPONENTS_DATA = {
     },
     {
       id: "brk_eddy_current",
-      name: "Electromagnetic Linear Track and Ceramic Brakes",
+      name: "Linear Track Eddy-Current & Ceramic Brakes (350+ km/h)",
       type: "brakes",
       regenEfficiency: 0.35,
       safetyIndex: 98,
@@ -126,8 +182,8 @@ const MECHANICAL_COMPONENTS_DATA = {
       cost: 190000,
       leadDays: 18,
       supplier: "Bremse Systems International",
-      inHouseTech: "tech_regenerative_grid",
-      desc: "Wear-free electromagnetic rail brake providing high deceleration rates without wheel wear."
+      inHouseTech: "tech_radial_bogies",
+      desc: "Wear-free electromagnetic rail brake providing high deceleration rates above 320 km/h."
     }
   ],
   battery: [
@@ -170,7 +226,7 @@ const MECHANICAL_COMPONENTS_DATA = {
       cost: 380000,
       leadDays: 24,
       supplier: "VoltaRail Storage Systems",
-      inHouseTech: "tech_intercity_battery",
+      inHouseTech: "tech_driverless_ato",
       desc: "High-energy density module designed to span non-electrified gaps on branch lines."
     }
   ],
@@ -244,7 +300,4 @@ const MECHANICAL_COMPONENTS_DATA = {
 };
 
 // Merge into universal registry
-const COMPONENTS_DATA = {
-  ...TRACTION_COMPONENTS_DATA,
-  ...MECHANICAL_COMPONENTS_DATA
-};
+Object.assign(COMPONENTS_DATA, MECHANICAL_COMPONENTS_DATA);
