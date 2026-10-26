@@ -2,7 +2,7 @@
 class DashboardView {
   static render(container) {
     const qEst = OrderEngine.calculateQuarterlyEstimate();
-    const tenderCount = state.marketTenders.length;
+    const contractCount = state.marketTenders.length;
     const activeTech = state.activeResearchId ? state.findTechById(state.activeResearchId) : null;
 
     container.innerHTML = `
@@ -28,9 +28,9 @@ class DashboardView {
               </span>
             </div>
             <div class="stat-gauge-row">
-              <span class="text-muted">Government Contracts</span>
-              <span class="font-mono ${tenderCount > 0 ? "text-positive" : "text-warning"}">
-                ${tenderCount > 0 ? `${tenderCount} Active Government Contracts` : `No Open Contracts: Next in ~${Math.max(1, state.nextTenderCountdown)} Days`}
+              <span class="text-muted">Ministry Contracts</span>
+              <span class="font-mono ${contractCount > 0 ? "text-positive" : "text-warning"}">
+                ${contractCount > 0 ? `${contractCount} Open Opportunities` : `Next Round in ~${Math.max(1, state.nextTenderCountdown)} Days`}
               </span>
             </div>
           </div>
@@ -67,13 +67,13 @@ class DashboardView {
         </div>
         ${state.activeContracts.length === 0 
           ? `<div class="text-muted" style="padding:20px; text-align:center;">
-               No active government contracts. ${tenderCount > 0 ? `${tenderCount} official orders are open for proposals in Ministry Tenders.` : `Next contract opening in approximately ${Math.max(1, state.nextTenderCountdown)} days.`}
+               No active government contracts. ${contractCount > 0 ? `${contractCount} official contracts are open for proposals in Ministry Contracts.` : `Next contract opening in approximately ${Math.max(1, state.nextTenderCountdown)} days.`}
              </div>`
           : `<div style="overflow-x:auto;">
               <table class="inv-table">
                 <thead>
                   <tr>
-                    <th>Agency / Tender Name</th>
+                    <th>Agency / Contract Name</th>
                     <th>Assigned Model</th>
                     <th>Delivered / Quota</th>
                     <th>Unit Sale Price</th>
@@ -116,7 +116,7 @@ class DashboardView {
     const container = document.createElement("div");
     container.innerHTML = `
       <p class="text-muted" style="font-size:11px; margin-bottom:12px;">
-        Swap the rolling stock variant assigned to "${contract.title}". Swapped models must satisfy all original tender requirements. The government will pay a higher price if the new variant provides superior performance:
+        Swap the rolling stock variant assigned to "${contract.title}". Swapped models must satisfy all original specifications. The Ministry will pay an increased rate if the new model offers superior performance:
       </p>
       <div style="display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto;" id="swap-variants-list"></div>
     `;
@@ -143,8 +143,8 @@ class DashboardView {
             <div style="font-size:11px; margin-top:4px;">
               ${evalRes.eligible
                 ? `<span class="text-positive">
-                     Requirements Met. Approved Unit Price: <strong>$${evalRes.newPrice.toLocaleString()}</strong>
-                     ${evalRes.isHigherPrice ? ` (+$${evalRes.priceDelta.toLocaleString()} Government Performance Bonus!)` : ""}
+                     Specifications Satisfied. Approved Unit Price: <strong>$${evalRes.newPrice.toLocaleString()}</strong>
+                     ${evalRes.isHigherPrice ? ` (+$${evalRes.priceDelta.toLocaleString()} Performance Bonus!)` : ""}
                    </span>`
                 : `<span class="text-negative">${evalRes.reason}</span>`
               }

@@ -1,31 +1,31 @@
-// Government Contracts Bidding Board and Competitor Intelligence Tracker
+// Ministry Rolling Stock Contracts Board & Proposal Bidding View
 class MarketView {
   static render(container) {
-    const tenderCount = state.marketTenders.length;
+    const contractCount = state.marketTenders.length;
 
     container.innerHTML = `
       <div class="view-grid-two">
         <div class="c-card">
           <div class="card-header">
-            <span class="card-title">Government Contracts Board</span>
-            <span class="c-badge ${tenderCount > 0 ? "badge-green" : "badge-amber"}">
-              ${tenderCount > 0 ? `${tenderCount} Open Contracts` : "No Open Contracts"}
+            <span class="card-title">Ministry Contracts Directorate</span>
+            <span class="c-badge ${contractCount > 0 ? "badge-green" : "badge-amber"}">
+              ${contractCount} Open Opportunities
             </span>
           </div>
 
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-            The government awards large multi-year orders in planned batches. Multiple contracts may be open at the same time, with periods where no contracts are available.
+            The Ministry of Transportation and federal rail authorities release multi-year procurement contracts. Models must satisfy all technical requirements and undergo test-track certification before proposal submission.
           </div>
 
-          <div id="tender-slot-area" style="display:flex; flex-direction:column; gap:12px;">
-            ${tenderCount === 0 ? `
+          <div id="contract-slot-area" style="display:flex; flex-direction:column; gap:12px;">
+            ${contractCount === 0 ? `
               <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:24px; text-align:center;">
                 <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS CURRENTLY OPEN FOR BIDDING</div>
                 <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
-                  The Ministry of Transportation is currently reviewing budgets and route schedules.
+                  Federal transit authorities are evaluating upcoming route schedules.
                 </p>
                 <div class="font-mono text-blue" style="font-size:11px;">
-                  Next Contract Opening in approximately: <strong>${Math.max(1, state.nextTenderCountdown)} Days</strong>
+                  Next contract round opening in: <strong>${Math.max(1, state.nextTenderCountdown)} Days</strong>
                 </div>
               </div>
             ` : ""}
@@ -38,7 +38,7 @@ class MarketView {
             <span class="c-badge badge-blue">Rolling Stock Manufacturers</span>
           </div>
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
-            Rivals bid on open contracts and will absorb defaulted batch allocations if your assembly lines fall behind schedule.
+            Rival manufacturers evaluate every open ministry contract and absorb defaulted quotas if your assembly lines run behind schedule.
           </div>
           <div style="display:flex; flex-direction:column; gap:8px;">
             ${COMPETITORS_DATA.map(comp => `
@@ -50,7 +50,7 @@ class MarketView {
                 <div class="text-muted" style="font-size:10px; margin-bottom:4px;">${comp.specialty} &bull; ${comp.country}</div>
                 <div style="display:flex; gap:14px; font-size:10px;">
                   <span>Reliability: <strong class="text-positive">${comp.reliabilityScore}%</strong></span>
-                  <span>Average Markup: <strong class="text-warning">+${comp.avgMarkup}%</strong></span>
+                  <span>Average Margin: <strong class="text-warning">+${comp.avgMarkup}%</strong></span>
                   <span>Speed: <strong class="text-blue">${comp.speedScore}</strong></span>
                 </div>
               </div>
@@ -60,80 +60,80 @@ class MarketView {
       </div>
     `;
 
-    if (tenderCount > 0) {
-      const area = document.getElementById("tender-slot-area");
-      state.marketTenders.forEach(t => {
-        area.appendChild(this.buildTenderCard(t));
+    if (contractCount > 0) {
+      const area = document.getElementById("contract-slot-area");
+      state.marketTenders.forEach(c => {
+        area.appendChild(this.buildContractCard(c));
       });
     }
   }
 
-  static buildTenderCard(t) {
+  static buildContractCard(c) {
     const card = document.createElement("div");
     card.style.background = "var(--bg-surface)";
     card.style.padding = "12px 14px";
     card.style.borderRadius = "var(--radius-xs)";
     card.style.border = "1px solid var(--border-strong)";
 
-    const daysRemaining = Math.max(0, t.expiresDay - state.day);
+    const daysRemaining = Math.max(0, c.expiresDay - state.day);
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
         <div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <h4 style="font-size:13px; font-weight:700; color:var(--text-main);">${t.title}</h4>
-            <span class="c-badge badge-blue">${t.strictnessTier}</span>
+            <h4 style="font-size:13px; font-weight:700; color:var(--text-main);">${c.title}</h4>
+            <span class="c-badge badge-blue">${c.strictnessTier}</span>
           </div>
-          <span class="text-blue font-mono" style="font-size:10px;">${t.agency}</span>
+          <span class="text-blue font-mono" style="font-size:10px;">${c.agency}</span>
         </div>
-        <span class="c-badge badge-amber font-mono">${daysRemaining} Days Remaining</span>
+        <span class="c-badge badge-amber font-mono">${daysRemaining} Days Window</span>
       </div>
 
-      <p class="text-muted" style="font-size:11px; margin-bottom:10px; line-height:1.35;">${t.description}</p>
+      <p class="text-muted" style="font-size:11px; margin-bottom:10px; line-height:1.35;">${c.description}</p>
 
       <div style="margin-bottom:10px;">
-        <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Mandatory Targeted Requirements</span>
-        <div style="display:flex; flex-direction:column; gap:3px; margin-top:4px;">
-          ${t.requirements.map(req => `
-            <div style="background:var(--bg-panel); padding:4px 8px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; font-size:11px;">
-              <span>${req.label}</span>
-              <strong class="font-mono text-blue">${req.compare === "min" ? "At least" : "No more than"} ${req.value.toLocaleString()} ${req.unit}</strong>
+        <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Mandatory Contract Specifications</span>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
+          ${(c.requirements || []).map(req => `
+            <div style="background:var(--bg-panel); padding:5px 8px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; font-size:10.5px;">
+              <span class="text-secondary">${req.label}:</span>
+              <strong class="font-mono text-blue">${req.compare === "min" ? "Min" : (req.compare === "max" ? "Max" : "")} ${req.value.toLocaleString()} ${req.unit}</strong>
             </div>
           `).join("")}
         </div>
       </div>
 
       <div class="view-grid-two" style="gap:6px; font-size:11px; margin-bottom:10px; background:rgba(0,0,0,0.2); padding:6px 8px; border-radius:var(--radius-xs);">
-        <div><span class="text-muted">Total Order:</span> <strong class="font-mono">${t.unitsRequired} Trainsets</strong></div>
-        <div><span class="text-muted">Quarterly Quota:</span> <strong class="font-mono text-blue">${t.batchSizePerQuarter} Units / Qtr</strong></div>
-        <div><span class="text-muted">Budget Allocation / Unit:</span> <strong class="font-mono text-positive">$${t.budgetPerUnit.toLocaleString()}</strong></div>
-        <div><span class="text-muted">Delay Tolerance:</span> <strong class="font-mono text-negative">Max ${t.delayToleranceDays} Days</strong></div>
+        <div><span class="text-muted">Total Fleet Order:</span> <strong class="font-mono">${c.unitsRequired} Units</strong></div>
+        <div><span class="text-muted">Quarterly Delivery:</span> <strong class="font-mono text-blue">${c.batchSizePerQuarter} Units / Qtr</strong></div>
+        <div><span class="text-muted">Unit Budget Ceiling:</span> <strong class="font-mono text-positive">$${c.budgetPerUnit.toLocaleString()}</strong></div>
+        <div><span class="text-muted">Max Delay Tolerance:</span> <strong class="font-mono text-negative">${c.delayToleranceDays} Days</strong></div>
       </div>
 
       <div style="display:flex; justify-content:flex-end;">
-        <button class="c-btn btn-primary btn-sm btn-submit-bid">Select Model and Submit Tender Proposal</button>
+        <button class="c-btn btn-primary btn-sm btn-submit-bid">Select Model &amp; Submit Contract Proposal</button>
       </div>
     `;
 
     card.querySelector(".btn-submit-bid").onclick = () => {
-      this.openBidModal(t);
+      this.openBidModal(c);
     };
 
     return card;
   }
 
-  static openBidModal(t) {
+  static openBidModal(contract) {
     if (state.variants.length === 0) {
-      UI.toast("Design and verify a model in Engineering CAD before submitting a proposal.", "danger");
+      UI.toast("Design and verify a rolling stock model in Engineering CAD before submitting a bid.", "danger");
       return;
     }
 
     const picker = document.createElement("div");
     picker.innerHTML = `
-      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select certified train model. The government will evaluate only the required parameters for this contract:</p>
-      <div style="display:flex; flex-direction:column; gap:8px;">
+      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select a certified model. The Ministry will evaluate each required specification for this procurement:</p>
+      <div style="display:flex; flex-direction:column; gap:8px; max-height:450px; overflow-y:auto;">
         ${state.variants.map(v => {
-          const check = OrderEngine.validateVariantRequirements(v, t);
+          const check = OrderEngine.validateVariantRequirements(v, contract);
           return `
             <div style="background:var(--bg-surface); padding:10px; border-radius:var(--radius-xs); border:1px solid ${check.valid ? "var(--border-strong)" : "var(--border-subtle)"};">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -148,7 +148,7 @@ class MarketView {
 
               <div style="font-size:10px; margin-bottom:8px;">
                 ${check.valid 
-                  ? `<span class="text-positive">All ${t.requirements.length} mandatory contract requirements satisfied.</span>` 
+                  ? `<span class="text-positive">All ${contract.requirements.length} mandatory specifications fully satisfied.</span>` 
                   : `<span class="text-negative">${check.errors[0]}</span>`
                 }
               </div>
@@ -165,7 +165,7 @@ class MarketView {
     `;
 
     UI.showModal({
-      title: `Submit Proposal: ${t.title}`,
+      title: `Submit Proposal: ${contract.title}`,
       contentNode: picker,
       actions: []
     });
@@ -173,11 +173,11 @@ class MarketView {
     picker.querySelectorAll(".btn-pick-model").forEach(btn => {
       btn.onclick = () => {
         const varId = btn.getAttribute("data-var");
-        const res = OrderEngine.submitTenderProposal(t.id, varId);
+        const res = OrderEngine.submitTenderProposal(contract.id, varId);
         UI.closeModal();
 
         if (res.success) {
-          UI.toast(`CONTRACT AWARDED: ${t.title} secured. Maintain production quotas to prevent competitor transfer.`, "success");
+          UI.toast(`CONTRACT SECURED: "${contract.title}" awarded to your enterprise. Maintain production quotas!`, "success");
           Events.emit("marketChanged");
           MarketView.render(document.getElementById("viewport-root"));
         } else {

@@ -1,62 +1,45 @@
-// Government Contracts, Targeted Requirements Validator, and Scaled Profit Rewards
+// Government Contracts Engine, Multi-Parameter Validation & Scaled Performance Pricing
 class OrderEngine {
   static evaluateGovernmentBids() {
     state.marketTenders.forEach(t => {
       if (state.day >= t.expiresDay) {
         t.expired = true;
         Events.emit("toast", {
-          text: `Contract Bidding Closed: Order window for "${t.title}" is now closed.`,
+          text: `Contract Closed: Bidding window for "${t.title}" has concluded.`,
           type: "normal"
         });
       }
     });
     state.marketTenders = state.marketTenders.filter(t => !t.expired);
 
-    // Contract rounds: a few concurrent orders, with periods where no contracts are open
-    if (state.marketTenders.length === 0) {
-      state.nextTenderCountdown -= 1;
-      if (state.nextTenderCountdown <= 0) {
-        const waveCount = 2 + Math.floor(Math.random() * 2);
-        const shuffled = [...TENDER_TEMPLATES].sort(() => 0.5 - Math.random());
+    state.nextTenderCountdown -= 1;
+    const targetConcurrentContracts = 5;
 
-        for (let i = 0; i < waveCount && i < shuffled.length; i++) {
-          const template = shuffled[i];
-          state.marketTenders.push({
-            id: "tnd_" + Math.random().toString(36).substring(2, 8),
-            ...template,
-            issuedDay: state.day,
-            expiresDay: state.day + 75 + Math.floor(Math.random() * 25),
-            awarded: false
-          });
-        }
-        state.nextTenderCountdown = 60 + Math.floor(Math.random() * 30);
-        Events.emit("toast", {
-          text: `New Government Orders: Ministry announced ${state.marketTenders.length} rolling stock contracts.`,
-          type: "success"
+    // Generate new contract opportunities frequently
+    if (state.marketTenders.length < targetConcurrentContracts && state.nextTenderCountdown <= 0) {
+      const needed = Math.min(3, targetConcurrentContracts - state.marketTenders.length);
+      const activeTypes = new Set(state.marketTenders.map(t => t.type));
+      const availableTemplates = CONTRACT_TEMPLATES.filter(tpl => !activeTypes.has(tpl.type));
+      const pool = availableTemplates.length >= needed ? availableTemplates : CONTRACT_TEMPLATES;
+      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+
+      for (let i = 0; i < needed && i < shuffled.length; i++) {
+        const template = shuffled[i];
+        state.marketTenders.push({
+          id: "cnt_" + Math.random().toString(36).substring(2, 8),
+          ...template,
+          issuedDay: state.day,
+          expiresDay: state.day + 65 + Math.floor(Math.random() * 35),
+          awarded: false
         });
-        Events.emit("marketChanged");
       }
-    } else if (state.marketTenders.length < 3) {
-      state.nextTenderCountdown -= 1;
-      if (state.nextTenderCountdown <= 0) {
-        const unused = TENDER_TEMPLATES.filter(tpl => !state.marketTenders.some(t => t.type === tpl.type));
-        if (unused.length > 0) {
-          const template = unused[Math.floor(Math.random() * unused.length)];
-          state.marketTenders.push({
-            id: "tnd_" + Math.random().toString(36).substring(2, 8),
-            ...template,
-            issuedDay: state.day,
-            expiresDay: state.day + 80,
-            awarded: false
-          });
-          Events.emit("toast", {
-            text: `New Contract Announced: "${template.title}" opened by ${template.agency}.`,
-            type: "success"
-          });
-          Events.emit("marketChanged");
-        }
-        state.nextTenderCountdown = 45 + Math.floor(Math.random() * 30);
-      }
+      state.nextTenderCountdown = 14 + Math.floor(Math.random() * 8);
+      state.saveToStorage();
+      Events.emit("toast", {
+        text: `New Ministry Contracts: Directorate published fresh rolling stock procurement opportunities.`,
+        type: "success"
+      });
+      Events.emit("marketChanged");
     }
 
     state.activeContracts.forEach(contract => {
@@ -69,7 +52,7 @@ class OrderEngine {
           const forfeitedUnits = contract.totalUnits - contract.totalDelivered;
           state.reputation = Math.max(10, state.reputation - 20);
           Events.emit("toast", {
-            text: `Contract Canceled: "${contract.title}" canceled due to delivery delays. Remaining ${forfeitedUnits} units given to competitors.`,
+            text: `Contract Default: "${contract.title}" terminated due to delivery delays. Remaining ${forfeitedUnits} units transferred to competitors.`,
             type: "danger"
           });
           contract.terminated = true;
@@ -80,31 +63,74 @@ class OrderEngine {
     state.activeContracts = state.activeContracts.filter(c => !c.terminated && c.totalDelivered < c.totalUnits);
   }
 
-  static validateVariantRequirements(variant, tender) {
-    if (!variant || !tender) return { valid: false, errors: ["Invalid configuration."] };
+  static validateVariantRequirements(variant, contract) {
+    if (!variant || !contract) return { valid: false, errors: ["Invalid configuration."] };
     if (!variant.certified) {
-      return { valid: false, errors: ["The government requires test track certification before proposal submission."] };
+      return { valid: false, errors: ["Test Track Certification Required: Ministry regulations mandate dynamic test track certification before contract submission."] };
     }
 
     const errors = [];
     const complianceDetails = [];
 
-    tender.requirements.forEach(req => {
+    (contract.requirements || []).forEach(req => {
       let candidateValue = 0;
+      let isBooleanMatch = null;
+
       switch (req.key) {
-        case "speed": candidateValue = variant.testedStats.exactTopSpeed; break;
-        case "acceleration": candidateValue = variant.testedStats.certifiedAcceleration || variant.stats.acceleration; break;
-        case "horsepower": candidateValue = variant.testedStats.certifiedHorsepower || variant.stats.horsepower; break;
-        case "tractiveEffort": candidateValue = variant.testedStats.exactAdhesionKn || variant.stats.maxAdhesionKn; break;
-        case "unitCost": candidateValue = variant.unitProductionCost; break;
-        case "maxAxleLoad": candidateValue = variant.testedStats.certifiedAxleLoad || variant.stats.axleLoad; break;
-        case "passengerCap": candidateValue = variant.stats.passengerCap; break;
+        case "speed":
+          candidateValue = variant.testedStats?.exactTopSpeed || variant.stats.theoreticalSpeed;
+          break;
+        case "acceleration":
+          candidateValue = variant.testedStats?.certifiedAcceleration || variant.stats.acceleration;
+          break;
+        case "horsepower":
+          candidateValue = variant.testedStats?.certifiedHorsepower || variant.stats.horsepower;
+          break;
+        case "tractiveEffort":
+          candidateValue = variant.testedStats?.exactAdhesionKn || variant.stats.maxAdhesionKn;
+          break;
+        case "maxAxleLoad":
+          candidateValue = variant.testedStats?.certifiedAxleLoad || variant.stats.axleLoad;
+          break;
+        case "passengerCap":
+          candidateValue = variant.stats.passengerCap || 0;
+          break;
+        case "unitCost":
+          candidateValue = variant.unitProductionCost;
+          break;
+        case "efficiency":
+          candidateValue = Math.round((variant.testedStats?.exactEfficiency || (variant.stats.totalEfficiency * 100)));
+          break;
+        case "safetyScore":
+          candidateValue = variant.stats.safetyScore || 0;
+          break;
+        case "batteryRange":
+          candidateValue = variant.stats.batteryRangeKm || 0;
+          break;
+        case "carriageCount":
+          candidateValue = variant.stats.carriageCount || 1;
+          break;
+        case "aerodynamics":
+          candidateValue = variant.stats.components?.carbody?.dragCd || 0.40;
+          break;
+        case "multiSystem": {
+          const pVolt = variant.stats.components?.pantograph?.voltage || "";
+          const tVolt = variant.stats.components?.transformer?.supportedVoltage || "";
+          isBooleanMatch = pVolt.includes("Multi") || tVolt.includes("Multi");
+          break;
+        }
       }
 
-      if (req.compare === "min" && candidateValue < req.value) {
-        errors.push(`Requirement Deficit: ${req.label} (${candidateValue} ${req.unit}) is below mandatory minimum of ${req.value} ${req.unit}.`);
+      if (isBooleanMatch !== null) {
+        if (!isBooleanMatch) {
+          errors.push(`${req.label}: Model does not satisfy specification (${req.value}).`);
+        } else {
+          complianceDetails.push({ label: req.label, candidate: "Compliant", target: req.value, unit: "", met: true });
+        }
+      } else if (req.compare === "min" && candidateValue < req.value) {
+        errors.push(`${req.label} Deficit: Certified ${candidateValue} ${req.unit} is below mandatory ${req.value} ${req.unit}.`);
       } else if (req.compare === "max" && candidateValue > req.value) {
-        errors.push(`Limit Exceeded: ${req.label} (${candidateValue} ${req.unit}) exceeds allowable limit of ${req.value} ${req.unit}.`);
+        errors.push(`${req.label} Exceeded: ${candidateValue} ${req.unit} exceeds allowable limit of ${req.value} ${req.unit}.`);
       } else {
         complianceDetails.push({ label: req.label, candidate: candidateValue, target: req.value, unit: req.unit, met: true });
       }
@@ -114,14 +140,13 @@ class OrderEngine {
   }
 
   static evaluateVariantSwap(contract, newVariant) {
-    const originalTemplate = TENDER_TEMPLATES.find(t => t.title === contract.title) || { requirements: [] };
+    const originalTemplate = CONTRACT_TEMPLATES.find(t => t.title === contract.title) || { requirements: [] };
     const check = this.validateVariantRequirements(newVariant, originalTemplate);
     if (!check.valid) return { eligible: false, reason: check.errors[0] };
 
     const budgetCeiling = contract.budgetPerUnit || (contract.unitSalePrice * 1.35);
-
     let proposedPrice = Math.max(contract.unitSalePrice, newVariant.salePrice);
-    if (newVariant.stats.theoreticalSpeed > (originalTemplate.requirements.find(r => r.key === "speed")?.value || 0)) {
+    if (newVariant.stats.theoreticalSpeed > (originalTemplate.requirements?.find(r => r.key === "speed")?.value || 0)) {
       proposedPrice = Math.round(proposedPrice * 1.06);
     }
     const approvedPrice = Math.min(budgetCeiling, proposedPrice);
@@ -153,38 +178,38 @@ class OrderEngine {
     return { success: true, newPrice: evalResult.newPrice, delta: evalResult.priceDelta };
   }
 
-  static submitTenderProposal(tenderId, variantId) {
-    const tender = state.marketTenders.find(t => t.id === tenderId);
+  static submitTenderProposal(contractId, variantId) {
+    const contract = state.marketTenders.find(t => t.id === contractId);
     const variant = state.variants.find(v => v.id === variantId);
-    if (!tender || !variant) return { success: false, reason: "Invalid tender or rolling stock blueprint." };
+    if (!contract || !variant) return { success: false, reason: "Invalid contract or rolling stock model." };
 
-    const check = this.validateVariantRequirements(variant, tender);
+    const check = this.validateVariantRequirements(variant, contract);
     if (!check.valid) return { success: false, reason: check.errors[0] };
 
-    if (variant.salePrice > tender.budgetPerUnit) {
-      return { success: false, reason: `Bid Price Exceeded: Model commercial price ($${variant.salePrice.toLocaleString()}) exceeds the tender budget ($${tender.budgetPerUnit.toLocaleString()}). Adjust markup margin.` };
+    if (variant.salePrice > contract.budgetPerUnit) {
+      return { success: false, reason: `Proposal Budget Exceeded: Commercial price ($${variant.salePrice.toLocaleString()}) exceeds maximum contract budget ($${contract.budgetPerUnit.toLocaleString()}). Adjust markup margin.` };
     }
 
-    const priceAdvantage = ((tender.budgetPerUnit - variant.salePrice) / tender.budgetPerUnit) * 30;
+    const priceAdvantage = ((contract.budgetPerUnit - variant.salePrice) / contract.budgetPerUnit) * 30;
     const reputationScore = (state.reputation / 100) * 35;
-    const strictnessBonus = tender.premiumMarkupFactor * 15;
+    const strictnessBonus = contract.premiumMarkupFactor * 15;
     const totalProposalScore = 50 + priceAdvantage + reputationScore + strictnessBonus;
 
     if (totalProposalScore >= (65 + Math.random() * 22)) {
-      const contract = {
+      const activeContract = {
         id: "cnt_" + Date.now().toString(36),
-        tenderId: tender.id,
-        title: tender.title,
-        agency: tender.agency,
+        contractId: contract.id,
+        title: contract.title,
+        agency: contract.agency,
         variantId: variant.id,
         variantName: variant.name,
-        strictnessTier: tender.strictnessTier,
-        budgetPerUnit: tender.budgetPerUnit,
+        strictnessTier: contract.strictnessTier,
+        budgetPerUnit: contract.budgetPerUnit,
         unitSalePrice: variant.salePrice,
         unitProfit: variant.profitPerUnit,
-        totalUnits: tender.unitsRequired,
-        batchSizePerQuarter: tender.batchSizePerQuarter,
-        delayToleranceDays: tender.delayToleranceDays,
+        totalUnits: contract.unitsRequired,
+        batchSizePerQuarter: contract.batchSizePerQuarter,
+        delayToleranceDays: contract.delayToleranceDays,
         delayDaysAccrued: 0,
         quarterStartDay: state.day,
         deliveredThisQuarter: 0,
@@ -192,15 +217,15 @@ class OrderEngine {
         totalRevenueEarned: 0
       };
 
-      state.activeContracts.push(contract);
+      state.activeContracts.push(activeContract);
       state.reputation = Math.min(100, state.reputation + 6);
-      state.marketTenders = state.marketTenders.filter(t => t.id !== tenderId);
+      state.marketTenders = state.marketTenders.filter(t => t.id !== contractId);
       state.saveToStorage();
 
-      return { success: true, contract };
+      return { success: true, contract: activeContract };
     } else {
       state.reputation = Math.max(10, state.reputation - 2);
-      return { success: false, reason: "Bid Rejected: Competitor evaluation scored higher. Increase performance margins or reduce commercial markup." };
+      return { success: false, reason: "Proposal Rejected: Competitor evaluation scored higher. Improve physical metrics or reduce commercial margin." };
     }
   }
 
