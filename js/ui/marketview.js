@@ -14,7 +14,7 @@ class MarketView {
           </div>
 
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-            The Ministry of Transportation and federal rail authorities release multi-year procurement contracts. Models must satisfy all technical requirements and undergo test-track certification before proposal submission.
+            The Ministry of Transportation and federal rail authorities release multi-year procurement contracts. Each contract provides an initial mobilization grace period to order components from suppliers before delivery quotas begin.
           </div>
 
           <div id="contract-slot-area" style="display:flex; flex-direction:column; gap:12px;">
@@ -76,6 +76,7 @@ class MarketView {
     card.style.border = "1px solid var(--border-strong)";
 
     const daysRemaining = Math.max(0, c.expiresDay - state.day);
+    const mobDays = c.mobilizationDays || 45;
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
@@ -107,7 +108,7 @@ class MarketView {
         <div><span class="text-muted">Total Fleet Order:</span> <strong class="font-mono">${c.unitsRequired} Units</strong></div>
         <div><span class="text-muted">Quarterly Delivery:</span> <strong class="font-mono text-blue">${c.batchSizePerQuarter} Units / Qtr</strong></div>
         <div><span class="text-muted">Unit Budget Ceiling:</span> <strong class="font-mono text-positive">$${c.budgetPerUnit.toLocaleString()}</strong></div>
-        <div><span class="text-muted">Max Delay Tolerance:</span> <strong class="font-mono text-negative">${c.delayToleranceDays} Days</strong></div>
+        <div><span class="text-muted">Procurement Grace:</span> <strong class="font-mono text-blue">${mobDays} Days Initial Window</strong></div>
       </div>
 
       <div style="display:flex; justify-content:flex-end;">
@@ -177,7 +178,8 @@ class MarketView {
         UI.closeModal();
 
         if (res.success) {
-          UI.toast(`CONTRACT SECURED: "${contract.title}" awarded to your enterprise. Maintain production quotas!`, "success");
+          const mobDays = res.contract.mobilizationDaysTotal || 45;
+          UI.toast(`CONTRACT AWARDED: "${contract.title}" secured! Initial ${mobDays}-day procurement window active to buy components.`, "success");
           Events.emit("marketChanged");
           MarketView.render(document.getElementById("viewport-root"));
         } else {

@@ -109,8 +109,10 @@ class SimulationRunner {
       if (state.quarter === 1) state.year += 1;
 
       state.activeContracts.forEach(c => {
-        c.quarterStartDay = state.day;
-        c.deliveredThisQuarter = 0;
+        if (!c.isMobilizing) {
+          c.quarterStartDay = state.day;
+          c.deliveredThisQuarter = 0;
+        }
       });
 
       OrderEngine.evaluateGovernmentBids();

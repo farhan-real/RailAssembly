@@ -77,18 +77,27 @@ class DashboardView {
                     <th>Assigned Model</th>
                     <th>Delivered / Quota</th>
                     <th>Unit Sale Price</th>
-                    <th>Accumulated Delay</th>
+                    <th>Schedule &bull; Procurement Phase</th>
                     <th>Contract Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${state.activeContracts.map(c => `
                     <tr>
-                      <td style="font-weight:600;">${c.title}</td>
+                      <td style="font-weight:600;">
+                        <div>${c.title}</div>
+                        <div class="text-muted" style="font-size:10px;">${c.agency}</div>
+                      </td>
                       <td class="font-mono text-blue">${c.variantName}</td>
                       <td class="font-mono">${c.totalDelivered}/${c.totalUnits} (${c.deliveredThisQuarter}/${c.batchSizePerQuarter} Qtr)</td>
                       <td class="font-mono text-positive">$${c.unitSalePrice.toLocaleString()}</td>
-                      <td class="font-mono ${c.delayDaysAccrued > 0 ? "text-negative" : "text-positive"}">${c.delayDaysAccrued} Days</td>
+                      <td>
+                        ${c.isMobilizing
+                          ? `<span class="c-badge badge-blue">Procurement: ${c.mobilizationDaysLeft}d left</span>
+                             <div class="text-muted" style="font-size:9px; margin-top:2px;">Grace window to buy parts</div>`
+                          : `<span class="font-mono ${c.delayDaysAccrued > 0 ? "text-negative" : "text-positive"}">${c.delayDaysAccrued > 0 ? `Delayed ${c.delayDaysAccrued} Days` : "Active &bull; On Schedule"}</span>`
+                        }
+                      </td>
                       <td>
                         <button class="c-btn btn-ghost btn-sm btn-swap-contract-variant" data-id="${c.id}">Swap Variant...</button>
                       </td>

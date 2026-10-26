@@ -159,7 +159,14 @@ class GameState {
       if (Array.isArray(data.inHouseQueue)) this.inHouseQueue = data.inHouseQueue;
       if (Array.isArray(data.variants)) this.variants = data.variants;
       if (Array.isArray(data.productionLines)) this.productionLines = data.productionLines;
-      if (Array.isArray(data.activeContracts)) this.activeContracts = data.activeContracts;
+      if (Array.isArray(data.activeContracts)) {
+        this.activeContracts = data.activeContracts.map(c => ({
+          ...c,
+          isMobilizing: Boolean(c.isMobilizing),
+          mobilizationDaysLeft: typeof c.mobilizationDaysLeft === "number" ? c.mobilizationDaysLeft : 0,
+          mobilizationDaysTotal: typeof c.mobilizationDaysTotal === "number" ? c.mobilizationDaysTotal : 45
+        }));
+      }
       if (Array.isArray(data.marketTenders)) this.marketTenders = data.marketTenders;
       if (typeof data.nextTenderCountdown === "number") this.nextTenderCountdown = data.nextTenderCountdown;
       if (Array.isArray(data.customCarriageTypes)) this.customCarriageTypes = data.customCarriageTypes;

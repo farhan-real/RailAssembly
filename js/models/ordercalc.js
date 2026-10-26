@@ -43,6 +43,22 @@ class OrderEngine {
     }
 
     state.activeContracts.forEach(contract => {
+      // 1. Initial Component Procurement & Factory Mobilization Waiting Period
+      if (contract.isMobilizing) {
+        contract.mobilizationDaysLeft -= 1;
+        if (contract.mobilizationDaysLeft <= 0) {
+          contract.isMobilizing = false;
+          contract.mobilizationDaysLeft = 0;
+          contract.quarterStartDay = state.day;
+          Events.emit("toast", {
+            text: `Procurement Grace Ended: "${contract.title}" has entered active quarterly delivery quota schedule.`,
+            type: "normal"
+          });
+        }
+        return; // Zero delay penalties accrue during the mobilization window
+      }
+
+      // 2. Active Quarterly Delivery Quota Tracking
       const daysIntoCurrentQuarter = (state.day - contract.quarterStartDay);
       const daysPerBatch = 90;
 
@@ -196,6 +212,7 @@ class OrderEngine {
     const totalProposalScore = 50 + priceAdvantage + reputationScore + strictnessBonus;
 
     if (totalProposalScore >= (65 + Math.random() * 22)) {
+      const mobDays = contract.mobilizationDays || 45;
       const activeContract = {
         id: "cnt_" + Date.now().toString(36),
         contractId: contract.id,
@@ -214,7 +231,10 @@ class OrderEngine {
         quarterStartDay: state.day,
         deliveredThisQuarter: 0,
         totalDelivered: 0,
-        totalRevenueEarned: 0
+        totalRevenueEarned: 0,
+        mobilizationDaysTotal: mobDays,
+        mobilizationDaysLeft: mobDays,
+        isMobilizing: true
       };
 
       state.activeContracts.push(activeContract);
