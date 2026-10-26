@@ -59,12 +59,37 @@
   margin-bottom: 14px;
 }
 
-/* Consist Modal Carriage List */
+/* Custom Text Input Control */
+.c-input-custom {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  color: var(--text-main);
+  padding: 6px 10px;
+  font-size: 11px;
+  width: 100%;
+}
+.c-input-custom:focus {
+  border-color: var(--color-blue);
+}
+
+/* Consist Modal Carriage List & Action Bar */
+.consist-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  background-color: var(--bg-panel);
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  gap: 8px;
+  flex-wrap: wrap;
+}
 .carriage-item-row {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  padding: 10px 12px;
+  padding: 9px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -231,6 +256,26 @@
   height: 100%;
   background-color: var(--color-blue);
   transition: width 0.2s ease;
+}
+
+/* Stat Rows */
+.stat-gauge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+.stat-bar-container {
+  width: 120px;
+  height: 4px;
+  background-color: var(--bg-surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  background-color: var(--color-blue);
 }
 
 @media (max-width: 1024px) {

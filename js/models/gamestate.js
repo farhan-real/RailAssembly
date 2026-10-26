@@ -1,4 +1,4 @@
-// Central Game State Singleton with In-House, Supplier, and Saved Design Persistence
+// Central Game State Singleton with Custom Carriage Types and Presets
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -13,20 +13,12 @@ class GameState {
     this.researchProgress = 0;
     this.unlockedTechs = new Set(["tech_aluminum_extrusion"]);
 
-    // Active Warehouse Storage
     this.warehouse = {
-      panto_std: 12,
-      trans_heavy: 6,
-      inv_igbt_air: 10,
-      mot_ind_basic: 12,
-      bog_co_co: 8,
-      body_steel: 8,
-      brk_disc_regen: 12,
-      bat_none: 16,
-      tcms_basic: 8
+      panto_std: 12, trans_heavy: 6, inv_igbt_air: 10,
+      mot_ind_basic: 12, bog_co_co: 8, body_steel: 8,
+      brk_disc_regen: 12, bat_none: 16, tcms_basic: 8
     };
     this.warehouseCapacity = 250;
-
     this.longStorage = {};
     this.pendingDeliveries = [];
     this.inHouseQueue = [];
@@ -36,22 +28,69 @@ class GameState {
     this.marketTenders = [];
     this.nextTenderCountdown = 0;
 
-    // Design Blueprint Library with Reference Factory Presets
+    // Standard and Custom Carriage Types Registry
+    this.customCarriageTypes = [
+      {
+        id: "driving_motor",
+        name: "Driving Cab Motor Coach",
+        isPowered: true,
+        layout: "standard",
+        seatMultiplier: 1.0,
+        weightOffset: 0,
+        costOffset: 0,
+        desc: "Front/rear driver cab equipped with TCMS master and high-voltage traction motor bogie."
+      },
+      {
+        id: "intermediate_motor",
+        name: "Intermediate Motor Coach",
+        isPowered: true,
+        layout: "standard",
+        seatMultiplier: 1.0,
+        weightOffset: 0,
+        costOffset: 0,
+        desc: "Underfloor inverter and traction motor pack driving standard passenger coach body."
+      },
+      {
+        id: "intermediate_trailer",
+        name: "Intermediate Trailer Coach",
+        isPowered: false,
+        layout: "standard",
+        seatMultiplier: 1.15,
+        weightOffset: -4000,
+        costOffset: -60000,
+        desc: "Unpowered passenger coach maximizing seating density and reducing consist tare mass."
+      },
+      {
+        id: "driving_trailer",
+        name: "Driving Cab Trailer Coach",
+        isPowered: false,
+        layout: "standard",
+        seatMultiplier: 0.95,
+        weightOffset: -3000,
+        costOffset: -45000,
+        desc: "Front/rear driver cab with lightweight unpowered guide bogies."
+      },
+      {
+        id: "bistro_trailer",
+        name: "Bistro & First-Class Lounge Car",
+        isPowered: false,
+        layout: "lounge",
+        seatMultiplier: 0.6,
+        weightOffset: 1200,
+        costOffset: 35000,
+        desc: "Dining galley and premium passenger lounge with reduced seat count."
+      }
+    ];
+
     this.savedDesigns = [
       {
         id: "design_preset_emu_8car",
         name: "Express 8-Car Intercity EMU (4M4T)",
         type: "trainset",
         slots: {
-          pantograph: "panto_std",
-          transformer: "trans_compact",
-          inverter: "inv_igbt_liquid",
-          motor: "mot_ind_commuter",
-          bogie: "bog_bo_bo",
-          carbody: "body_aluminum",
-          brakes: "brk_disc_regen",
-          battery: "bat_none",
-          tcms: "tcms_etcs2"
+          pantograph: "panto_std", transformer: "trans_compact", inverter: "inv_igbt_liquid",
+          motor: "mot_ind_commuter", bogie: "bog_bo_bo", carbody: "body_aluminum",
+          brakes: "brk_disc_regen", battery: "bat_none", tcms: "tcms_etcs2"
         },
         subSelections: {
           pantograph: { subcomponent: "cs_carbon", modification: "act_servo" },
@@ -67,47 +106,17 @@ class GameState {
         consistConfig: {
           carriageCount: 8,
           carriages: [
-            { index: 1, role: "driving_motor", isPowered: true, name: "Car 1: Driving Motor Coach" },
-            { index: 2, role: "intermediate_motor", isPowered: true, name: "Car 2: Intermediate Motor Coach" },
-            { index: 3, role: "intermediate_trailer", isPowered: false, name: "Car 3: Intermediate Trailer Coach" },
-            { index: 4, role: "bistro_trailer", isPowered: false, name: "Car 4: Bistro Trailer Coach" },
-            { index: 5, role: "intermediate_trailer", isPowered: false, name: "Car 5: Intermediate Trailer Coach" },
-            { index: 6, role: "intermediate_motor", isPowered: true, name: "Car 6: Intermediate Motor Coach" },
-            { index: 7, role: "intermediate_motor", isPowered: true, name: "Car 7: Intermediate Motor Coach" },
-            { index: 8, role: "driving_trailer", isPowered: false, name: "Car 8: Driving Trailer Coach" }
+            { index: 1, typeId: "driving_motor", name: "Car 1: Driving Motor Coach", isPowered: true },
+            { index: 2, typeId: "intermediate_motor", name: "Car 2: Intermediate Motor Coach", isPowered: true },
+            { index: 3, typeId: "intermediate_trailer", name: "Car 3: Intermediate Trailer Coach", isPowered: false },
+            { index: 4, typeId: "bistro_trailer", name: "Car 4: Bistro Trailer Coach", isPowered: false },
+            { index: 5, typeId: "intermediate_trailer", name: "Car 5: Intermediate Trailer Coach", isPowered: false },
+            { index: 6, typeId: "intermediate_motor", name: "Car 6: Intermediate Motor Coach", isPowered: true },
+            { index: 7, typeId: "intermediate_motor", name: "Car 7: Intermediate Motor Coach", isPowered: true },
+            { index: 8, typeId: "driving_trailer", name: "Car 8: Driving Trailer Coach", isPowered: false }
           ]
         },
         marginPercent: 25,
-        savedDate: "Factory Master Reference"
-      },
-      {
-        id: "design_preset_freight_coco",
-        name: "Heavy Mineral Freight Co-Co Locomotive",
-        type: "locomotive",
-        slots: {
-          pantograph: "panto_freight",
-          transformer: "trans_heavy",
-          inverter: "inv_igbt_freight",
-          motor: "mot_ind_highoutput",
-          bogie: "bog_co_co",
-          carbody: "body_steel",
-          brakes: "brk_disc_regen",
-          battery: "bat_lfp_lastmile",
-          tcms: "tcms_basic"
-        },
-        subSelections: {
-          pantograph: { subcomponent: "cs_copper", modification: "act_pneumatic" },
-          transformer: { subcomponent: "wind_copper", modification: "cool_mineral" },
-          inverter: { subcomponent: "gd_dynamic", modification: "therm_coldplate" },
-          motor: { subcomponent: "gb_freight", modification: "brg_steel" },
-          bogie: { subcomponent: "susp_coil", modification: "whl_cryo" },
-          carbody: { subcomponent: "crash_standard", modification: "aero_none" },
-          brakes: { subcomponent: "cal_cast", modification: "disc_iron" },
-          battery: { subcomponent: "btherm_liquid", modification: "bprot_kevlar" },
-          tcms: { subcomponent: "bus_wtb", modification: "sens_standard" }
-        },
-        consistConfig: { carriageCount: 1, carriages: [] },
-        marginPercent: 20,
         savedDate: "Factory Master Reference"
       }
     ];
@@ -147,6 +156,10 @@ class GameState {
     if (this.longStorage[componentId] === 0) delete this.longStorage[componentId];
     this.addToWarehouse(componentId, count);
     return true;
+  }
+
+  findCarriageType(typeId) {
+    return this.customCarriageTypes.find(t => t.id === typeId) || this.customCarriageTypes[0];
   }
 
   isInHouseAvailable(component) {

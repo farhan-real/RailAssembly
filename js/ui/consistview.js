@@ -1,100 +1,85 @@
-// Dedicated Menu-Driven Carriage Consist Customization Modal
+// Dedicated Menu-Driven Carriage Consist Customization and Custom Type Creator
 class ConsistView {
   static openConsistModal(builderInstance) {
     const container = document.createElement("div");
 
-    const header = document.createElement("p");
-    header.className = "text-muted";
-    header.style.fontSize = "11px";
-    header.style.marginBottom = "12px";
-    header.textContent = "Specify trainset carriage count and customize individual coach traction distribution and operational roles:";
-    container.appendChild(header);
+    container.innerHTML = `
+      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
+        Configure carriages in this trainset consist. You can create custom carriage types and append carriages directly to the end of the train:
+      </p>
 
-    // Consist Length & Quick Presets Bar
-    const controlBar = document.createElement("div");
-    controlBar.style.display = "flex";
-    controlBar.style.justifyContent = "space-between";
-    controlBar.style.alignItems = "center";
-    controlBar.style.marginBottom = "14px";
-    controlBar.style.background = "var(--bg-panel)";
-    controlBar.style.padding = "8px 12px";
-    controlBar.style.borderRadius = "var(--radius-xs)";
+      <div class="consist-toolbar">
+        <div>
+          <span style="font-size:12px; font-weight:700;">Consist Total: ${builderInstance.consistConfig.carriages.length} Carriages</span>
+          <span class="text-muted" style="font-size:11px; margin-left:8px;">
+            (${builderInstance.consistConfig.carriages.filter(c => c.isPowered).length} Powered &bull; ${builderInstance.consistConfig.carriages.filter(c => !c.isPowered).length} Trailer)
+          </span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="c-btn btn-primary btn-sm" id="btn-add-carriage-end">+ Add Carriage to End</button>
+          <button class="c-btn btn-ghost btn-sm" id="btn-create-custom-type">Create Carriage Type...</button>
+        </div>
+      </div>
 
-    const lengthLabel = document.createElement("span");
-    lengthLabel.style.fontSize = "11px";
-    lengthLabel.style.fontWeight = "700";
-    lengthLabel.textContent = `Consist Length: ${builderInstance.consistConfig.carriageCount} Carriages`;
+      <div style="display:flex; flex-direction:column; gap:6px; max-height:360px; overflow-y:auto;" id="carriage-rows-container"></div>
+    `;
 
-    const stepper = UI.createStepper({
-      min: 2,
-      max: 12,
-      value: builderInstance.consistConfig.carriageCount,
-      step: 1,
-      onChange: (newCount) => {
-        ConsistView.resizeConsist(builderInstance, newCount);
-        ConsistView.openConsistModal(builderInstance);
-      }
-    });
-
-    controlBar.appendChild(lengthLabel);
-    controlBar.appendChild(stepper);
-    container.appendChild(controlBar);
-
-    // Carriages List
-    const carriageList = document.createElement("div");
-    carriageList.style.display = "flex";
-    carriageList.style.flexDirection = "column";
-    carriageList.style.gap = "6px";
-    carriageList.style.maxHeight = "360px";
-    carriageList.style.overflowY = "auto";
+    const list = container.querySelector("#carriage-rows-container");
 
     builderInstance.consistConfig.carriages.forEach((car, idx) => {
+      const typeDef = state.findCarriageType(car.typeId);
       const row = document.createElement("div");
       row.className = `carriage-item-row ${car.isPowered ? "powered" : "trailer"}`;
 
       row.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:2px;">
+        <div style="display:flex; flex-direction:column; gap:2px; max-width:65%;">
           <div style="display:flex; align-items:center; gap:6px;">
-            <strong style="font-size:12px;">Carriage ${idx + 1}</strong>
+            <strong style="font-size:11px;">Carriage ${idx + 1}: ${car.name || typeDef.name}</strong>
             <span class="c-badge ${car.isPowered ? "badge-blue" : "badge-amber"}">
               ${car.isPowered ? "Powered Motor Car" : "Unpowered Trailer Car"}
             </span>
           </div>
-          <span class="text-muted" style="font-size:10px;">${car.name}</span>
+          <span class="text-muted" style="font-size:10px;">${typeDef.desc}</span>
         </div>
-        <div style="display:flex; gap:6px;">
-          <button class="c-btn btn-ghost btn-sm btn-toggle-power" data-idx="${idx}">
-            ${car.isPowered ? "Convert to Trailer" : "Convert to Powered"}
-          </button>
-          <button class="c-btn btn-ghost btn-sm btn-change-role" data-idx="${idx}">
-            Role Menu...
-          </button>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button class="c-btn btn-ghost btn-sm btn-change-type" data-idx="${idx}">Change Type Menu...</button>
+          ${builderInstance.consistConfig.carriages.length > 2 
+            ? `<button class="c-btn btn-ghost btn-sm btn-remove-car" data-idx="${idx}" style="color:var(--color-negative);">Remove</button>` 
+            : ""
+          }
         </div>
       `;
 
-      row.querySelector(".btn-toggle-power").onclick = () => {
-        car.isPowered = !car.isPowered;
-        if (!car.isPowered && car.role.includes("motor")) car.role = "intermediate_trailer";
-        if (car.isPowered && car.role.includes("trailer")) car.role = "intermediate_motor";
-        car.name = ConsistView.getRoleName(car.role, idx + 1);
-        ConsistView.openConsistModal(builderInstance);
+      row.querySelector(".btn-change-type").onclick = () => {
+        ConsistView.openChangeCarriageTypeMenu(builderInstance, idx);
       };
 
-      row.querySelector(".btn-change-role").onclick = () => {
-        ConsistView.openRoleMenu(builderInstance, idx);
-      };
+      const remBtn = row.querySelector(".btn-remove-car");
+      if (remBtn) {
+        remBtn.onclick = () => {
+          builderInstance.consistConfig.carriages.splice(idx, 1);
+          builderInstance.consistConfig.carriageCount = builderInstance.consistConfig.carriages.length;
+          ConsistView.openConsistModal(builderInstance);
+        };
+      }
 
-      carriageList.appendChild(row);
+      list.appendChild(row);
     });
 
-    container.appendChild(carriageList);
+    container.querySelector("#btn-add-carriage-end").onclick = () => {
+      ConsistView.openAppendCarriageMenu(builderInstance);
+    };
+
+    container.querySelector("#btn-create-custom-type").onclick = () => {
+      ConsistView.openCreateTypeModal(builderInstance);
+    };
 
     UI.showModal({
-      title: "Multiple-Unit Consist Composition Architecture",
+      title: "Consist Carriages & Custom Rolling Stock Composition",
       contentNode: container,
       actions: [
         {
-          label: "Apply Consist Configuration",
+          label: "Apply to CAD Blueprint",
           className: "btn-primary",
           onClick: () => {
             BuilderView.render(document.getElementById("viewport-root"));
@@ -104,66 +89,157 @@ class ConsistView {
     });
   }
 
-  static resizeConsist(builderInstance, newCount) {
-    const list = builderInstance.consistConfig.carriages;
-    if (newCount > list.length) {
-      for (let i = list.length; i < newCount; i++) {
-        const isPow = i % 2 === 0;
-        const role = isPow ? "intermediate_motor" : "intermediate_trailer";
-        list.push({
-          index: i + 1,
-          role,
-          isPowered: isPow,
-          name: ConsistView.getRoleName(role, i + 1)
-        });
-      }
-    } else if (newCount < list.length) {
-      list.length = newCount;
-    }
-    builderInstance.consistConfig.carriageCount = newCount;
-  }
-
-  static openRoleMenu(builderInstance, carIdx) {
-    const car = builderInstance.consistConfig.carriages[carIdx];
-    const roles = [
-      { id: "driving_motor", name: "Driving Cab Motor Coach", powered: true, desc: "Front/rear driver cab equipped with TCMS master and high-voltage traction motor bogie." },
-      { id: "driving_trailer", name: "Driving Cab Trailer Coach", powered: false, desc: "Front/rear driver cab with lightweight unpowered guide bogies." },
-      { id: "intermediate_motor", name: "Intermediate Motor Coach", powered: true, desc: "Underfloor inverter and traction motor pack driving standard passenger carbody." },
-      { id: "intermediate_trailer", name: "Intermediate Trailer Coach", powered: false, desc: "Unpowered passenger coach maximizing seating density and reducing consist tare mass." },
-      { id: "bistro_trailer", name: "Bistro & First-Class Trailer Coach", powered: false, desc: "Dining galley and premium passenger lounge with reduced seat count." }
-    ];
-
-    const items = roles.map(r => ({
-      id: r.id,
-      name: r.name,
-      specs: r.powered ? "Traction Motorized Coach" : "Unpowered Trailer Coach",
-      desc: r.desc,
+  static openAppendCarriageMenu(builderInstance) {
+    const items = state.customCarriageTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      specs: `${type.isPowered ? "Powered Motor Car" : "Unpowered Trailer Car"} &bull; Layout: ${type.layout.toUpperCase()}`,
+      desc: type.desc,
       disabled: false
     }));
 
     BuilderView.openSelectionModal({
-      title: `Select Role for Carriage ${carIdx + 1}`,
-      subtitle: "Choose operational designation and traction assignment for this carriage:",
+      title: "Add Carriage to End of Consist",
+      subtitle: "Select carriage specification to append to the end of this trainset:",
       items,
-      activeId: car.role,
-      onSelect: (roleId) => {
-        const selectedRole = roles.find(r => r.id === roleId);
-        car.role = selectedRole.id;
-        car.isPowered = selectedRole.powered;
-        car.name = ConsistView.getRoleName(selectedRole.id, carIdx + 1);
+      activeId: null,
+      onSelect: (typeId) => {
+        const typeDef = state.findCarriageType(typeId);
+        const newIdx = builderInstance.consistConfig.carriages.length + 1;
+        builderInstance.consistConfig.carriages.push({
+          index: newIdx,
+          typeId: typeDef.id,
+          name: `Car ${newIdx}: ${typeDef.name}`,
+          isPowered: typeDef.isPowered
+        });
+        builderInstance.consistConfig.carriageCount = builderInstance.consistConfig.carriages.length;
         ConsistView.openConsistModal(builderInstance);
       }
     });
   }
 
-  static getRoleName(roleId, carNum) {
-    switch (roleId) {
-      case "driving_motor": return `Car ${carNum}: Driving Motor Coach`;
-      case "driving_trailer": return `Car ${carNum}: Driving Trailer Coach`;
-      case "intermediate_motor": return `Car ${carNum}: Intermediate Motor Coach`;
-      case "intermediate_trailer": return `Car ${carNum}: Intermediate Trailer Coach`;
-      case "bistro_trailer": return `Car ${carNum}: Bistro Trailer Coach`;
-      default: return `Car ${carNum}: Passenger Coach`;
-    }
+  static openChangeCarriageTypeMenu(builderInstance, carIdx) {
+    const car = builderInstance.consistConfig.carriages[carIdx];
+    const items = state.customCarriageTypes.map(type => ({
+      id: type.id,
+      name: type.name,
+      specs: `${type.isPowered ? "Powered Motor Car" : "Unpowered Trailer Car"} &bull; Layout: ${type.layout.toUpperCase()}`,
+      desc: type.desc,
+      disabled: false
+    }));
+
+    BuilderView.openSelectionModal({
+      title: `Assign Carriage Type for Position ${carIdx + 1}`,
+      subtitle: "Choose standard or custom carriage type for this position:",
+      items,
+      activeId: car.typeId,
+      onSelect: (typeId) => {
+        const typeDef = state.findCarriageType(typeId);
+        car.typeId = typeDef.id;
+        car.isPowered = typeDef.isPowered;
+        car.name = `Car ${carIdx + 1}: ${typeDef.name}`;
+        ConsistView.openConsistModal(builderInstance);
+      }
+    });
+  }
+
+  static openCreateTypeModal(builderInstance) {
+    const container = document.createElement("div");
+    let isPowered = false;
+    let selectedLayout = "standard";
+
+    container.innerHTML = `
+      <p class="text-muted" style="font-size:11px; margin-bottom:12px;">
+        Define and name a new specialized carriage specification for your rolling stock catalog:
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div>
+          <label style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Carriage Type Name</label>
+          <input type="text" class="c-input-custom" id="custom-type-name" placeholder="e.g. Panoramic Observation Lounge Car" style="margin-top:4px;">
+        </div>
+
+        <div>
+          <label style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Traction Assignment</label>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            <button class="c-btn btn-ghost btn-sm" id="btn-set-trailer" style="flex:1;">Unpowered Trailer Car</button>
+            <button class="c-btn btn-ghost btn-sm" id="btn-set-powered" style="flex:1;">Powered Motor Car</button>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Interior Accommodation &amp; Layout</label>
+          <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;">
+            <button class="c-btn btn-primary btn-sm btn-layout-choice" data-layout="standard">Standard Passenger</button>
+            <button class="c-btn btn-ghost btn-sm btn-layout-choice" data-layout="high_density">High-Density Commuter</button>
+            <button class="c-btn btn-ghost btn-sm btn-layout-choice" data-layout="lounge">First-Class Lounge</button>
+            <button class="c-btn btn-ghost btn-sm btn-layout-choice" data-layout="cargo">Luggage &amp; Cargo Freight</button>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Operational Purpose Description</label>
+          <input type="text" class="c-input-custom" id="custom-type-desc" placeholder="e.g. Luxury interior seating with panoramic glass dome." style="margin-top:4px;">
+        </div>
+      </div>
+    `;
+
+    const btnTrailer = container.querySelector("#btn-set-trailer");
+    const btnPowered = container.querySelector("#btn-set-powered");
+
+    const refreshTractionButtons = () => {
+      btnTrailer.className = `c-btn ${!isPowered ? "btn-primary" : "btn-ghost"} btn-sm`;
+      btnPowered.className = `c-btn ${isPowered ? "btn-primary" : "btn-ghost"} btn-sm`;
+    };
+    refreshTractionButtons();
+
+    btnTrailer.onclick = () => { isPowered = false; refreshTractionButtons(); };
+    btnPowered.onclick = () => { isPowered = true; refreshTractionButtons(); };
+
+    container.querySelectorAll(".btn-layout-choice").forEach(btn => {
+      btn.onclick = () => {
+        container.querySelectorAll(".btn-layout-choice").forEach(b => b.className = "c-btn btn-ghost btn-sm btn-layout-choice");
+        btn.className = "c-btn btn-primary btn-sm btn-layout-choice";
+        selectedLayout = btn.getAttribute("data-layout");
+      };
+    });
+
+    UI.showModal({
+      title: "Create and Name New Carriage Type",
+      contentNode: container,
+      actions: [
+        {
+          label: "Save Carriage Type to Catalog",
+          className: "btn-primary",
+          onClick: () => {
+            const name = container.querySelector("#custom-type-name").value.trim() || "Custom Specialized Coach";
+            const desc = container.querySelector("#custom-type-desc").value.trim() || "Custom engineered carriage specification.";
+
+            let seatMult = 1.0;
+            let wOffset = 0;
+            let cOffset = 0;
+
+            if (selectedLayout === "high_density") { seatMult = 1.35; wOffset = 800; cOffset = -20000; }
+            else if (selectedLayout === "lounge") { seatMult = 0.55; wOffset = 1500; cOffset = 45000; }
+            else if (selectedLayout === "cargo") { seatMult = 0.0; wOffset = -1500; cOffset = -40000; }
+
+            const newType = {
+              id: "cartype_" + Date.now().toString(36),
+              name,
+              isPowered,
+              layout: selectedLayout,
+              seatMultiplier: seatMult,
+              weightOffset: wOffset,
+              costOffset: cOffset,
+              desc
+            };
+
+            state.customCarriageTypes.push(newType);
+            UI.toast(`Carriage Type "${name}" created and added to catalog.`, "success");
+            ConsistView.openConsistModal(builderInstance);
+          }
+        }
+      ]
+    });
   }
 }

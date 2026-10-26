@@ -5,10 +5,10 @@ class BuilderView {
   static consistConfig = {
     carriageCount: 4,
     carriages: [
-      { index: 1, role: "driving_motor", isPowered: true, name: "Car 1: Driving Motor Coach" },
-      { index: 2, role: "intermediate_motor", isPowered: true, name: "Car 2: Intermediate Motor Coach" },
-      { index: 3, role: "intermediate_trailer", isPowered: false, name: "Car 3: Intermediate Trailer Coach" },
-      { index: 4, role: "driving_trailer", isPowered: false, name: "Car 4: Driving Trailer Coach" }
+      { index: 1, typeId: "driving_motor", name: "Car 1: Driving Motor Coach", isPowered: true },
+      { index: 2, typeId: "intermediate_motor", name: "Car 2: Intermediate Motor Coach", isPowered: true },
+      { index: 3, typeId: "intermediate_trailer", name: "Car 3: Intermediate Trailer Coach", isPowered: false },
+      { index: 4, typeId: "driving_trailer", name: "Car 4: Driving Trailer Coach", isPowered: false }
     ]
   };
 
@@ -55,9 +55,7 @@ class BuilderView {
                 Multiple-Unit Trainset
               </button>
             </div>
-            <div style="display:flex; gap:6px;">
-              <button class="c-btn btn-ghost btn-sm" id="btn-design-archive">Blueprints Archive...</button>
-            </div>
+            <button class="c-btn btn-ghost btn-sm" id="btn-design-archive">Blueprints Archive...</button>
           </div>
           <button class="c-btn btn-primary" id="btn-save-variant">Save &amp; Commission Blueprint</button>
         </div>
@@ -68,10 +66,10 @@ class BuilderView {
             <div>
               <strong style="font-size:12px; color:var(--text-main);">Trainset Consist Architecture:</strong>
               <span class="text-blue font-mono" style="font-size:12px; margin-left:6px;">
-                ${stats.carriageCount} Carriages (${stats.poweredCarCount} Powered Motor Cars, ${stats.trailerCarCount} Trailer Cars)
+                ${stats.carriageCount} Carriages (${stats.poweredCarCount} Powered, ${stats.trailerCarCount} Trailer)
               </span>
               <div class="text-muted" style="font-size:10px; margin-top:2px;">
-                Passenger Seating Capacity: ${stats.passengerCap} Passengers &bull; Adhesion Ratio: ${Math.round((stats.poweredCarCount / stats.carriageCount) * 100)}%
+                Total Seating: ${stats.passengerCap} Passengers &bull; Adhesion Ratio: ${Math.round((stats.poweredCarCount / stats.carriageCount) * 100)}%
               </div>
             </div>
             <button class="c-btn btn-ghost btn-sm" id="btn-configure-consist">
