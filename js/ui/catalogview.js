@@ -43,6 +43,9 @@ class CatalogView {
         ? `<span class="c-badge badge-blue">Variant of: ${variant.baseModelName}</span>`
         : "";
 
+      const exactSpeed = variant.certified ? variant.testedStats.exactTopSpeed : variant.stats.theoreticalSpeed;
+      const exactAccel = variant.certified ? variant.testedStats.certifiedAcceleration : variant.stats.acceleration;
+
       card.innerHTML = `
         <div class="card-header">
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -66,7 +69,7 @@ class CatalogView {
           <div>
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
             <div class="font-mono text-blue" style="font-size:13px;">
-              ${variant.certified ? `${variant.testedStats.exactTopSpeed} km/h &bull; ${variant.testedStats.certifiedAcceleration} m/s²` : `${variant.stats.roughSpeedMin}~${variant.stats.roughSpeedMax} km/h (Est)`}
+              ${exactSpeed} km/h &bull; ${Number(exactAccel).toFixed(2)} m/s²
             </div>
           </div>
           <div>

@@ -91,6 +91,7 @@ class BuilderView {
   static render(container) {
     const stats = TrainModelCalc.calculateTrainStats(this.currentSlots, this.subSelections, this.rollingStockType, this.consistConfig);
     const diag = stats.diagnostics;
+    const laborCost = this.rollingStockType === "trainset" ? stats.carriageCount * 45000 : 140000;
 
     container.innerHTML = `
       <div class="cad-container">
@@ -125,7 +126,7 @@ class BuilderView {
                 ${stats.carriageCount} Carriages (${stats.poweredCarCount} Powered, ${stats.trailerCarCount} Trailer)
               </span>
               <div class="text-muted" style="font-size:10px; margin-top:2px;">
-                Seating: ${stats.passengerCap} Passengers &bull; Adhesion Ratio: ${Math.round((stats.poweredCarCount / stats.carriageCount) * 100)}%
+                Seating: ${stats.passengerCap} Passengers &bull; Adhesion Ratio: ${((stats.poweredCarCount / stats.carriageCount) * 100).toFixed(0)}%
               </div>
             </div>
             <button class="c-btn btn-ghost btn-sm" id="btn-configure-consist">Customize Carriages &amp; Consist...</button>
@@ -135,32 +136,32 @@ class BuilderView {
         <div class="view-grid-four" style="margin-bottom:12px;">
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Speed &bull; Acceleration</span>
+              <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
               <span class="c-badge badge-blue font-mono" style="font-size:9px;">Adhesion: ${stats.maxAdhesionKn} kN</span>
             </div>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
-              ${stats.roughSpeedMin}&sim;${stats.roughSpeedMax} km/h &bull; ${stats.acceleration} m/s²
+              ${stats.theoreticalSpeed} km/h &bull; ${stats.acceleration.toFixed(2)} m/s²
             </div>
             <div class="text-muted" style="font-size:9px; display:flex; justify-content:space-between;">
-              <span>Adhesion: &mu; ${(stats.totalAdhesionCoeff || 0.38).toFixed(2)}</span>
-              <span>Adhesive Mass: ${stats.adhesiveMassTons || stats.totalMassTons} t</span>
+              <span>Adhesion: &mu; ${(stats.totalAdhesionCoeff || 0.38).toFixed(3)}</span>
+              <span>Adhesive Mass: ${(stats.adhesiveMassTons || stats.totalMassTons).toFixed(1)} t</span>
             </div>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Net Traction Power</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
-              ${stats.availablePowerKw} kW (${stats.horsepower.toLocaleString()} hp)
+              ${stats.availablePowerKw.toLocaleString()} kW (${stats.horsepower.toLocaleString()} hp)
             </div>
-            <span class="text-muted" style="font-size:9px;">Powertrain Efficiency: ${Math.round(stats.totalEfficiency * 100)}%</span>
+            <span class="text-muted" style="font-size:9px;">Powertrain Efficiency: ${(stats.totalEfficiency * 100).toFixed(1)}%</span>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load &bull; Gross Mass</span>
             <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:13px; margin:2px 0;">
-              ${stats.axleLoad} t / Axle (Limit: ${stats.maxAllowedAxleLoad} t)
+              ${stats.axleLoad.toFixed(2)} t / Axle (Limit: ${stats.maxAllowedAxleLoad.toFixed(1)} t)
             </div>
-            <span class="text-muted" style="font-size:9px;">Consist Mass: ${stats.totalMassTons} Metric Tons</span>
+            <span class="text-muted" style="font-size:9px;">Consist Mass: ${stats.totalMassTons.toFixed(1)} Metric Tons</span>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); min-width:0;">
@@ -168,7 +169,7 @@ class BuilderView {
             <div class="font-mono text-warning" style="font-size:13px; margin:2px 0;">
               $${stats.bomCost.toLocaleString()}
             </div>
-            <span class="text-muted" style="font-size:9px;">Direct hardware component sum</span>
+            <span class="text-muted" style="font-size:9px;">Assembly Labor: +$${laborCost.toLocaleString()}</span>
           </div>
         </div>
 
