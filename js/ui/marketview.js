@@ -1,4 +1,4 @@
-// Ministry Tender Bidding Board and Competitor Intelligence Tracker
+// Government Contracts Bidding Board and Competitor Intelligence Tracker
 class MarketView {
   static render(container) {
     const tenderCount = state.marketTenders.length;
@@ -7,25 +7,25 @@ class MarketView {
       <div class="view-grid-two">
         <div class="c-card">
           <div class="card-header">
-            <span class="card-title">National Railway Procurement Board</span>
+            <span class="card-title">Government Contracts Board</span>
             <span class="c-badge ${tenderCount > 0 ? "badge-green" : "badge-amber"}">
-              ${tenderCount > 0 ? `${tenderCount} Tenders Active` : "Procurement Hiatus"}
+              ${tenderCount > 0 ? `${tenderCount} Open Contracts` : "No Open Contracts"}
             </span>
           </div>
 
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-            The Ministry awards multi-year megaprojects slowly over phased quarters. Multiple tenders may be active concurrently during open gazettes, with periods of review hiatus.
+            The government awards large multi-year orders in planned batches. Multiple contracts may be open at the same time, with periods where no contracts are available.
           </div>
 
           <div id="tender-slot-area" style="display:flex; flex-direction:column; gap:12px;">
             ${tenderCount === 0 ? `
               <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:24px; text-align:center;">
-                <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO TENDERS CURRENTLY OPEN FOR BIDDING</div>
+                <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CONTRACTS CURRENTLY OPEN FOR BIDDING</div>
                 <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
-                  The Ministry of Transportation is currently in budget review and corridor planning.
+                  The Ministry of Transportation is currently reviewing budgets and route schedules.
                 </p>
                 <div class="font-mono text-blue" style="font-size:11px;">
-                  Next Procurement Gazette in approximately: <strong>${Math.max(1, state.nextTenderCountdown)} Days</strong>
+                  Next Contract Opening in approximately: <strong>${Math.max(1, state.nextTenderCountdown)} Days</strong>
                 </div>
               </div>
             ` : ""}
@@ -38,7 +38,7 @@ class MarketView {
             <span class="c-badge badge-blue">Rolling Stock Manufacturers</span>
           </div>
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
-            Rivals bid aggressively across active tenders and will absorb defaulted batch allocations if your assembly lines incur delivery delays.
+            Rivals bid on open contracts and will absorb defaulted batch allocations if your assembly lines fall behind schedule.
           </div>
           <div style="display:flex; flex-direction:column; gap:8px;">
             ${COMPETITORS_DATA.map(comp => `
@@ -130,7 +130,7 @@ class MarketView {
 
     const picker = document.createElement("div");
     picker.innerHTML = `
-      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select certified train model. The Ministry will evaluate only the required parameters for this tender:</p>
+      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select certified train model. The government will evaluate only the required parameters for this contract:</p>
       <div style="display:flex; flex-direction:column; gap:8px;">
         ${state.variants.map(v => {
           const check = OrderEngine.validateVariantRequirements(v, t);
@@ -148,7 +148,7 @@ class MarketView {
 
               <div style="font-size:10px; margin-bottom:8px;">
                 ${check.valid 
-                  ? `<span class="text-positive">All ${t.requirements.length} mandatory tender requirements satisfied.</span>` 
+                  ? `<span class="text-positive">All ${t.requirements.length} mandatory contract requirements satisfied.</span>` 
                   : `<span class="text-negative">${check.errors[0]}</span>`
                 }
               </div>

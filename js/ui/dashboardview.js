@@ -27,9 +27,9 @@ class DashboardView {
               </span>
             </div>
             <div class="stat-gauge-row">
-              <span class="text-muted">Ministry Procurement Board</span>
+              <span class="text-muted">Government Contracts</span>
               <span class="font-mono ${tenderCount > 0 ? "text-positive" : "text-warning"}">
-                ${tenderCount > 0 ? `${tenderCount} Active Government Tenders` : `Procurement Hiatus: ~${Math.max(1, state.nextTenderCountdown)} Days`}
+                ${tenderCount > 0 ? `${tenderCount} Active Government Contracts` : `No Open Contracts: Next in ~${Math.max(1, state.nextTenderCountdown)} Days`}
               </span>
             </div>
           </div>
@@ -66,7 +66,7 @@ class DashboardView {
         </div>
         ${state.activeContracts.length === 0 
           ? `<div class="text-muted" style="padding:20px; text-align:center;">
-               No active government contracts. ${tenderCount > 0 ? `${tenderCount} official tenders are currently open for proposals in Ministry Tenders.` : `Next tender announcement in approximately ${Math.max(1, state.nextTenderCountdown)} days.`}
+               No active government contracts. ${tenderCount > 0 ? `${tenderCount} official orders are open for proposals in Ministry Tenders.` : `Next contract opening in approximately ${Math.max(1, state.nextTenderCountdown)} days.`}
              </div>`
           : `<div style="overflow-x:auto;">
               <table class="inv-table">
@@ -115,7 +115,7 @@ class DashboardView {
     const container = document.createElement("div");
     container.innerHTML = `
       <p class="text-muted" style="font-size:11px; margin-bottom:12px;">
-        Swap the rolling stock variant assigned to "${contract.title}". Swapped models must satisfy all original tender requirements. The Ministry will pay a higher price if the new variant provides superior performance:
+        Swap the rolling stock variant assigned to "${contract.title}". Swapped models must satisfy all original tender requirements. The government will pay a higher price if the new variant provides superior performance:
       </p>
       <div style="display:flex; flex-direction:column; gap:8px; max-height:420px; overflow-y:auto;" id="swap-variants-list"></div>
     `;

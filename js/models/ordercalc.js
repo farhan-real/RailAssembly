@@ -5,13 +5,14 @@ class OrderEngine {
       if (state.day >= t.expiresDay) {
         t.expired = true;
         Events.emit("toast", {
-          text: `Tender Notice Concluded: Ministry procurement window for "${t.title}" is now closed.`,
+          text: `Contract Bidding Closed: Order window for "${t.title}" is now closed.`,
           type: "normal"
         });
       }
     });
     state.marketTenders = state.marketTenders.filter(t => !t.expired);
 
+    // Contract rounds: a few concurrent orders, with periods where no contracts are open
     if (state.marketTenders.length === 0) {
       state.nextTenderCountdown -= 1;
       if (state.nextTenderCountdown <= 0) {
@@ -30,7 +31,7 @@ class OrderEngine {
         }
         state.nextTenderCountdown = 60 + Math.floor(Math.random() * 30);
         Events.emit("toast", {
-          text: `National Procurement Gazette: Ministry published ${state.marketTenders.length} new rolling stock tenders.`,
+          text: `New Government Orders: Ministry announced ${state.marketTenders.length} rolling stock contracts.`,
           type: "success"
         });
         Events.emit("marketChanged");
@@ -49,7 +50,7 @@ class OrderEngine {
             awarded: false
           });
           Events.emit("toast", {
-            text: `Supplementary Tender Gazetted: "${template.title}" published by ${template.agency}.`,
+            text: `New Contract Announced: "${template.title}" opened by ${template.agency}.`,
             type: "success"
           });
           Events.emit("marketChanged");
@@ -68,7 +69,7 @@ class OrderEngine {
           const forfeitedUnits = contract.totalUnits - contract.totalDelivered;
           state.reputation = Math.max(10, state.reputation - 20);
           Events.emit("toast", {
-            text: `Contract Terminated: "${contract.title}" defaulted due to excessive delays. Remaining ${forfeitedUnits} units transferred to competitors.`,
+            text: `Contract Canceled: "${contract.title}" canceled due to delivery delays. Remaining ${forfeitedUnits} units given to competitors.`,
             type: "danger"
           });
           contract.terminated = true;
@@ -82,7 +83,7 @@ class OrderEngine {
   static validateVariantRequirements(variant, tender) {
     if (!variant || !tender) return { valid: false, errors: ["Invalid configuration."] };
     if (!variant.certified) {
-      return { valid: false, errors: ["The Ministry requires verified test track dynamic certification before proposal submission."] };
+      return { valid: false, errors: ["The government requires test track certification before proposal submission."] };
     }
 
     const errors = [];
@@ -103,7 +104,7 @@ class OrderEngine {
       if (req.compare === "min" && candidateValue < req.value) {
         errors.push(`Requirement Deficit: ${req.label} (${candidateValue} ${req.unit}) is below mandatory minimum of ${req.value} ${req.unit}.`);
       } else if (req.compare === "max" && candidateValue > req.value) {
-        errors.push(`Ceiling Exceeded: ${req.label} (${candidateValue} ${req.unit}) exceeds allowable ceiling of ${req.value} ${req.unit}.`);
+        errors.push(`Limit Exceeded: ${req.label} (${candidateValue} ${req.unit}) exceeds allowable limit of ${req.value} ${req.unit}.`);
       } else {
         complianceDetails.push({ label: req.label, candidate: candidateValue, target: req.value, unit: req.unit, met: true });
       }
@@ -117,11 +118,8 @@ class OrderEngine {
     const check = this.validateVariantRequirements(newVariant, originalTemplate);
     if (!check.valid) return { eligible: false, reason: check.errors[0] };
 
-    // Government willingness to pay premium for superior performance
     const budgetCeiling = contract.budgetPerUnit || (contract.unitSalePrice * 1.35);
-    const costOffset = newVariant.salePrice - contract.unitSalePrice;
 
-    // Willing to pay up to 10% premium over new variant's commercial markup if specs exceed targets
     let proposedPrice = Math.max(contract.unitSalePrice, newVariant.salePrice);
     if (newVariant.stats.theoreticalSpeed > (originalTemplate.requirements.find(r => r.key === "speed")?.value || 0)) {
       proposedPrice = Math.round(proposedPrice * 1.06);
