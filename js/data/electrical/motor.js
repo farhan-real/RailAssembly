@@ -99,13 +99,13 @@ COMPONENTS_DATA.motor = [
 
 SUBCOMPONENTS_DATA.motor = {
   subcomponents: [
-    { id: "gb_single", name: "Single-Stage Helical Reduction Gearbox", cost: 16000, weight: 380, speedBonus: 0, desc: "Standard ratio reduction built for regional passenger trainsets." },
-    { id: "mot_stator_polyimide_220", name: "Class 220 Polyimide Corona-Resistant Stator Insulation", cost: 28000, weight: -40, speedBonus: 15, efficiencyBonus: 0.008, desc: "Handles steep SiC high-frequency voltage rise without partial dielectric breakdown." },
-    { id: "mot_rotor_halbach", name: "Sintered NdFeB Halbach-Array Magnetic Rotor", cost: 52000, weight: -80, speedBonus: 35, efficiencyBonus: 0.018, desc: "Pure sinusoidal flux distribution eliminating high-RPM magnetic eddy losses for 320+ km/h." }
+    { id: "gb_single", name: "Single-Stage Helical Reduction Gearbox", cost: 16000, weight: 380, speedBonus: 0, inHouseTech: null, desc: "Standard ratio reduction built for regional passenger trainsets." },
+    { id: "mot_stator_polyimide_220", name: "Class 220 Polyimide Corona-Resistant Stator Insulation", cost: 28000, weight: -40, speedBonus: 15, efficiencyBonus: 0.008, inHouseTech: "tech_mot_stator_polyimide", desc: "Handles steep SiC high-frequency voltage rise without partial dielectric breakdown." },
+    { id: "mot_rotor_halbach", name: "Sintered NdFeB Halbach-Array Magnetic Rotor", cost: 52000, weight: -80, speedBonus: 35, efficiencyBonus: 0.018, inHouseTech: "tech_mot_rotor_halbach", desc: "Pure sinusoidal flux distribution eliminating high-RPM magnetic eddy losses for 320+ km/h." }
   ],
   modifications: [
-    { id: "brg_ceramic", name: "Silicon Nitride Hybrid Ceramic Bearings", cost: 19000, weight: 20, reliabilityBonus: 15, desc: "Zero electrical fluting erosion and lower frictional heat buildup." },
-    { id: "mot_cool_rotor_oiljet", name: "Hollow-Shaft Pressurized Rotor Oil Jet Cooling", cost: 26000, weight: 25, speedBonus: 20, reliabilityBonus: 10, desc: "Direct oil jet cooling through rotor interior permitting sustained 320+ km/h runs." }
+    { id: "brg_ceramic", name: "Silicon Nitride Hybrid Ceramic Bearings", cost: 19000, weight: 20, reliabilityBonus: 15, inHouseTech: "tech_brg_ceramic", desc: "Zero electrical fluting erosion and lower frictional heat buildup." },
+    { id: "mot_cool_rotor_oiljet", name: "Hollow-Shaft Pressurized Rotor Oil Jet Cooling", cost: 26000, weight: 25, speedBonus: 20, reliabilityBonus: 10, inHouseTech: "tech_mot_cool_rotor_oiljet", desc: "Direct oil jet cooling through rotor interior permitting sustained 320+ km/h runs." }
   ]
 };
 
@@ -116,5 +116,9 @@ COMPONENT_RESEARCH.push(
   { id: "tech_mot_pmsm_280", name: "280 km/h Permanent Magnet Synchronous Motor", branch: "motors", costMoney: 1400000, durationDays: 80, unlocks: ["mot_pmsm"], desc: "Neodymium permanent magnet rotor delivering 6800 kW output with 97% efficiency." },
   { id: "tech_mot_pmsm_320", name: "320 km/h High-RPM Buried Magnet Motor", branch: "motors", costMoney: 2200000, durationDays: 100, unlocks: ["mot_pmsm_express_320"], desc: "Buried NdFeB magnets engineered specifically for sustained 320 km/h running." },
   { id: "tech_mot_synchro_360", name: "360 km/h Distributed Liquid-Cooled Motor", branch: "motors", costMoney: 3800000, durationDays: 140, unlocks: ["mot_hs_synchro_360"], desc: "Direct liquid cooling permitting sustained 8600 kW sprints without thermal derating." },
-  { id: "tech_mot_halbach_420", name: "420 km/h Halbach Array Hyper-Velocity Drive", branch: "motors", costMoney: 5400000, durationDays: 175, unlocks: ["mot_hyper_velocity_400"], desc: "Halbach array sinusoidal flux rotor operating at 6000+ RPM without iron losses." }
+  { id: "tech_mot_halbach_420", name: "420 km/h Halbach Array Hyper-Velocity Drive", branch: "motors", costMoney: 5400000, durationDays: 175, unlocks: ["mot_hyper_velocity_400"], desc: "Halbach array sinusoidal flux rotor operating at 6000+ RPM without iron losses." },
+  { id: "tech_mot_stator_polyimide", name: "Class 220 Polyimide Corona Insulation", branch: "motors", costMoney: 620000, durationDays: 50, unlocks: ["mot_stator_polyimide_220"], desc: "Resin-rich corona shielding rated for steep nanosecond switching pulses." },
+  { id: "tech_brg_ceramic", name: "Silicon Nitride Hybrid Ceramic Bearings", branch: "motors", costMoney: 850000, durationDays: 65, unlocks: ["brg_ceramic"], desc: "Insulating ceramic rolling elements completely preventing electrical discharge damage." },
+  { id: "tech_mot_cool_rotor_oiljet", name: "Pressurized Hollow-Shaft Rotor Cooling", branch: "motors", costMoney: 1400000, durationDays: 85, unlocks: ["mot_cool_rotor_oiljet"], desc: "Continuous internal oil circulation preventing permanent magnet demagnetization." },
+  { id: "tech_mot_rotor_halbach", name: "Halbach-Array Sinusoidal Magnetic Flux", branch: "motors", costMoney: 2600000, durationDays: 115, unlocks: ["mot_rotor_halbach"], desc: "Arrangement concentrating flux on the working face while cancelling rear stray fields." }
 );

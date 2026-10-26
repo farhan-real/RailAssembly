@@ -1,4 +1,4 @@
-// Industrial Engineering CAD View: Multi-Component Slots, Limits & Electrical Diagnostics
+// Industrial Engineering CAD View: Multi-Component Slots, Subcomponents & Diagnostics
 class BuilderView {
   static editingVariantId = null;
   static rollingStockType = "trainset";
@@ -234,6 +234,11 @@ class BuilderView {
 
       const comp = state.findComponentById(this.currentSlots[cat.key]) || COMPONENTS_DATA[cat.key]?.[0];
       const isNone = !comp || comp.cost === 0;
+      const subData = SUBCOMPONENTS_DATA[cat.key];
+
+      const currentSub = this.subSelections[cat.key] || {};
+      const activeSubObj = subData?.subcomponents?.find(s => s.id === currentSub.subcomponent);
+      const activeModObj = subData?.modifications?.find(m => m.id === currentSub.modification);
 
       card.innerHTML = `
         <div class="subsystem-header">
@@ -257,9 +262,39 @@ class BuilderView {
             </div>
           </div>
         </div>
+
+        ${subData ? `
+          <div class="subsystem-sub-controls">
+            ${subData.subcomponents && subData.subcomponents.length > 0 ? `
+              <div class="sub-control-chip">
+                <div class="sub-control-info">
+                  <span class="sub-control-label">Sub-Component:</span>
+                  <span class="sub-control-name">${activeSubObj ? activeSubObj.name : "Standard Architecture"}</span>
+                </div>
+                <button class="c-btn btn-ghost btn-sm btn-config-sub" data-cat="${cat.key}">Config...</button>
+              </div>
+            ` : ""}
+            ${subData.modifications && subData.modifications.length > 0 ? `
+              <div class="sub-control-chip">
+                <div class="sub-control-info">
+                  <span class="sub-control-label">Mod / Package:</span>
+                  <span class="sub-control-name">${activeModObj ? activeModObj.name : "Standard Package"}</span>
+                </div>
+                <button class="c-btn btn-ghost btn-sm btn-config-mod" data-cat="${cat.key}">Config...</button>
+              </div>
+            ` : ""}
+          </div>
+        ` : ""}
       `;
 
       card.querySelector(".btn-open-comp-menu").onclick = () => BuilderView.openPrimaryComponentMenu(cat.key, cat.label);
+
+      const subBtn = card.querySelector(".btn-config-sub");
+      if (subBtn) subBtn.onclick = () => SubcompView.open(cat.key, false, BuilderView);
+
+      const modBtn = card.querySelector(".btn-config-mod");
+      if (modBtn) modBtn.onclick = () => SubcompView.open(cat.key, true, BuilderView);
+
       container.appendChild(card);
     });
   }

@@ -1,4 +1,4 @@
-// Research Tree Graph Structure with Highly Descriptive Industrial Engineering Specifications
+// Research Tree Graph Structure with Universal Researchable Sub-Components & Mods
 const TREE_STRUCTURE = {
   core: {
     id: "tech_core",
@@ -9,7 +9,7 @@ const TREE_STRUCTURE = {
     costMoney: 0,
     durationDays: 0,
     prereq: [],
-    unlocks: [],
+    unlocks: ["wind_copper", "cool_mineral", "susp_coil", "whl_standard", "aero_none", "crash_standard", "cal_cast", "disc_iron", "btherm_passive", "bprot_standard", "sand_heater", "draft_rubber_elastomer", "bus_wtb", "sens_standard", "gd_optical", "therm_coldplate", "pwm_dsp_dualcore", "pwm_spread_spectrum", "gb_single", "dclink_precharge_contactor", "vcb_bottle_cucr", "transm_teeth_carburized", "dryer_desiccant"],
     desc: "The central electric traction research tree foundation. All specialized engineering lines branch outward from this single core."
   },
   branches: [
@@ -21,7 +21,7 @@ const TREE_STRUCTURE = {
     { key: "automation", label: "Track 6: Pneumatics, Batteries, HVAC & TCMS Automation" }
   ],
   coords: {
-    // Track 1: Aerodynamics (Branching Upwards from Core)
+    // Track 1: Aerodynamics
     tech_body_structural_steel: { x: 1400, y: 860 },
     tech_body_aluminum_extruded: { x: 1400, y: 720 },
     tech_body_carbon_monocoque: { x: 1400, y: 580 },
@@ -29,7 +29,7 @@ const TREE_STRUCTURE = {
     tech_body_supersonic_420: { x: 1300, y: 300 },
     tech_coup_retractable_nose: { x: 1500, y: 440 },
 
-    // Track 2: Power Electronics (Branching Up-Left from Core)
+    // Track 2: Power Electronics & Core Subcomponents
     tech_trans_heavy_ac: { x: 1180, y: 860 },
     tech_trans_dc_choke: { x: 1020, y: 860 },
     tech_dclink_electrolytic: { x: 1180, y: 720 },
@@ -52,8 +52,15 @@ const TREE_STRUCTURE = {
     tech_inv_sic_hyper_380: { x: 540, y: 50 },
     tech_aux_aps_static: { x: 1020, y: 720 },
     tech_aux_aps_hvac: { x: 1020, y: 300 },
+    tech_wind_supercond: { x: 860, y: 50 },
+    tech_cool_ester: { x: 1180, y: 300 },
+    tech_dclink_crowbar: { x: 700, y: 220 },
+    tech_gd_dynamic: { x: 1020, y: 160 },
+    tech_therm_phasechange: { x: 860, y: 220 },
+    tech_pwm_fpga: { x: 540, y: 220 },
+    tech_pwm_overmod: { x: 380, y: 220 },
 
-    // Track 3: Motors (Branching Far Right from Core)
+    // Track 3: Motors & Rotors
     tech_mot_basic_induction: { x: 1620, y: 1000 },
     tech_mot_commuter_induction: { x: 1620, y: 880 },
     tech_mot_copper_rotor: { x: 1820, y: 1000 },
@@ -61,8 +68,12 @@ const TREE_STRUCTURE = {
     tech_mot_pmsm_320: { x: 2220, y: 1000 },
     tech_mot_synchro_360: { x: 2420, y: 1000 },
     tech_mot_halbach_420: { x: 2620, y: 1000 },
+    tech_mot_stator_polyimide: { x: 1820, y: 880 },
+    tech_brg_ceramic: { x: 2020, y: 880 },
+    tech_mot_cool_rotor_oiljet: { x: 2220, y: 880 },
+    tech_mot_rotor_halbach: { x: 2420, y: 880 },
 
-    // Track 4: Running Gear, Transmissions & Brakes (Branching Down-Right from Core)
+    // Track 4: Running Gear, Transmissions & Brakes
     tech_bog_flexicoil_220: { x: 1620, y: 1140 },
     tech_bog_light_tram: { x: 1620, y: 1260 },
     tech_transm_nose_hung: { x: 1820, y: 1140 },
@@ -81,7 +92,7 @@ const TREE_STRUCTURE = {
     tech_bog_composite_420: { x: 2620, y: 1140 },
     tech_transm_direct_420: { x: 2620, y: 1260 },
 
-    // Track 5: Power Collection, Circuit Breakers & Cooling (Branching Downwards from Core)
+    // Track 5: Power Collection, Adhesion & Cooling
     tech_panto_baseline_ac: { x: 1400, y: 1140 },
     tech_panto_urban_dc: { x: 1260, y: 1140 },
     tech_vcb_vacuum_ac: { x: 1400, y: 1260 },
@@ -106,7 +117,7 @@ const TREE_STRUCTURE = {
     tech_sand_plasma: { x: 1540, y: 1860 },
     tech_panto_hyper_420: { x: 1400, y: 2100 },
 
-    // Track 6: Automation, Pneumatics & Safety (Branching Down-Left from Core)
+    // Track 6: Automation & Auxiliary
     tech_comp_piston_basic: { x: 1180, y: 1140 },
     tech_tcms_baseline: { x: 1020, y: 1140 },
     tech_safe_wsp_pneumatic: { x: 1020, y: 1260 },
@@ -122,7 +133,6 @@ const TREE_STRUCTURE = {
     tech_tcms_cbtc_goa4: { x: 540, y: 1380 }
   },
   prerequisites: {
-    // Track 1
     tech_body_structural_steel: ["tech_core"],
     tech_body_aluminum_extruded: ["tech_body_structural_steel"],
     tech_body_carbon_monocoque: ["tech_body_aluminum_extruded"],
@@ -130,7 +140,6 @@ const TREE_STRUCTURE = {
     tech_coup_retractable_nose: ["tech_body_carbon_monocoque"],
     tech_body_supersonic_420: ["tech_body_shinkansen_360"],
 
-    // Track 2
     tech_trans_heavy_ac: ["tech_core"],
     tech_trans_dc_choke: ["tech_core"],
     tech_dclink_electrolytic: ["tech_trans_heavy_ac"],
@@ -153,8 +162,14 @@ const TREE_STRUCTURE = {
     tech_pwm_neural_adaptive: ["tech_pwm_ultrasonic_sic"],
     tech_trans_solid_state: ["tech_inv_sic_mosfet"],
     tech_inv_sic_hyper_380: ["tech_trans_solid_state"],
+    tech_wind_supercond: ["tech_trans_solid_state"],
+    tech_cool_ester: ["tech_trans_compact_underfloor"],
+    tech_dclink_crowbar: ["tech_dclink_film"],
+    tech_gd_dynamic: ["tech_inv_liquid_vvvf"],
+    tech_therm_phasechange: ["tech_inv_sic_mosfet"],
+    tech_pwm_fpga: ["tech_pwm_space_vector"],
+    tech_pwm_overmod: ["tech_pwm_direct_torque"],
 
-    // Track 3
     tech_mot_basic_induction: ["tech_core"],
     tech_mot_commuter_induction: ["tech_core"],
     tech_mot_copper_rotor: ["tech_mot_basic_induction"],
@@ -162,8 +177,11 @@ const TREE_STRUCTURE = {
     tech_mot_pmsm_320: ["tech_mot_pmsm_280"],
     tech_mot_synchro_360: ["tech_mot_pmsm_320"],
     tech_mot_halbach_420: ["tech_mot_synchro_360"],
+    tech_mot_stator_polyimide: ["tech_mot_copper_rotor"],
+    tech_brg_ceramic: ["tech_mot_pmsm_280"],
+    tech_mot_cool_rotor_oiljet: ["tech_mot_pmsm_320"],
+    tech_mot_rotor_halbach: ["tech_mot_synchro_360"],
 
-    // Track 4
     tech_bog_flexicoil_220: ["tech_core"],
     tech_bog_light_tram: ["tech_core"],
     tech_transm_nose_hung: ["tech_core"],
@@ -182,7 +200,6 @@ const TREE_STRUCTURE = {
     tech_bog_composite_420: ["tech_bog_tilting_360"],
     tech_transm_direct_420: ["tech_bog_composite_420"],
 
-    // Track 5
     tech_panto_baseline_ac: ["tech_core"],
     tech_panto_urban_dc: ["tech_core"],
     tech_vcb_vacuum_ac: ["tech_panto_baseline_ac"],
@@ -207,7 +224,6 @@ const TREE_STRUCTURE = {
     tech_sand_plasma: ["tech_sand_pneumatic"],
     tech_panto_hyper_420: ["tech_panto_ultra_380"],
 
-    // Track 6
     tech_comp_piston_basic: ["tech_core"],
     tech_tcms_baseline: ["tech_core"],
     tech_safe_wsp_pneumatic: ["tech_tcms_baseline"],
@@ -224,7 +240,6 @@ const TREE_STRUCTURE = {
   }
 };
 
-// Build master TECH_DATA array combining core, registered components, and hierarchy
 const TECH_DATA = [
   TREE_STRUCTURE.core,
   ...(window.COMPONENT_RESEARCH || []).map(node => {

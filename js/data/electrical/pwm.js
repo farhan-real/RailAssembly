@@ -128,12 +128,12 @@ COMPONENTS_DATA.pwm = [
 
 SUBCOMPONENTS_DATA.pwm = {
   subcomponents: [
-    { id: "pwm_dsp_dualcore", name: "Dual-Core 32-Bit Floating Point DSP Engine", cost: 9500, weight: 6, reliabilityBonus: 8, desc: "Executes space-vector matrix transformation calculations with hardware dead-time interlock protection." },
-    { id: "pwm_fpga_optical", name: "Direct Optical Matrix FPGA Gate Engine", cost: 21000, weight: 4, reliabilityBonus: 16, desc: "Microsecond gate firing logic with sub-nanosecond jitter immunity against high-voltage EMI transients." }
+    { id: "pwm_dsp_dualcore", name: "Dual-Core 32-Bit Floating Point DSP Engine", cost: 9500, weight: 6, reliabilityBonus: 8, inHouseTech: null, desc: "Executes space-vector matrix transformation calculations with hardware dead-time interlock protection." },
+    { id: "pwm_fpga_optical", name: "Direct Optical Matrix FPGA Gate Engine", cost: 21000, weight: 4, reliabilityBonus: 16, inHouseTech: "tech_pwm_fpga", desc: "Microsecond gate firing logic with sub-nanosecond jitter immunity against high-voltage EMI transients." }
   ],
   modifications: [
-    { id: "pwm_spread_spectrum", name: "Spread-Spectrum Carrier Frequency Dithering", cost: 12000, weight: 2, reliabilityBonus: 6, desc: "Spreads acoustic and electromagnetic switching peaks across a broad band to eliminate passenger cabin hum." },
-    { id: "pwm_overmod_sixstep", name: "Synchronous Six-Step Over-Modulation Transition Logic", cost: 24000, weight: 3, speedBonus: 20, desc: "Maximizes fundamental output voltage to motor windings at high RPM by transitioning cleanly into square-wave drive." }
+    { id: "pwm_spread_spectrum", name: "Spread-Spectrum Carrier Frequency Dithering", cost: 12000, weight: 2, reliabilityBonus: 6, inHouseTech: null, desc: "Spreads acoustic and electromagnetic switching peaks across a broad band to eliminate passenger cabin hum." },
+    { id: "pwm_overmod_sixstep", name: "Synchronous Six-Step Over-Modulation Transition Logic", cost: 24000, weight: 3, speedBonus: 20, inHouseTech: "tech_pwm_overmod", desc: "Maximizes fundamental output voltage to motor windings at high RPM by transitioning cleanly into square-wave drive." }
   ]
 };
 
@@ -145,5 +145,7 @@ COMPONENT_RESEARCH.push(
   { id: "tech_pwm_direct_torque", name: "Direct Torque Control (DTC) Hysteresis Modulator", branch: "electronics", costMoney: 890000, durationDays: 70, unlocks: ["pwm_direct_torque_dtc"], desc: "Instantaneous torque and magnetic flux hysteresis regulation for sub-millisecond anti-slip." },
   { id: "tech_pwm_sopp_express", name: "Synchronized Optimal Pulse Pattern Drive", branch: "electronics", costMoney: 1450000, durationDays: 95, unlocks: ["pwm_synchronized_optimal_sop"], desc: "Optimized switching transitions blending into square-wave over-modulation at 360 km/h." },
   { id: "tech_pwm_ultrasonic_sic", name: "Ultrasonic 18 kHz Silicon Carbide Vector Modulator", branch: "electronics", costMoney: 2600000, durationDays: 125, unlocks: ["pwm_ultrasonic_sic_vector"], desc: "Inaudible 18 kHz carrier modulation eliminating torque ripple for 400 km/h operations." },
-  { id: "tech_pwm_neural_adaptive", name: "Neural-Adaptive Real-Time Saturation Modulator", branch: "electronics", costMoney: 4200000, durationDays: 155, unlocks: ["pwm_neural_adaptive_flux"], desc: "Artificial intelligence optimizing individual gate pulse widths against rail adhesion." }
+  { id: "tech_pwm_neural_adaptive", name: "Neural-Adaptive Real-Time Saturation Modulator", branch: "electronics", costMoney: 4200000, durationDays: 155, unlocks: ["pwm_neural_adaptive_flux"], desc: "Artificial intelligence optimizing individual gate pulse widths against rail adhesion." },
+  { id: "tech_pwm_fpga", name: "Optical Matrix FPGA Real-Time Gate Engine", branch: "electronics", costMoney: 780000, durationDays: 60, unlocks: ["pwm_fpga_optical"], desc: "Sub-nanosecond switching accuracy immune to extreme high-voltage EMI surges." },
+  { id: "tech_pwm_overmod", name: "Synchronous Six-Step Over-Modulation Logic", branch: "electronics", costMoney: 1100000, durationDays: 75, unlocks: ["pwm_overmod_sixstep"], desc: "Square-wave over-modulation transition supplying full fundamental bus voltage (+20 km/h)." }
 );

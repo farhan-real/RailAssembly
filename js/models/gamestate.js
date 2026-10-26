@@ -72,6 +72,30 @@ class GameState {
     return { success: true, tech };
   }
 
+  isSubcomponentUnlocked(subId) {
+    if (!subId) return true;
+    for (const cat in SUBCOMPONENTS_DATA) {
+      const data = SUBCOMPONENTS_DATA[cat];
+      const item = data.subcomponents?.find(s => s.id === subId) || data.modifications?.find(m => m.id === subId);
+      if (item) {
+        if (!item.inHouseTech) return true;
+        return this.unlockedTechs.has(item.inHouseTech);
+      }
+    }
+    return true;
+  }
+
+  findSubcomponentOrMod(id) {
+    for (const cat in SUBCOMPONENTS_DATA) {
+      const data = SUBCOMPONENTS_DATA[cat];
+      const sub = data.subcomponents?.find(s => s.id === id);
+      if (sub) return { ...sub, isMod: false, catKey: cat };
+      const mod = data.modifications?.find(m => m.id === id);
+      if (mod) return { ...mod, isMod: true, catKey: cat };
+    }
+    return null;
+  }
+
   saveVariant(variantData) {
     const existingIndex = this.variants.findIndex(v => v.id === variantData.id);
     if (existingIndex >= 0) this.variants[existingIndex] = { ...variantData };
