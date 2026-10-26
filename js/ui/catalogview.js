@@ -48,7 +48,7 @@ class CatalogView {
           </div>
           <div style="display:flex; gap:6px;">
             <button class="c-btn btn-ghost btn-sm btn-edit-variant" data-id="${variant.id}">Edit in CAD</button>
-            <button class="c-btn btn-ghost btn-sm btn-duplicate-variant" data-id="${variant.id}">Duplicate as Variant</button>
+            <button class="c-btn btn-ghost btn-sm btn-duplicate-variant" data-id="${variant.id}">Duplicate Variant</button>
             ${!variant.certified 
               ? `<button class="c-btn btn-accent btn-sm btn-test-track" data-id="${variant.id}">Dynamic Test Run ($45,000)</button>` 
               : ""

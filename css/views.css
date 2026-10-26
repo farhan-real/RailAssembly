@@ -59,7 +59,6 @@
   margin-bottom: 14px;
 }
 
-/* Custom Text Input Control */
 .c-input-custom {
   background-color: var(--bg-panel);
   border: 1px solid var(--border-strong);
@@ -73,12 +72,12 @@
   border-color: var(--color-blue);
 }
 
-/* Consist Modal Carriage List & Action Bar */
+/* Consist Modal Toolbar and Reorder Rows */
 .consist-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   background-color: var(--bg-panel);
   padding: 8px 12px;
   border-radius: var(--radius-xs);
@@ -89,7 +88,7 @@
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xs);
-  padding: 9px 12px;
+  padding: 8px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,6 +99,19 @@
 }
 .carriage-item-row.trailer {
   border-left: 3px solid var(--text-muted);
+}
+.carriage-reorder-btn {
+  padding: 2px 6px;
+  font-size: 10px;
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+}
+.carriage-reorder-btn:hover {
+  color: var(--text-main);
+  border-color: var(--border-strong);
 }
 
 /* Subsystem Configuration Cards */

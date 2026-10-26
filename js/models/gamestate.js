@@ -1,4 +1,4 @@
-// Central Game State Singleton with Variant Editing, Persistence, and Contract Swapping
+// Central Game State Singleton with Custom Carriage Types and Presets
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -29,7 +29,7 @@ class GameState {
     this.nextTenderCountdown = 0;
 
     this.customCarriageTypes = [
-      { id: "driving_motor", name: "Driving Cab Motor Coach", isPowered: true, layout: "standard", seatMultiplier: 1.0, weightOffset: 0, costOffset: 0, desc: "Front/rear driver cab equipped with TCMS master and high-voltage motor bogie." },
+      { id: "driving_motor", name: "Driving Cab Motor Coach", isPowered: true, layout: "standard", seatMultiplier: 1.0, weightOffset: 0, costOffset: 0, desc: "Front/rear driver cab with TCMS master and high-voltage motor bogie." },
       { id: "intermediate_motor", name: "Intermediate Motor Coach", isPowered: true, layout: "standard", seatMultiplier: 1.0, weightOffset: 0, costOffset: 0, desc: "Underfloor inverter and traction motor pack driving standard passenger coach body." },
       { id: "intermediate_trailer", name: "Intermediate Trailer Coach", isPowered: false, layout: "standard", seatMultiplier: 1.15, weightOffset: -4000, costOffset: -60000, desc: "Unpowered passenger coach maximizing seating density and reducing consist tare mass." },
       { id: "driving_trailer", name: "Driving Cab Trailer Coach", isPowered: false, layout: "standard", seatMultiplier: 0.95, weightOffset: -3000, costOffset: -45000, desc: "Front/rear driver cab with lightweight unpowered guide bogies." },
@@ -42,13 +42,28 @@ class GameState {
 
   saveVariant(variantData) {
     const existingIndex = this.variants.findIndex(v => v.id === variantData.id);
-    if (existingIndex >= 0) {
-      this.variants[existingIndex] = { ...variantData };
-    } else {
-      this.variants.push(variantData);
-    }
+    if (existingIndex >= 0) this.variants[existingIndex] = { ...variantData };
+    else this.variants.push(variantData);
     this.saveToStorage();
     Events.emit("variantsChanged");
+  }
+
+  addCarriageType(typeData) {
+    this.customCarriageTypes.push(typeData);
+    this.saveToStorage();
+  }
+
+  updateCarriageType(id, updatedData) {
+    const idx = this.customCarriageTypes.findIndex(t => t.id === id);
+    if (idx >= 0) {
+      this.customCarriageTypes[idx] = { ...this.customCarriageTypes[idx], ...updatedData };
+      this.saveToStorage();
+    }
+  }
+
+  deleteCarriageType(id) {
+    this.customCarriageTypes = this.customCarriageTypes.filter(t => t.id !== id);
+    this.saveToStorage();
   }
 
   saveToStorage() {
@@ -62,7 +77,7 @@ class GameState {
         day: this.day
       };
       localStorage.setItem("rail_assembly_save", JSON.stringify(data));
-    } catch (e) { /* Storage optional */ }
+    } catch (e) { /* Safe fallback */ }
   }
 
   loadFromStorage() {

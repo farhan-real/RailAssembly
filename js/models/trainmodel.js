@@ -48,23 +48,23 @@ class TrainModelCalc {
     if (isTrainset) {
       consistConfig.carriages.forEach(c => {
         const typeDef = state.findCarriageType(c.typeId);
-        const isPow = c.isPowered ?? typeDef.isPowered;
+        const isPow = c.isPowered !== undefined ? c.isPowered : typeDef.isPowered;
         if (isPow) poweredCarCount += 1;
 
-        const wOffset = typeDef.weightOffset || 0;
-        const cOffset = typeDef.costOffset || 0;
+        const wOffset = (c.customWeightOffset !== undefined ? c.customWeightOffset : typeDef.weightOffset) || 0;
+        const cOffset = (c.customCostOffset !== undefined ? c.customCostOffset : typeDef.costOffset) || 0;
+        const seatMult = (c.customSeatMult !== undefined ? c.customSeatMult : typeDef.seatMultiplier) || 1.0;
 
         if (isPow) {
           totalWeightKg += (motorCarWeightKg + wOffset);
           totalBOMCost += (motorCarBOMCost + cOffset);
-          passengerCap += Math.round(body.passengerCap * (typeDef.seatMultiplier || 1.0));
+          passengerCap += Math.round(body.passengerCap * seatMult);
         } else {
-          // Trailer cars save motor, inverter, and heavy transformer equipment
           const trailerWeight = Math.round(body.weight + (bogie.weight * 0.6) + brakes.weight + 3200 + wOffset);
           const trailerCost = Math.round(body.cost + (bogie.cost * 0.5) + brakes.cost + 40000 + cOffset);
           totalWeightKg += trailerWeight;
           totalBOMCost += trailerCost;
-          passengerCap += Math.round(body.passengerCap * (typeDef.seatMultiplier || 1.15));
+          passengerCap += Math.round(body.passengerCap * seatMult * 1.15);
         }
       });
     } else {
