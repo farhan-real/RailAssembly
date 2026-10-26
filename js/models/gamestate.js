@@ -1,4 +1,4 @@
-// Central Game State Singleton with Audio Settings, Persistence, and Reset
+// Central Game State Singleton with Time and Money R&D System
 class GameState {
   constructor() {
     this.funds = 14500000;
@@ -7,11 +7,11 @@ class GameState {
     this.quarter = 1;
     this.year = 1;
     this.simSpeed = 1;
-    this.sciencePoints = 80;
-    this.dailyResearchBudget = 10000;
-    this.activeResearchId = "tech_aluminum_extrusion";
-    this.researchProgress = 0;
-    // Central core node unlocked by default as the single-source root
+
+    // R&D Project State: Real-World Time & Money
+    this.activeResearchId = null;
+    this.researchDaysLeft = 0;
+    this.researchTotalDays = 0;
     this.unlockedTechs = new Set(["tech_core"]);
 
     this.masterVolume = 80;
@@ -43,6 +43,33 @@ class GameState {
 
     this.savedDesigns = [];
     this.loadFromStorage();
+  }
+
+  startResearch(techId) {
+    const tech = TECH_DATA.find(t => t.id === techId);
+    if (!tech) return { success: false, reason: "Invalid technology." };
+
+    if (this.unlockedTechs.has(tech.id)) {
+      return { success: false, reason: "Technology is already developed." };
+    }
+
+    const unfulfilledPrereqs = tech.prereq.filter(p => !this.unlockedTechs.has(p));
+    if (unfulfilledPrereqs.length > 0) {
+      return { success: false, reason: "Branch locked: complete prerequisite research first." };
+    }
+
+    if (this.funds < tech.costMoney) {
+      return { success: false, reason: `Insufficient capital: requires $${tech.costMoney.toLocaleString()}.` };
+    }
+
+    this.funds -= tech.costMoney;
+    this.activeResearchId = tech.id;
+    this.researchDaysLeft = tech.durationDays;
+    this.researchTotalDays = tech.durationDays;
+
+    this.saveToStorage();
+    Events.emit("fundsChanged");
+    return { success: true, tech };
   }
 
   saveVariant(variantData) {
@@ -80,10 +107,13 @@ class GameState {
         funds: this.funds,
         reputation: this.reputation,
         day: this.day,
+        activeResearchId: this.activeResearchId,
+        researchDaysLeft: this.researchDaysLeft,
+        researchTotalDays: this.researchTotalDays,
+        unlockedTechs: Array.from(this.unlockedTechs),
         masterVolume: this.masterVolume,
         sfxVolume: this.sfxVolume,
-        audioMuted: this.audioMuted,
-        unlockedTechs: Array.from(this.unlockedTechs)
+        audioMuted: this.audioMuted
       };
       localStorage.setItem("rail_assembly_save", JSON.stringify(data));
     } catch (e) { /* Safe fallback */ }
@@ -98,6 +128,9 @@ class GameState {
       if (Array.isArray(data.customCarriageTypes)) this.customCarriageTypes = data.customCarriageTypes;
       if (Array.isArray(data.savedDesigns)) this.savedDesigns = data.savedDesigns;
       if (Array.isArray(data.unlockedTechs)) this.unlockedTechs = new Set(data.unlockedTechs);
+      if (data.activeResearchId !== undefined) this.activeResearchId = data.activeResearchId;
+      if (data.researchDaysLeft !== undefined) this.researchDaysLeft = data.researchDaysLeft;
+      if (data.researchTotalDays !== undefined) this.researchTotalDays = data.researchTotalDays;
       if (data.masterVolume !== undefined) this.masterVolume = data.masterVolume;
       if (data.sfxVolume !== undefined) this.sfxVolume = data.sfxVolume;
       if (data.audioMuted !== undefined) this.audioMuted = data.audioMuted;
@@ -113,10 +146,10 @@ class GameState {
     this.quarter = 1;
     this.year = 1;
     this.simSpeed = 1;
-    this.sciencePoints = 80;
-    this.dailyResearchBudget = 10000;
-    this.activeResearchId = "tech_aluminum_extrusion";
-    this.researchProgress = 0;
+
+    this.activeResearchId = null;
+    this.researchDaysLeft = 0;
+    this.researchTotalDays = 0;
     this.unlockedTechs = new Set(["tech_core"]);
 
     this.warehouse = {

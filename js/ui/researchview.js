@@ -1,4 +1,4 @@
-// Mindustry-Style Single-Source Branching Research Tree Interface
+// Mindustry-Style Single-Source Branching Research Tree Interface (Time & Money Driven)
 class ResearchView {
   static branchLabels = {
     core: "Core Directorate",
@@ -15,36 +15,49 @@ class ResearchView {
     const coreNode = TECH_DATA.find(t => t.id === "tech_core");
     const tracks = ["aerodynamics", "electronics", "motors", "running_gear", "power_collection", "automation"];
 
+    const progressPercent = activeTech && state.researchTotalDays > 0
+      ? Math.round(((state.researchTotalDays - state.researchDaysLeft) / state.researchTotalDays) * 100)
+      : 0;
+
     container.innerHTML = `
-      <!-- R&D Capital Investment Header -->
+      <!-- Active R&D Project Status Banner -->
       <div class="c-card" style="margin-bottom:12px;">
         <div class="card-header">
           <span class="card-title">Research &amp; Development Directorate</span>
-          <span class="c-badge badge-blue font-mono">Accumulated: ${state.sciencePoints} Research Points</span>
+          <span class="c-badge ${activeTech ? "badge-blue" : "badge-amber"}">
+            ${activeTech ? "Engineering Development Active" : "Directorate Idle"}
+          </span>
         </div>
-        <div class="view-grid-two">
-          <div id="res-budget-slider"></div>
-          <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Active Research Node</span>
-            <div class="font-mono text-blue" style="font-size:14px; margin:2px 0;">
-              ${activeTech ? activeTech.name : "None (Directorate Idle)"}
+
+        <div style="background:var(--bg-surface); padding:10px 14px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+          ${activeTech ? `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div>
+                <strong class="text-blue" style="font-size:13px;">${activeTech.name}</strong>
+                <span class="text-muted" style="font-size:10px; margin-left:8px;">Initial Capital Investment: $${activeTech.costMoney.toLocaleString()}</span>
+              </div>
+              <span class="font-mono text-positive" style="font-size:12px;">${state.researchDaysLeft} Days Remaining</span>
             </div>
-            ${activeTech ? `
-              <div class="tech-progress-bar">
-                <div class="tech-progress-fill" style="width:${Math.round((state.researchProgress / activeTech.costScience) * 100)}%;"></div>
-              </div>
-              <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:3px;" class="text-muted font-mono">
-                <span>${state.researchProgress} / ${activeTech.costScience} Research Points</span>
-                <span>${Math.round((state.researchProgress / activeTech.costScience) * 100)}%</span>
-              </div>
-            ` : ""}
-          </div>
+
+            <div class="tech-progress-bar" style="height:6px; margin-bottom:4px;">
+              <div class="tech-progress-fill" style="width:${progressPercent}%;"></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-size:10px;" class="text-muted font-mono">
+              <span>Timeline: ${state.researchTotalDays - state.researchDaysLeft} / ${state.researchTotalDays} Days Elapsed</span>
+              <span>${progressPercent}% Complete</span>
+            </div>
+          ` : `
+            <div style="text-align:center; padding:10px 0;">
+              <div class="text-muted" style="font-size:12px; margin-bottom:4px;">No engineering development project is currently active.</div>
+              <span class="text-muted" style="font-size:10px;">Select an available branch node below to allocate capital funding and begin development.</span>
+            </div>
+          `}
         </div>
       </div>
 
       <!-- Single-Source Mindustry-Style Tree Workspace -->
       <div class="tree-workspace">
-        <!-- Central Root Source -->
         <div class="tree-core-banner">
           <div>
             <div style="display:flex; align-items:center; gap:8px;">
@@ -56,7 +69,6 @@ class ResearchView {
           <span class="c-badge badge-blue font-mono">6 Specialized Branches Originating</span>
         </div>
 
-        <!-- Specialized Tree Branches -->
         <div class="tree-branches-container">
           ${tracks.map(trackKey => {
             const nodes = TECH_DATA.filter(t => t.branch === trackKey);
@@ -73,22 +85,6 @@ class ResearchView {
         </div>
       </div>
     `;
-
-    // Mount Daily Budget Slider
-    const budgetBox = container.querySelector("#res-budget-slider");
-    const slider = UI.createSlider({
-      min: 0,
-      max: 50000,
-      value: state.dailyResearchBudget,
-      label: "Daily Research Investment ($)",
-      unit: " / Day",
-      step: 2500,
-      onInput: (v) => {
-        state.dailyResearchBudget = v;
-        state.saveToStorage();
-      }
-    });
-    budgetBox.appendChild(slider);
 
     // Populate Branch Nodes
     tracks.forEach(trackKey => {
@@ -109,20 +105,20 @@ class ResearchView {
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
               <span class="t-node-title">${tech.name}</span>
               <span class="c-badge ${isResearched ? "badge-green" : (isActive ? "badge-blue" : (isLocked ? "badge-amber" : "badge-blue"))}">
-                ${isResearched ? "Mastered" : (isActive ? "Researching" : (isLocked ? "Locked" : "Available"))}
+                ${isResearched ? "Mastered" : (isActive ? "In Progress" : (isLocked ? "Locked" : "Ready"))}
               </span>
             </div>
             <p class="text-muted" style="font-size:10px; line-height:1.3;">${tech.desc}</p>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:4px;">
-            <span class="t-node-cost">${isResearched ? "Completed" : `${tech.costScience} Points`}</span>
-            ${!isResearched && !isLocked && !isActive ? `<button class="c-btn btn-ghost btn-sm btn-start-node" style="font-size:10px; padding:2px 6px;">Research</button>` : ""}
+            <span class="t-node-cost">${isResearched ? "Developed" : (isActive ? `${state.researchDaysLeft} Days Left` : `$${tech.costMoney.toLocaleString()} &bull; ${tech.durationDays} Days`)}</span>
+            ${!isResearched && !isLocked && !isActive ? `<button class="c-btn btn-ghost btn-sm btn-start-node" style="font-size:10px; padding:2px 6px;">Fund</button>` : ""}
           </div>
         `;
 
         card.onclick = () => {
           if (isResearched) {
-            UI.toast(`"${tech.name}" is already fully mastered.`, "normal");
+            UI.toast(`"${tech.name}" is already fully developed.`, "normal");
             return;
           }
           if (isLocked) {
@@ -130,11 +126,45 @@ class ResearchView {
             UI.toast(`Branch Locked: Complete prerequisite "${unfulfilled.join(", ")}" first.`, "danger");
             return;
           }
-          state.activeResearchId = tech.id;
-          state.researchProgress = 0;
-          SoundSystem.playClick();
-          UI.toast(`R&D Project Assigned: ${tech.name}`, "success");
-          ResearchView.render(document.getElementById("viewport-root"));
+          if (state.activeResearchId && state.activeResearchId !== tech.id) {
+            UI.toast(`Engineering Directorate Occupied: Wait for current project to finish (${state.researchDaysLeft} days remaining).`, "danger");
+            return;
+          }
+
+          // Confirmation Modal
+          const modalBody = document.createElement("div");
+          modalBody.innerHTML = `
+            <p style="font-size:12px; margin-bottom:10px; color:var(--text-main);">
+              Commission engineering development for <strong>${tech.name}</strong>?
+            </p>
+            <div style="background:var(--bg-surface); padding:8px 12px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); margin-bottom:12px; font-size:11px;">
+              <div>Capital Investment Required: <strong class="text-warning">$${tech.costMoney.toLocaleString()}</strong></div>
+              <div>Development Timeline: <strong class="text-blue">${tech.durationDays} Days</strong></div>
+              <div class="text-muted" style="margin-top:4px;">${tech.desc}</div>
+            </div>
+          `;
+
+          UI.showModal({
+            title: `Fund R&D: ${tech.name}`,
+            contentNode: modalBody,
+            actions: [
+              { label: "Cancel", className: "btn-ghost", onClick: () => {} },
+              {
+                label: "Confirm & Fund Project",
+                className: "btn-primary",
+                onClick: () => {
+                  const res = state.startResearch(tech.id);
+                  if (res.success) {
+                    SoundSystem.playClick();
+                    UI.toast(`R&D Project Started: ${tech.name} funded ($${tech.costMoney.toLocaleString()}). Expected in ${tech.durationDays} days.`, "success");
+                    ResearchView.render(document.getElementById("viewport-root"));
+                  } else {
+                    UI.toast(res.reason, "danger");
+                  }
+                }
+              }
+            ]
+          });
         };
 
         row.appendChild(card);

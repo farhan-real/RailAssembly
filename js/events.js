@@ -35,19 +35,21 @@ class SimulationRunner {
   static stepDay() {
     state.day += 1;
 
-    // Daily Research Progress
-    if (state.activeResearchId && state.dailyResearchBudget > 0 && state.funds >= state.dailyResearchBudget) {
-      state.funds -= state.dailyResearchBudget;
-      const scienceYield = Math.max(1, Math.round(state.dailyResearchBudget / 400));
-      state.sciencePoints += scienceYield;
-      state.researchProgress += scienceYield;
+    // Daily Real-Time Research Progression
+    if (state.activeResearchId && state.researchDaysLeft > 0) {
+      state.researchDaysLeft -= 1;
 
-      const tech = TECH_DATA.find(t => t.id === state.activeResearchId);
-      if (tech && state.researchProgress >= tech.costScience) {
-        state.unlockedTechs.add(tech.id);
-        UI.toast(`Research Completed: "${tech.name}" is now operational for in-house manufacturing.`, "success");
+      if (state.researchDaysLeft <= 0) {
+        const tech = TECH_DATA.find(t => t.id === state.activeResearchId);
+        if (tech) {
+          state.unlockedTechs.add(tech.id);
+          UI.toast(`Research Complete: "${tech.name}" is now fully developed and available for production.`, "success");
+          SoundSystem.playSuccess();
+        }
         state.activeResearchId = null;
-        state.researchProgress = 0;
+        state.researchDaysLeft = 0;
+        state.researchTotalDays = 0;
+        state.saveToStorage();
         Events.emit("techUnlocked");
       }
     }

@@ -3,6 +3,7 @@ class DashboardView {
   static render(container) {
     const qEst = OrderEngine.calculateQuarterlyEstimate();
     const tenderCount = state.marketTenders.length;
+    const activeTech = state.activeResearchId ? state.findTechById(state.activeResearchId) : null;
 
     container.innerHTML = `
       <div class="view-grid-two">
@@ -21,9 +22,9 @@ class DashboardView {
               <span class="font-mono text-blue">$${qEst.revenueEst.toLocaleString()}</span>
             </div>
             <div class="stat-gauge-row">
-              <span class="text-muted">Projected Net Quarterly Profit</span>
-              <span class="font-mono text-positive ${qEst.netProfitEst < 0 ? "text-negative" : ""}">
-                ${qEst.netProfitEst >= 0 ? "+" : ""}$${qEst.netProfitEst.toLocaleString()}
+              <span class="text-muted">Active R&amp;D Development</span>
+              <span class="font-mono ${activeTech ? "text-blue" : "text-muted"}">
+                ${activeTech ? `${activeTech.name} (${state.researchDaysLeft}d left)` : "Directorate Idle"}
               </span>
             </div>
             <div class="stat-gauge-row">

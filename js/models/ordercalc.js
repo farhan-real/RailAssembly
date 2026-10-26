@@ -1,4 +1,4 @@
-// Government Contracts, Targeted Requirements Validator, and Contract Swapping
+// Government Contracts, Targeted Requirements Validator, and Scaled Profit Rewards
 class OrderEngine {
   static evaluateGovernmentBids() {
     state.marketTenders.forEach(t => {
@@ -214,7 +214,6 @@ class OrderEngine {
       quarterlyRevenueEst += scheduledUnits * c.unitSalePrice;
     });
 
-    const netProfitEst = quarterlyProfitEst - (state.dailyResearchBudget * 90);
-    return { revenueEst: quarterlyRevenueEst, grossProfitEst: quarterlyProfitEst, netProfitEst };
+    return { revenueEst: quarterlyRevenueEst, grossProfitEst: quarterlyProfitEst, netProfitEst: quarterlyProfitEst };
   }
 }
