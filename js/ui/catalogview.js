@@ -49,20 +49,26 @@ class CatalogView {
           </div>
         </div>
 
-        <div class="view-grid-three" style="margin-bottom:10px;">
+        <div class="view-grid-four" style="margin-bottom:10px;">
           <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed Verification</span>
-            <div class="font-mono text-blue" style="font-size:14px;">
-              ${variant.certified ? `${variant.testedStats.exactTopSpeed} km/h (Certified)` : `${variant.stats.roughSpeedMin} ~ ${variant.stats.roughSpeedMax} km/h (Estimated)`}
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
+            <div class="font-mono text-blue" style="font-size:13px;">
+              ${variant.certified ? `${variant.testedStats.exactTopSpeed} km/h &bull; ${variant.testedStats.certifiedAcceleration} m/s²` : `${variant.stats.roughSpeedMin}~${variant.stats.roughSpeedMax} km/h (Est)`}
+            </div>
+          </div>
+          <div>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Power &bull; Tractive Force</span>
+            <div class="font-mono text-blue" style="font-size:13px;">
+              ${variant.stats.horsepower.toLocaleString()} hp &bull; ${variant.stats.maxAdhesionKn} kN
             </div>
           </div>
           <div>
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Unit Production Cost</span>
-            <div class="font-mono" style="font-size:14px;">$${variant.unitProductionCost.toLocaleString()}</div>
+            <div class="font-mono" style="font-size:13px;">$${variant.unitProductionCost.toLocaleString()}</div>
           </div>
           <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Target Unit Profit</span>
-            <div class="font-mono text-positive" style="font-size:14px;">+$${variant.profitPerUnit.toLocaleString()} (${variant.marginPercent}% Markup)</div>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Target Commercial Price</span>
+            <div class="font-mono text-positive" style="font-size:13px;">$${variant.salePrice.toLocaleString()} (+${variant.marginPercent}%)</div>
           </div>
         </div>
 

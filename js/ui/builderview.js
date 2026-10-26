@@ -41,42 +41,40 @@ class BuilderView {
           <button class="c-btn btn-primary" id="btn-save-variant">Save and Commission Blueprint</button>
         </div>
 
-        <!-- Comprehensive Telemetry and Constraint Analysis -->
         <div class="view-grid-four" style="margin-bottom:14px;">
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Estimated Speed Rating</span>
-            <div class="font-mono text-blue" style="font-size:14px; margin:2px 0;">
-              ${stats.roughSpeedMin} &sim; ${stats.roughSpeedMax} km/h
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
+            <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
+              ${stats.roughSpeedMin} &sim; ${stats.roughSpeedMax} km/h &bull; ${stats.acceleration} m/s²
             </div>
-            <span class="text-muted" style="font-size:9px;">Bench verification required for certification</span>
+            <span class="text-muted" style="font-size:9px;">Adhesion Tractive Force: ${stats.maxAdhesionKn} kN</span>
+          </div>
+
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Traction Power Rating</span>
+            <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
+              ${stats.availablePowerKw} kW (${stats.horsepower.toLocaleString()} hp)
+            </div>
+            <span class="text-muted" style="font-size:9px;">Total Electrical Efficiency: ${Math.round(stats.totalEfficiency * 100)}%</span>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load Verification</span>
-            <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:14px; margin:2px 0;">
-              ${stats.axleLoad} Metric Tons / Axle
+            <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:13px; margin:2px 0;">
+              ${stats.axleLoad} t / Axle (Limit: ${stats.maxAllowedAxleLoad} t)
             </div>
-            <span class="text-muted" style="font-size:9px;">Bogie Limit: ${stats.maxAllowedAxleLoad} Metric Tons (${stats.axles} Axles)</span>
+            <span class="text-muted" style="font-size:9px;">Gross Tare Weight: ${stats.totalMassTons} Metric Tons</span>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Traction Power Capacity</span>
-            <div class="font-mono text-blue" style="font-size:14px; margin:2px 0;">
-              ${stats.availablePowerKw} Kilowatts
-            </div>
-            <span class="text-muted" style="font-size:9px;">System Efficiency: ${Math.round(stats.totalEfficiency * 100)}%</span>
-          </div>
-
-          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Bill of Materials Total</span>
-            <div class="font-mono text-warning" style="font-size:14px; margin:2px 0;">
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Hardware BOM Cost</span>
+            <div class="font-mono text-warning" style="font-size:13px; margin:2px 0;">
               $${stats.bomCost.toLocaleString()}
             </div>
-            <span class="text-muted" style="font-size:9px;">Tare Mass: ${stats.totalMassTons} Metric Tons</span>
+            <span class="text-muted" style="font-size:9px;">Direct component and modification total</span>
           </div>
         </div>
 
-        <!-- Subsystems and Subcomponents Configuration Workspace -->
         <div class="view-grid-three" id="subsystem-cards-container"></div>
       </div>
     `;
@@ -128,14 +126,13 @@ class BuilderView {
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
           <div>
             <div style="font-weight:600; font-size:12px;">${comp.name}</div>
-            <div class="text-muted" style="font-size:10px; margin-top:2px;">Supplier: ${comp.supplier} &bull; Tare: ${comp.weight} kg</div>
+            <div class="text-muted" style="font-size:10px; margin-top:2px;">Supplier: ${comp.supplier} &bull; Mass: ${comp.weight} kg</div>
           </div>
           <button class="c-btn btn-ghost btn-sm btn-open-menu" data-cat="${cat.key}">
             Select from Menu...
           </button>
         </div>
 
-        <!-- Subcomponents and Modifications -->
         ${subData ? `
           <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
             ${subData.subcomponents ? `

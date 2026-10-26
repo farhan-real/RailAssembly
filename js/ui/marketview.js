@@ -1,4 +1,4 @@
-// Ministry Tender Bidding Board and Competitor Intelligence
+// Ministry Tender Bidding Board and Competitor Intelligence Tracker
 class MarketView {
   static render(container) {
     const hasTender = state.marketTenders.length > 0;
@@ -9,20 +9,20 @@ class MarketView {
           <div class="card-header">
             <span class="card-title">National Railway Procurement Board</span>
             <span class="c-badge ${hasTender ? "badge-green" : "badge-amber"}">
-              ${hasTender ? "1 Tender Active" : "Budget Review In Progress"}
+              ${hasTender ? "1 Open Tender" : "Review Period"}
             </span>
           </div>
 
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-            The Ministry awards multi-year megaprojects slowly over phased quarters. Delivery delays exceeding contract tolerance trigger reallocation to competitors.
+            The Ministry awards multi-year megaprojects slowly over phased quarters. Tighter technical specifications offer substantially higher budgets and profit rewards.
           </div>
 
           <div id="tender-slot-area">
             ${hasTender ? "" : `
-              <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:20px; text-align:center;">
+              <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:24px; text-align:center;">
                 <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO TENDERS CURRENTLY OPEN FOR BIDDING</div>
                 <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
-                  The Ministry of Transportation is finalizing specifications and line capacity allocations.
+                  The Ministry of Transportation is drafting line capacity and engineering specifications.
                 </p>
                 <div class="font-mono text-blue" style="font-size:11px;">
                   Next Gazette Notice in approximately: <strong>${Math.max(1, state.nextTenderCountdown)} Days</strong>
@@ -38,7 +38,7 @@ class MarketView {
             <span class="c-badge badge-blue">Rolling Stock Manufacturers</span>
           </div>
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
-            Rivals bid on government tenders and absorb defaulted batch quantities if assembly lines incur unaddressed delays.
+            Rivals bid aggressively on tenders and will absorb defaulted batch allocations if your assembly line incurs unaddressed delivery delays.
           </div>
           <div style="display:flex; flex-direction:column; gap:8px;">
             ${COMPETITORS_DATA.map(comp => `
@@ -51,7 +51,7 @@ class MarketView {
                 <div style="display:flex; gap:14px; font-size:10px;">
                   <span>Reliability: <strong class="text-positive">${comp.reliabilityScore}%</strong></span>
                   <span>Average Markup: <strong class="text-warning">+${comp.avgMarkup}%</strong></span>
-                  <span>Speed Score: <strong class="text-blue">${comp.speedScore}</strong></span>
+                  <span>Speed: <strong class="text-blue">${comp.speedScore}</strong></span>
                 </div>
               </div>
             `).join("")}
@@ -68,56 +68,89 @@ class MarketView {
   static renderActiveTender(container, t) {
     const card = document.createElement("div");
     card.style.background = "var(--bg-surface)";
-    card.style.padding = "12px";
+    card.style.padding = "14px";
     card.style.borderRadius = "var(--radius-xs)";
     card.style.border = "1px solid var(--border-strong)";
 
     const daysRemaining = Math.max(0, t.expiresDay - state.day);
 
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
         <div>
-          <h4 style="font-size:13px; font-weight:700; color:var(--text-main);">${t.title}</h4>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <h4 style="font-size:13px; font-weight:700; color:var(--text-main);">${t.title}</h4>
+            <span class="c-badge badge-blue">${t.strictnessTier}</span>
+          </div>
           <span class="text-blue font-mono" style="font-size:10px;">${t.agency}</span>
         </div>
         <span class="c-badge badge-amber font-mono">${daysRemaining} Days to Submit Proposal</span>
       </div>
 
-      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">${t.description}</p>
+      <p class="text-muted" style="font-size:11px; margin-bottom:12px; line-height:1.4;">${t.description}</p>
 
-      <div class="view-grid-two" style="gap:6px; font-size:11px; margin-bottom:12px; background:rgba(0,0,0,0.2); padding:8px; border-radius:var(--radius-xs);">
-        <div><span class="text-muted">Total Fleet Order:</span> <strong class="font-mono">${t.unitsRequired} Trainsets</strong></div>
-        <div><span class="text-muted">Quarterly Delivery Quota:</span> <strong class="font-mono text-blue">${t.batchSizePerQuarter} Units per Quarter</strong></div>
+      <div style="margin-bottom:12px;">
+        <span class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700;">Mandatory Targeted Requirements</span>
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top:6px;">
+          ${t.requirements.map(req => `
+            <div style="background:var(--bg-panel); padding:6px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; font-size:11px;">
+              <span>${req.label}</span>
+              <strong class="font-mono text-blue">${req.compare === "min" ? "At least" : "No more than"} ${req.value.toLocaleString()} ${req.unit}</strong>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="view-grid-two" style="gap:6px; font-size:11px; margin-bottom:14px; background:rgba(0,0,0,0.25); padding:8px 10px; border-radius:var(--radius-xs);">
+        <div><span class="text-muted">Total Order:</span> <strong class="font-mono">${t.unitsRequired} Trainsets</strong></div>
+        <div><span class="text-muted">Quarterly Quota:</span> <strong class="font-mono text-blue">${t.batchSizePerQuarter} Units / Quarter</strong></div>
         <div><span class="text-muted">Budget Allocation / Unit:</span> <strong class="font-mono text-positive">$${t.budgetPerUnit.toLocaleString()}</strong></div>
         <div><span class="text-muted">Delay Tolerance:</span> <strong class="font-mono text-negative">Maximum ${t.delayToleranceDays} Days</strong></div>
-        <div><span class="text-muted">Required Top Speed:</span> <strong class="font-mono">${t.minSpeed} km/h</strong></div>
-        <div><span class="text-muted">Passenger Capacity:</span> <strong class="font-mono">${t.minPassengerCap > 0 ? t.minPassengerCap + " Passengers Capacity" : "Freight Haulage (Not Applicable)"}</strong></div>
       </div>
 
       <div style="display:flex; justify-content:flex-end;">
-        <button class="c-btn btn-primary btn-sm btn-submit-bid">Submit Tender Proposal</button>
+        <button class="c-btn btn-primary btn-sm btn-submit-bid">Select Model and Submit Tender Proposal</button>
       </div>
     `;
 
     card.querySelector(".btn-submit-bid").onclick = () => {
       if (state.variants.length === 0) {
-        UI.toast("Design and verify a model in Engineering CAD prior to bidding.", "danger");
+        UI.toast("Design and verify a model in Engineering CAD before submitting a proposal.", "danger");
         return;
       }
 
       const picker = document.createElement("div");
       picker.innerHTML = `
-        <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select certified train model to enter into formal government procurement evaluation:</p>
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          ${state.variants.map(v => `
-            <button class="c-btn btn-ghost btn-select-model" data-var="${v.id}" style="justify-content:space-between;">
-              <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                <strong>${v.name}</strong>
-                <span class="text-muted" style="font-size:9px;">${v.certified ? `${v.testedStats.exactTopSpeed} km/h (Certified Test Stats)` : `Uncertified Design Estimates`}</span>
+        <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select certified train model. The Ministry will evaluate only the required parameters for this tender:</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${state.variants.map(v => {
+            const check = OrderEngine.validateVariantRequirements(v, t);
+            return `
+              <div style="background:var(--bg-surface); padding:10px; border-radius:var(--radius-xs); border:1px solid ${check.valid ? "var(--border-strong)" : "var(--border-subtle)"};">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <div>
+                    <strong style="font-size:12px;">${v.name}</strong>
+                    <span class="c-badge ${v.certified ? "badge-green" : "badge-amber"}" style="margin-left:6px;">
+                      ${v.certified ? "Certified Test Verified" : "Uncertified CAD"}
+                    </span>
+                  </div>
+                  <span class="font-mono text-positive" style="font-size:12px;">$${v.salePrice.toLocaleString()} / Unit</span>
+                </div>
+
+                <div style="font-size:10px; margin-bottom:8px;">
+                  ${check.valid 
+                    ? `<span class="text-positive">All ${t.requirements.length} mandatory tender requirements satisfied.</span>` 
+                    : `<span class="text-negative">${check.errors[0]}</span>`
+                  }
+                </div>
+
+                <div style="display:flex; justify-content:flex-end;">
+                  <button class="c-btn ${check.valid ? "btn-primary" : "btn-ghost"} btn-sm btn-pick-model" data-var="${v.id}" ${!check.valid ? "disabled" : ""}>
+                    Submit This Model
+                  </button>
+                </div>
               </div>
-              <span class="font-mono text-blue">$${v.salePrice.toLocaleString()} / Unit</span>
-            </button>
-          `).join("")}
+            `;
+          }).join("")}
         </div>
       `;
 
@@ -127,14 +160,14 @@ class MarketView {
         actions: []
       });
 
-      picker.querySelectorAll(".btn-select-model").forEach(btn => {
+      picker.querySelectorAll(".btn-pick-model").forEach(btn => {
         btn.onclick = () => {
           const varId = btn.getAttribute("data-var");
           const res = OrderEngine.submitTenderProposal(t.id, varId);
           UI.closeModal();
 
           if (res.success) {
-            UI.toast(`CONTRACT AWARDED: ${t.title} won. Fulfill scheduled quarterly quotas to prevent competitor reallocation.`, "success");
+            UI.toast(`CONTRACT AWARDED: ${t.title} secured. Maintain production quotas to prevent competitor transfer.`, "success");
             Events.emit("marketChanged");
             MarketView.render(document.getElementById("viewport-root"));
           } else {

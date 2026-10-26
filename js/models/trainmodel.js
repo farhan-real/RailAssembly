@@ -15,7 +15,6 @@ class TrainModelCalc {
       totalWeightKg += comp.weight || 0;
       bomCost += comp.cost || 0;
 
-      // Integrate Subcomponents & Modifications deltas
       const subConfig = subSelections[catKey] || {};
       const subData = SUBCOMPONENTS_DATA[catKey];
       if (subData) {
@@ -51,10 +50,11 @@ class TrainModelCalc {
 
     // Power Delivery Bottleneck Rule
     const availablePowerKw = Math.min(motor.powerKw, inv.maxKw, trans.powerRatingKw);
+    const horsepower = Math.round(availablePowerKw * 1.341);
     let totalEfficiency = Number((trans.efficiency * inv.efficiency * 0.96 + efficiencyBonusTotal).toFixed(3));
     totalEfficiency = Math.min(0.99, Math.max(0.70, totalEfficiency));
 
-    // Dynamic Speed Calculation
+    // Aerodynamic Drag and Speed
     const aeroCd = body.dragCd;
     let theoreticalSpeed = Math.round(
       Math.pow((availablePowerKw * 1000) / (0.5 * 1.225 * aeroCd * 10.5), 1 / 3) * 3.6
@@ -66,10 +66,17 @@ class TrainModelCalc {
       theoreticalSpeed = Math.round(theoreticalSpeed * 0.72);
     }
 
+    // Tractive Adhesion Force (kN)
     const adhesionCoefficient = bogie.axles === 6 ? 0.38 : 0.31;
     const maxAdhesionKn = Math.round(totalMassTons * 9.81 * adhesionCoefficient);
 
-    // Rough CAD Estimates vs Certified Tested Benchmarks
+    // Initial Starting Acceleration (m/s²)
+    // a = F / m where F is effective tractive force and m is total mass
+    const effectiveTractiveForceKn = Math.min(maxAdhesionKn, Math.round(availablePowerKw / 8.2));
+    let acceleration = Number((effectiveTractiveForceKn / totalMassTons).toFixed(2));
+    acceleration = Math.min(1.25, Math.max(0.20, acceleration));
+
+    // Rough Estimates vs Certified Benchmarks
     const roughSpeedMin = Math.round(theoreticalSpeed * 0.90);
     const roughSpeedMax = Math.round(theoreticalSpeed * 1.08);
 
@@ -80,11 +87,13 @@ class TrainModelCalc {
       maxAllowedAxleLoad: bogie.maxAxleLoadTons,
       axleOverloaded,
       availablePowerKw,
+      horsepower,
       theoreticalSpeed,
       roughSpeedMin,
       roughSpeedMax,
       totalEfficiency,
       maxAdhesionKn,
+      acceleration,
       bomCost,
       passengerCap: body.passengerCap,
       cargoCapacityTons: body.cargoCapacityTons,
@@ -128,6 +137,8 @@ class TrainModelCalc {
       exactEfficiency: trueEff,
       exactAdhesionKn: variant.stats.maxAdhesionKn,
       certifiedAxleLoad: variant.stats.axleLoad,
+      certifiedAcceleration: variant.stats.acceleration,
+      certifiedHorsepower: variant.stats.horsepower,
       certifiedDate: state.getDateString()
     };
     variant.certified = true;
