@@ -23,6 +23,60 @@
   margin-bottom: 14px;
 }
 
+/* Rolling Stock Type & Consist Bar */
+.type-segmented-control {
+  display: inline-flex;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+.type-segmented-btn {
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  transition: all var(--trans-fast);
+}
+.type-segmented-btn.active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.consist-summary-banner {
+  background-color: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* Consist Modal Carriage List */
+.carriage-item-row {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.carriage-item-row.powered {
+  border-left: 3px solid var(--color-blue);
+}
+.carriage-item-row.trailer {
+  border-left: 3px solid var(--text-muted);
+}
+
 /* Subsystem Configuration Cards */
 .subsystem-card {
   background-color: var(--bg-surface);
@@ -177,26 +231,6 @@
   height: 100%;
   background-color: var(--color-blue);
   transition: width 0.2s ease;
-}
-
-/* Stat Rows */
-.stat-gauge-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 12px;
-}
-.stat-bar-container {
-  width: 120px;
-  height: 4px;
-  background-color: var(--bg-surface);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.stat-bar-fill {
-  height: 100%;
-  background-color: var(--color-blue);
 }
 
 @media (max-width: 1024px) {

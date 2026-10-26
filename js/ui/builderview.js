@@ -1,5 +1,17 @@
 // Industrial Engineering Computer-Aided Design View (Strictly Menu-Driven, Zero Dropdowns)
 class BuilderView {
+  static rollingStockType = "trainset"; // "locomotive" or "trainset"
+
+  static consistConfig = {
+    carriageCount: 4,
+    carriages: [
+      { index: 1, role: "driving_motor", isPowered: true, name: "Car 1: Driving Motor Coach" },
+      { index: 2, role: "intermediate_motor", isPowered: true, name: "Car 2: Intermediate Motor Coach" },
+      { index: 3, role: "intermediate_trailer", isPowered: false, name: "Car 3: Intermediate Trailer Coach" },
+      { index: 4, role: "driving_trailer", isPowered: false, name: "Car 4: Driving Trailer Coach" }
+    ]
+  };
+
   static currentSlots = {
     pantograph: "panto_std",
     transformer: "trans_heavy",
@@ -25,33 +37,61 @@ class BuilderView {
   };
 
   static trainName = "VoltMaster 1000";
-  static trainType = "locomotive";
   static marginPercent = 22;
 
   static render(container) {
-    const stats = TrainModelCalc.calculateTrainStats(this.currentSlots, this.subSelections);
+    const stats = TrainModelCalc.calculateTrainStats(this.currentSlots, this.subSelections, this.rollingStockType, this.consistConfig);
 
     container.innerHTML = `
       <div class="cad-container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border-subtle);">
-          <div>
-            <h2 style="font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Rolling Stock Engineering Architecture</h2>
-            <span class="text-muted" style="font-size:11px;">Configure primary modules, subcomponents, and engineering modifications via catalog menus</span>
+        <!-- Top Toolbar: Type Selector, Design Presets, Commission Button -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="type-segmented-control">
+              <button class="type-segmented-btn ${this.rollingStockType === "locomotive" ? "active" : ""}" id="btn-type-locomotive">
+                Standalone Locomotive
+              </button>
+              <button class="type-segmented-btn ${this.rollingStockType === "trainset" ? "active" : ""}" id="btn-type-trainset">
+                Multiple-Unit Trainset
+              </button>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="c-btn btn-ghost btn-sm" id="btn-design-archive">Blueprints Archive...</button>
+            </div>
           </div>
-          <button class="c-btn btn-primary" id="btn-save-variant">Save and Commission Blueprint</button>
+          <button class="c-btn btn-primary" id="btn-save-variant">Save &amp; Commission Blueprint</button>
         </div>
 
+        <!-- Trainset Consist Summary Bar (When in Trainset Mode) -->
+        ${this.rollingStockType === "trainset" ? `
+          <div class="consist-summary-banner">
+            <div>
+              <strong style="font-size:12px; color:var(--text-main);">Trainset Consist Architecture:</strong>
+              <span class="text-blue font-mono" style="font-size:12px; margin-left:6px;">
+                ${stats.carriageCount} Carriages (${stats.poweredCarCount} Powered Motor Cars, ${stats.trailerCarCount} Trailer Cars)
+              </span>
+              <div class="text-muted" style="font-size:10px; margin-top:2px;">
+                Passenger Seating Capacity: ${stats.passengerCap} Passengers &bull; Adhesion Ratio: ${Math.round((stats.poweredCarCount / stats.carriageCount) * 100)}%
+              </div>
+            </div>
+            <button class="c-btn btn-ghost btn-sm" id="btn-configure-consist">
+              Customize Carriages &amp; Consist...
+            </button>
+          </div>
+        ` : ""}
+
+        <!-- Comprehensive Telemetry and Physical Constraints -->
         <div class="view-grid-four" style="margin-bottom:14px;">
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
             <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed &bull; Acceleration</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.roughSpeedMin} &sim; ${stats.roughSpeedMax} km/h &bull; ${stats.acceleration} m/s²
             </div>
-            <span class="text-muted" style="font-size:9px;">Adhesion Tractive Force: ${stats.maxAdhesionKn} kN</span>
+            <span class="text-muted" style="font-size:9px;">Adhesion Force: ${stats.maxAdhesionKn} kN</span>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Traction Power Rating</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Consist Traction Power</span>
             <div class="font-mono text-blue" style="font-size:13px; margin:2px 0;">
               ${stats.availablePowerKw} kW (${stats.horsepower.toLocaleString()} hp)
             </div>
@@ -59,19 +99,19 @@ class BuilderView {
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load Verification</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load &bull; Gross Mass</span>
             <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:13px; margin:2px 0;">
               ${stats.axleLoad} t / Axle (Limit: ${stats.maxAllowedAxleLoad} t)
             </div>
-            <span class="text-muted" style="font-size:9px;">Gross Tare Weight: ${stats.totalMassTons} Metric Tons</span>
+            <span class="text-muted" style="font-size:9px;">Total Consist Tare Mass: ${stats.totalMassTons} Metric Tons</span>
           </div>
 
           <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Hardware BOM Cost</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Consist Hardware BOM</span>
             <div class="font-mono text-warning" style="font-size:13px; margin:2px 0;">
               $${stats.bomCost.toLocaleString()}
             </div>
-            <span class="text-muted" style="font-size:9px;">Direct component and modification total</span>
+            <span class="text-muted" style="font-size:9px;">${this.rollingStockType === "trainset" ? "Complete multi-car consist sum" : "Single locomotive total"}</span>
           </div>
         </div>
 
@@ -79,14 +119,35 @@ class BuilderView {
       </div>
     `;
 
+    this.bindToolbarEvents();
     this.renderSubsystemCards();
+  }
+
+  static bindToolbarEvents() {
+    document.getElementById("btn-type-locomotive").onclick = () => {
+      this.rollingStockType = "locomotive";
+      BuilderView.render(document.getElementById("viewport-root"));
+    };
+    document.getElementById("btn-type-trainset").onclick = () => {
+      this.rollingStockType = "trainset";
+      BuilderView.render(document.getElementById("viewport-root"));
+    };
+    document.getElementById("btn-design-archive").onclick = () => {
+      DesignView.openDesignManager(this);
+    };
+
+    const cfgConsist = document.getElementById("btn-configure-consist");
+    if (cfgConsist) {
+      cfgConsist.onclick = () => ConsistView.openConsistModal(this);
+    }
 
     document.getElementById("btn-save-variant").onclick = () => {
+      const stats = TrainModelCalc.calculateTrainStats(this.currentSlots, this.subSelections, this.rollingStockType, this.consistConfig);
       if (stats.axleOverloaded) {
         UI.toast("Axle Load Breach: Train tare weight exceeds bogie structural load limit.", "danger");
         return;
       }
-      const newVar = TrainModelCalc.createVariant(this.trainName, this.trainType, this.currentSlots, this.subSelections, this.marginPercent);
+      const newVar = TrainModelCalc.createVariant(this.trainName, this.rollingStockType, this.currentSlots, this.subSelections, this.consistConfig, this.marginPercent);
       state.variants.push(newVar);
       UI.toast(`Blueprint "${newVar.name}" commissioned to Fleet Catalog.`, "success");
       Events.emit("navTo", "catalog");
@@ -117,11 +178,8 @@ class BuilderView {
       const comp = state.findComponentById(currentCompId) || COMPONENTS_DATA[cat.key][0];
       const subData = SUBCOMPONENTS_DATA[cat.key];
 
-      const activeSubId = this.subSelections[cat.key]?.subcomponent;
-      const activeSub = subData?.subcomponents?.find(s => s.id === activeSubId);
-
-      const activeModId = this.subSelections[cat.key]?.modification;
-      const activeMod = subData?.modifications?.find(m => m.id === activeModId);
+      const activeSub = subData?.subcomponents?.find(s => s.id === this.subSelections[cat.key]?.subcomponent);
+      const activeMod = subData?.modifications?.find(m => m.id === this.subSelections[cat.key]?.modification);
 
       card.innerHTML = `
         <div class="subsystem-header">
@@ -129,19 +187,15 @@ class BuilderView {
           <span class="c-badge badge-blue font-mono">$${comp.cost.toLocaleString()}</span>
         </div>
 
-        <!-- Primary Subsystem Component Menu Trigger -->
         <div class="menu-trigger-box">
           <div class="menu-trigger-info">
             <span class="menu-trigger-label">Primary Module</span>
             <span class="menu-trigger-value">${comp.name}</span>
             <span class="text-muted" style="font-size:10px;">${comp.supplier} &bull; ${comp.weight} kg</span>
           </div>
-          <button class="c-btn btn-ghost btn-sm btn-open-comp-menu" data-cat="${cat.key}">
-            Choose Module Menu...
-          </button>
+          <button class="c-btn btn-ghost btn-sm btn-open-comp-menu" data-cat="${cat.key}">Choose Module...</button>
         </div>
 
-        <!-- Subcomponent Module Menu Trigger (No Dropdown) -->
         ${subData && subData.subcomponents ? `
           <div class="menu-trigger-box">
             <div class="menu-trigger-info">
@@ -149,13 +203,10 @@ class BuilderView {
               <span class="menu-trigger-value">${activeSub ? activeSub.name : "None Configured"}</span>
               <span class="menu-trigger-deltas">${activeSub ? `+$${activeSub.cost.toLocaleString()} &bull; ${activeSub.weight >= 0 ? "+" : ""}${activeSub.weight} kg` : ""}</span>
             </div>
-            <button class="c-btn btn-ghost btn-sm btn-open-sub-menu" data-cat="${cat.key}">
-              Select Subcomponent Menu...
-            </button>
+            <button class="c-btn btn-ghost btn-sm btn-open-sub-menu" data-cat="${cat.key}">Subcomponent...</button>
           </div>
         ` : ""}
 
-        <!-- Engineering Modification Menu Trigger (No Dropdown) -->
         ${subData && subData.modifications ? `
           <div class="menu-trigger-box">
             <div class="menu-trigger-info">
@@ -163,30 +214,16 @@ class BuilderView {
               <span class="menu-trigger-value">${activeMod ? activeMod.name : "None Configured"}</span>
               <span class="menu-trigger-deltas">${activeMod ? `+$${activeMod.cost.toLocaleString()} &bull; ${activeMod.weight >= 0 ? "+" : ""}${activeMod.weight} kg` : ""}</span>
             </div>
-            <button class="c-btn btn-ghost btn-sm btn-open-mod-menu" data-cat="${cat.key}">
-              Select Modification Menu...
-            </button>
+            <button class="c-btn btn-ghost btn-sm btn-open-mod-menu" data-cat="${cat.key}">Modification...</button>
           </div>
         ` : ""}
       `;
 
-      card.querySelector(".btn-open-comp-menu").onclick = () => {
-        BuilderView.openPrimaryComponentMenu(cat.key, cat.label);
-      };
-
+      card.querySelector(".btn-open-comp-menu").onclick = () => BuilderView.openPrimaryComponentMenu(cat.key, cat.label);
       const subBtn = card.querySelector(".btn-open-sub-menu");
-      if (subBtn) {
-        subBtn.onclick = () => {
-          BuilderView.openSubcomponentMenu(cat.key, cat.label);
-        };
-      }
-
+      if (subBtn) subBtn.onclick = () => BuilderView.openSubcomponentMenu(cat.key, cat.label);
       const modBtn = card.querySelector(".btn-open-mod-menu");
-      if (modBtn) {
-        modBtn.onclick = () => {
-          BuilderView.openModificationMenu(cat.key, cat.label);
-        };
-      }
+      if (modBtn) modBtn.onclick = () => BuilderView.openModificationMenu(cat.key, cat.label);
 
       container.appendChild(card);
     });
@@ -194,7 +231,6 @@ class BuilderView {
 
   static openSelectionModal({ title, subtitle, items, activeId, onSelect }) {
     const container = document.createElement("div");
-
     const header = document.createElement("p");
     header.className = "text-muted";
     header.style.fontSize = "11px";
@@ -243,12 +279,7 @@ class BuilderView {
     });
 
     container.appendChild(menuList);
-
-    UI.showModal({
-      title,
-      contentNode: container,
-      actions: []
-    });
+    UI.showModal({ title, contentNode: container, actions: [] });
   }
 
   static openPrimaryComponentMenu(catKey, catLabel) {
@@ -273,9 +304,7 @@ class BuilderView {
       subtitle: `Choose standard or specialized ${catLabel} for this electric rolling stock configuration:`,
       items,
       activeId: this.currentSlots[catKey],
-      onSelect: (id) => {
-        this.currentSlots[catKey] = id;
-      }
+      onSelect: (id) => { this.currentSlots[catKey] = id; }
     });
   }
 

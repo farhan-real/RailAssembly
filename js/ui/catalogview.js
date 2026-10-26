@@ -34,10 +34,16 @@ class CatalogView {
         ? `<span class="c-badge badge-green">Dynamic Certified</span>`
         : `<span class="c-badge badge-amber">Uncertified Design</span>`;
 
+      const isTrainset = variant.type === "trainset";
+      const archInfo = isTrainset && variant.consistConfig
+        ? `${variant.consistConfig.carriageCount}-Car Trainset (${variant.stats.poweredCarCount}M${variant.stats.trailerCarCount}T)`
+        : "Standalone Locomotive";
+
       card.innerHTML = `
         <div class="card-header">
           <div style="display:flex; align-items:center; gap:8px;">
             <span class="card-title">${variant.name}</span>
+            <span class="c-badge ${isTrainset ? "badge-blue" : "badge-green"}">${archInfo}</span>
             ${certBadge}
           </div>
           <div style="display:flex; gap:6px;">
@@ -57,9 +63,9 @@ class CatalogView {
             </div>
           </div>
           <div>
-            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Power &bull; Tractive Force</span>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Power &bull; Seating</span>
             <div class="font-mono text-blue" style="font-size:13px;">
-              ${variant.stats.horsepower.toLocaleString()} hp &bull; ${variant.stats.maxAdhesionKn} kN
+              ${variant.stats.horsepower.toLocaleString()} hp &bull; ${variant.stats.passengerCap} Seats
             </div>
           </div>
           <div>
