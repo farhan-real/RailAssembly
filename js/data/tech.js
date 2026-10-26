@@ -18,9 +18,9 @@ const TECH_DATA = [
     costScience: 200,
     costMoney: 450000,
     prereq: [],
-    unlocks: ["inv_igbt_liquid"],
+    unlocks: ["inv_igbt_liquid", "comp_dual_redundant"],
     inHouseUnlock: "inv_igbt_liquid",
-    desc: "Unlocks 6000kW liquid-cooled inverters with regenerative frequency logic."
+    desc: "Unlocks 6200kW liquid-cooled inverters with regenerative frequency logic."
   },
   {
     id: "tech_compact_transformer",
@@ -51,7 +51,7 @@ const TECH_DATA = [
     costScience: 380,
     costMoney: 800000,
     prereq: [],
-    unlocks: ["mot_ind_highoutput"],
+    unlocks: ["mot_ind_highoutput", "trans_freight_mega"],
     inHouseUnlock: "mot_ind_highoutput",
     desc: "High tractive effort motors capable of hauling immense freight loads."
   },
@@ -62,7 +62,7 @@ const TECH_DATA = [
     costScience: 450,
     costMoney: 1100000,
     prereq: [],
-    unlocks: ["tcms_etcs2"],
+    unlocks: ["tcms_etcs2", "wsp_microprocessor"],
     inHouseUnlock: "tcms_etcs2",
     desc: "Radio block signaling and automatic train protection algorithms."
   },
@@ -84,7 +84,7 @@ const TECH_DATA = [
     costScience: 800,
     costMoney: 2200000,
     prereq: ["tech_advanced_inverters"],
-    unlocks: ["inv_sic"],
+    unlocks: ["inv_sic", "cool_glycol_chiller"],
     inHouseUnlock: "inv_sic",
     desc: "SiC MOSFET modules boosting traction efficiency to 98.5%."
   },
@@ -117,7 +117,7 @@ const TECH_DATA = [
     costScience: 1300,
     costMoney: 3800000,
     prereq: ["tech_radial_bogies"],
-    unlocks: ["body_aero_cf", "panto_hs"],
+    unlocks: ["body_aero_cf", "panto_hs", "coup_aero_retractable"],
     inHouseUnlock: "body_aero_cf",
     desc: "Carbon-fiber composite nose cones achieving drag coefficients below 0.23."
   },
@@ -139,7 +139,7 @@ const TECH_DATA = [
     costScience: 1600,
     costMoney: 5000000,
     prereq: ["tech_etcs_automation"],
-    unlocks: ["tcms_cbtc_ai"],
+    unlocks: ["tcms_cbtc_ai", "wsp_integrated_surge", "sand_plasma_cleaner"],
     inHouseUnlock: "tcms_cbtc_ai",
     desc: "Full automated train operation with adaptive traction predictive braking."
   }
