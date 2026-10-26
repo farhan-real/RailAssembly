@@ -1,0 +1,196 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at 50% 0%, #101c30 0%, var(--bg-darkest) 75%);
+  overflow: hidden;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 18px;
+  background: var(--bg-darker);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  gap: 16px;
+  z-index: 20;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-logo svg {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
+}
+.brand-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+.brand-subtitle {
+  font-size: 10px;
+  color: var(--accent-electric);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  display: block;
+}
+
+.metrics-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 2px 4px;
+}
+.metric-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.metric-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.metric-details {
+  display: flex;
+  flex-direction: column;
+}
+.metric-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.metric-value {
+  font-size: 13px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.metric-sub {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.time-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.main-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.side-navigation {
+  width: 200px;
+  background: var(--bg-darker);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  text-align: left;
+  border: 1px solid transparent;
+}
+.nav-tab:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+.nav-tab.active {
+  background: var(--bg-surface-elevated);
+  color: var(--accent-electric);
+  border-color: var(--border-strong);
+  box-shadow: inset 3px 0 0 var(--accent-electric);
+}
+.nav-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.nav-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.content-viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px;
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .side-navigation {
+    width: 68px;
+    padding: 8px 4px;
+  }
+  .nav-label {
+    display: none;
+  }
+  .nav-tab {
+    justify-content: center;
+    padding: 12px;
+  }
+  .brand-subtitle {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-body {
+    flex-direction: column-reverse;
+  }
+  .side-navigation {
+    width: 100%;
+    height: 58px;
+    flex-direction: row;
+    justify-content: space-around;
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+    padding: 4px;
+  }
+  .app-header {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+  }
+  .metrics-bar {
+    order: 3;
+    width: 100%;
+    margin-top: 4px;
+  }
+}

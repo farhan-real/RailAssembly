@@ -1,0 +1,175 @@
+/* View Container Grids */
+.view-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.view-grid-three {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.blueprint-card {
+  background: linear-gradient(180deg, #091322 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.blueprint-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--border-subtle) 1px, transparent 1px);
+  background-size: 16px 16px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Schematic Train Display */
+.train-schematic-wrap {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-subtle);
+  background: rgba(5, 10, 20, 0.6);
+  margin-bottom: 14px;
+}
+.train-schematic-wrap svg {
+  max-width: 96%;
+  height: auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 229, 255, 0.15));
+}
+
+/* Slot Selector Grid */
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+.slot-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color var(--trans-fast);
+}
+.slot-card:hover {
+  border-color: var(--border-strong);
+}
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slot-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-electric);
+}
+
+/* Inventory Tab Tables */
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.inv-table th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.inv-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.inv-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Tech Tree Nodes */
+.tech-tree-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.tech-tier-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tech-node {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+  position: relative;
+}
+.tech-node:hover {
+  border-color: var(--accent-electric);
+}
+.tech-node.researched {
+  border-color: var(--accent-green);
+  background: rgba(0, 230, 118, 0.05);
+}
+.tech-node.active-research {
+  border-color: var(--accent-electric);
+  box-shadow: var(--shadow-glow);
+}
+.tech-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-darkest);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.tech-progress-fill {
+  height: 100%;
+  background: var(--accent-electric);
+  transition: width 0.2s ease;
+}
+
+/* Stat Gauge Rows */
+.stat-gauge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+.stat-bar-container {
+  width: 120px;
+  height: 6px;
+  background: var(--bg-darkest);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  background: var(--accent-electric);
+}
+
+@media (max-width: 1024px) {
+  .view-grid-two, .view-grid-three {
+    grid-template-columns: 1fr;
+  }
+  .tech-tree-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
