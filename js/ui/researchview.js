@@ -4,23 +4,23 @@ class ResearchView {
     const activeTech = TECH_DATA.find(t => t.id === state.activeResearchId);
 
     container.innerHTML = `
-      <div class="c-card" style="margin-bottom:16px;">
+      <div class="c-card" style="margin-bottom:14px;">
         <div class="card-header">
-          <span class="card-title text-cyan">R&amp;D Investment &amp; Engineering Directorate</span>
-          <span class="c-badge badge-cyan">SCIENCE: ${state.sciencePoints} PTS</span>
+          <span class="card-title">R&amp;D Directorate &bull; Capital Allocation</span>
+          <span class="c-badge badge-blue">Science: ${state.sciencePoints} Pts</span>
         </div>
         <div class="view-grid-two">
           <div id="res-budget-slider"></div>
           <div>
-            <span class="text-muted" style="font-size:11px;">ACTIVE RESEARCH PROJECT:</span>
-            <div class="font-mono text-cyan" style="font-size:16px; margin:4px 0;">
-              ${activeTech ? activeTech.name : "None (Idle)"}
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Active Research Node</span>
+            <div class="font-mono text-blue" style="font-size:14px; margin:2px 0;">
+              ${activeTech ? activeTech.name : "None (Idle Directorate)"}
             </div>
             ${activeTech 
               ? `<div class="tech-progress-bar">
                    <div class="tech-progress-fill" style="width:${Math.round((state.researchProgress / activeTech.costScience) * 100)}%;"></div>
                  </div>
-                 <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:4px;" class="text-muted font-mono">
+                 <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:3px;" class="text-muted font-mono">
                    <span>${state.researchProgress} / ${activeTech.costScience} Pts</span>
                    <span>${Math.round((state.researchProgress / activeTech.costScience) * 100)}%</span>
                  </div>`
@@ -32,25 +32,24 @@ class ResearchView {
 
       <div class="tech-tree-grid">
         <div class="tech-tier-col">
-          <h4 class="text-muted font-mono" style="font-size:11px; text-transform:uppercase;">Tier 1 - Foundations</h4>
-          <div id="tier-1-nodes" style="display:flex; flex-direction:column; gap:10px;"></div>
+          <span class="text-muted" style="font-size:10px; font-weight:700; text-transform:uppercase;">Tier 1 Foundations</span>
+          <div id="tier-1-nodes" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
         <div class="tech-tier-col">
-          <h4 class="text-muted font-mono" style="font-size:11px; text-transform:uppercase;">Tier 2 - Advanced Traction</h4>
-          <div id="tier-2-nodes" style="display:flex; flex-direction:column; gap:10px;"></div>
+          <span class="text-muted" style="font-size:10px; font-weight:700; text-transform:uppercase;">Tier 2 Advanced Traction</span>
+          <div id="tier-2-nodes" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
         <div class="tech-tier-col">
-          <h4 class="text-muted font-mono" style="font-size:11px; text-transform:uppercase;">Tier 3 - Semiconductor High-Voltage</h4>
-          <div id="tier-3-nodes" style="display:flex; flex-direction:column; gap:10px;"></div>
+          <span class="text-muted" style="font-size:10px; font-weight:700; text-transform:uppercase;">Tier 3 Semiconductors</span>
+          <div id="tier-3-nodes" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
         <div class="tech-tier-col">
-          <h4 class="text-muted font-mono" style="font-size:11px; text-transform:uppercase;">Tier 4 - Next-Gen Autonomous High-Speed</h4>
-          <div id="tier-4-nodes" style="display:flex; flex-direction:column; gap:10px;"></div>
+          <span class="text-muted" style="font-size:10px; font-weight:700; text-transform:uppercase;">Tier 4 Autonomous High-Speed</span>
+          <div id="tier-4-nodes" style="display:flex; flex-direction:column; gap:8px;"></div>
         </div>
       </div>
     `;
 
-    // Budget slider
     const budgetBox = document.getElementById("res-budget-slider");
     const slider = UI.createSlider({
       min: 0,
@@ -63,7 +62,6 @@ class ResearchView {
     });
     budgetBox.appendChild(slider);
 
-    // Populate Tiers
     [1, 2, 3, 4].forEach(tier => {
       const col = document.getElementById(`tier-${tier}-nodes`);
       const nodes = TECH_DATA.filter(t => t.tier === tier);
@@ -78,19 +76,19 @@ class ResearchView {
         if (!prereqsMet && !isResearched) card.style.opacity = "0.5";
 
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-            <span style="font-weight:700; font-size:12px;">${tech.name}</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+            <span style="font-weight:600; font-size:11px;">${tech.name}</span>
             ${isResearched
-              ? `<span class="c-badge badge-green">DONE</span>`
-              : (isActive ? `<span class="c-badge badge-cyan">RESEARCHING</span>` : `<span class="c-badge badge-amber">${tech.costScience} PTS</span>`)
+              ? `<span class="c-badge badge-green">Mastered</span>`
+              : (isActive ? `<span class="c-badge badge-blue">Active</span>` : `<span class="c-badge badge-amber">${tech.costScience} Pts</span>`)
             }
           </div>
-          <p class="text-muted" style="font-size:11px; line-height:1.3;">${tech.desc}</p>
+          <p class="text-muted" style="font-size:10px; line-height:1.3;">${tech.desc}</p>
         `;
 
         card.onclick = () => {
           if (isResearched) {
-            UI.toast(`"${tech.name}" is already fully mastered and in production.`, "normal");
+            UI.toast(`"${tech.name}" is already researched.`, "normal");
             return;
           }
           if (!prereqsMet) {
@@ -99,7 +97,7 @@ class ResearchView {
           }
           state.activeResearchId = tech.id;
           state.researchProgress = 0;
-          UI.toast(`Directorate assigned to: ${tech.name}`, "success");
+          UI.toast(`Research directed to: ${tech.name}`, "success");
           ResearchView.render(document.getElementById("viewport-root"));
         };
 

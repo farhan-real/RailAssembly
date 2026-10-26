@@ -1,4 +1,4 @@
-// Reusable Custom UI Components without raw generic controls
+// Professional Enterprise UI Components
 class UI {
   static createStepper({ min, max, value, step = 1, onChange }) {
     const wrap = document.createElement("div");
@@ -43,7 +43,7 @@ class UI {
     lbl.textContent = label;
 
     const valBadge = document.createElement("span");
-    valBadge.className = "font-mono text-cyan";
+    valBadge.className = "font-mono text-blue";
     valBadge.textContent = `${value}${unit}`;
 
     head.appendChild(lbl);
@@ -76,18 +76,18 @@ class UI {
     const header = document.createElement("div");
     header.className = "card-header";
     const h3 = document.createElement("h3");
-    h3.className = "card-title text-cyan";
+    h3.className = "card-title";
     h3.textContent = title;
     header.appendChild(h3);
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "c-btn btn-ghost btn-sm";
-    closeBtn.textContent = "✕";
+    closeBtn.textContent = "Close";
     closeBtn.onclick = UI.closeModal;
     header.appendChild(closeBtn);
 
     const body = document.createElement("div");
-    body.style.margin = "14px 0";
+    body.style.margin = "12px 0";
     if (typeof contentNode === "string") {
       body.innerHTML = contentNode;
     } else {
@@ -125,15 +125,15 @@ class UI {
     const shelf = document.getElementById("toast-shelf");
     const t = document.createElement("div");
     t.className = "c-toast";
-    if (type === "danger") t.style.borderColor = "var(--accent-red)";
-    if (type === "success") t.style.borderColor = "var(--accent-green)";
+    if (type === "danger") t.style.borderColor = "var(--color-negative)";
+    if (type === "success") t.style.borderColor = "var(--color-positive)";
     t.textContent = text;
     shelf.appendChild(t);
 
     setTimeout(() => {
       t.style.opacity = "0";
-      t.style.transition = "opacity 0.3s ease";
-      setTimeout(() => t.remove(), 300);
-    }, 3200);
+      t.style.transition = "opacity 0.25s ease";
+      setTimeout(() => t.remove(), 250);
+    }, 3000);
   }
 }

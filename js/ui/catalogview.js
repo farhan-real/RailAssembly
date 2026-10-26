@@ -1,27 +1,27 @@
-// Catalog View for Models, Unit Margin Controls, and Assembly Assignments
+// Fleet Catalog, Profit Margins, Dynamic Testing, and Batch Allocation
 class CatalogView {
   static render(container) {
     if (state.variants.length === 0) {
       container.innerHTML = `
-        <div class="c-card" style="text-align:center; padding:40px;">
-          <h3 class="text-cyan font-mono" style="margin-bottom:8px;">NO TRAIN MODELS DESIGNED</h3>
-          <p class="text-muted" style="margin-bottom:16px;">Visit the Train Builder to engineer and configure your first electric locomotive or EMU trainset.</p>
-          <button class="c-btn btn-primary" onclick="Events.emit('navTo', 'builder')">Open Train Builder</button>
+        <div class="c-card" style="text-align:center; padding:36px;">
+          <h3 style="margin-bottom:6px; font-size:14px; font-weight:700;">NO COMMISSIONED FLEET BLUEPRINTS</h3>
+          <p class="text-muted" style="margin-bottom:14px;">Use the Engineering CAD workspace to design and certify electric trainsets.</p>
+          <button class="c-btn btn-primary" onclick="Events.emit('navTo', 'builder')">Open Engineering CAD</button>
         </div>
       `;
       return;
     }
 
     container.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <div>
-          <h2 class="text-cyan font-mono" style="font-size:18px;">COMMISSIONED ELECTRIC FLEET CATALOG</h2>
-          <span class="text-muted" style="font-size:11px;">Pricing, Profit Margins, Dynamic Certification &amp; Batch Production</span>
+          <h2 style="font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Commissioned Fleet Catalog</h2>
+          <span class="text-muted" style="font-size:11px;">Manage margins, run dynamic certification runs, and allocate batch assembly lines</span>
         </div>
-        <button class="c-btn btn-ghost" onclick="Events.emit('navTo', 'builder')">+ Engineer New Model</button>
+        <button class="c-btn btn-ghost btn-sm" onclick="Events.emit('navTo', 'builder')">+ New Blueprint</button>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:16px;" id="catalog-list"></div>
+      <div style="display:flex; flex-direction:column; gap:12px;" id="catalog-list"></div>
     `;
 
     const list = document.getElementById("catalog-list");
@@ -31,38 +31,38 @@ class CatalogView {
       card.className = "c-card";
 
       const certBadge = variant.certified
-        ? `<span class="c-badge badge-green">${ICONS.check} Certified Rig Tested</span>`
-        : `<span class="c-badge badge-amber">${ICONS.alert} Rough CAD Estimates</span>`;
+        ? `<span class="c-badge badge-green">Dynamic Certified</span>`
+        : `<span class="c-badge badge-amber">Uncertified CAD</span>`;
 
       card.innerHTML = `
         <div class="card-header">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="card-title text-cyan">${variant.name}</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="card-title">${variant.name}</span>
             ${certBadge}
           </div>
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; gap:6px;">
             ${!variant.certified 
-              ? `<button class="c-btn btn-accent btn-sm btn-test-track" data-id="${variant.id}">Dynamic Test Rig ($45,000)</button>` 
+              ? `<button class="c-btn btn-accent btn-sm btn-test-track" data-id="${variant.id}">Dynamic Test Run ($45,000)</button>` 
               : ""
             }
-            <button class="c-btn btn-primary btn-sm btn-start-batch" data-id="${variant.id}">Assemble Batch</button>
+            <button class="c-btn btn-primary btn-sm btn-start-batch" data-id="${variant.id}">Assemble Unit</button>
           </div>
         </div>
 
-        <div class="view-grid-three" style="margin-bottom:12px;">
+        <div class="view-grid-three" style="margin-bottom:10px;">
           <div>
-            <span class="text-muted" style="font-size:11px;">CERTIFIED TOP SPEED</span>
-            <div class="font-mono text-cyan" style="font-size:15px;">
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Top Speed</span>
+            <div class="font-mono text-blue" style="font-size:14px;">
               ${variant.certified ? `${variant.testedStats.exactTopSpeed} km/h` : `${variant.stats.roughSpeedMin} ~ ${variant.stats.roughSpeedMax} km/h`}
             </div>
           </div>
           <div>
-            <span class="text-muted" style="font-size:11px;">UNIT PRODUCTION COST</span>
-            <div class="font-mono" style="font-size:15px;">$${variant.unitProductionCost.toLocaleString()}</div>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Unit Production Cost</span>
+            <div class="font-mono" style="font-size:14px;">$${variant.unitProductionCost.toLocaleString()}</div>
           </div>
           <div>
-            <span class="text-muted" style="font-size:11px;">PROFIT PER UNIT</span>
-            <div class="font-mono text-accent" style="font-size:15px;">+$${variant.profitPerUnit.toLocaleString()} (${variant.marginPercent}%)</div>
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Unit Profit Margin</span>
+            <div class="font-mono text-positive" style="font-size:14px;">+$${variant.profitPerUnit.toLocaleString()} (${variant.marginPercent}%)</div>
           </div>
         </div>
 
@@ -71,13 +71,12 @@ class CatalogView {
 
       list.appendChild(card);
 
-      // Attach margin slider
       const sliderBox = card.querySelector(`#slider-box-${variant.id}`);
       const marginSlider = UI.createSlider({
         min: 5,
         max: 60,
         value: variant.marginPercent,
-        label: "Profit Margin Markup",
+        label: "Target Markup Margin",
         unit: "%",
         step: 1,
         onInput: (val) => {
@@ -90,26 +89,23 @@ class CatalogView {
       });
       sliderBox.appendChild(marginSlider);
 
-      // Bind Test bench
       const testBtn = card.querySelector(".btn-test-track");
       if (testBtn) {
         testBtn.onclick = () => {
           if (state.funds < 45000) {
-            UI.toast("Insufficient capital for testing facility fees ($45,000).", "danger");
+            UI.toast("Insufficient capital for track test fees ($45,000).", "danger");
             return;
           }
           state.funds -= 45000;
           TrainModelCalc.certifyVariant(variant);
-          UI.toast(`Testing track run completed! Certified stats verified for ${variant.name}.`, "success");
+          UI.toast(`Certified stats verified on testing bench for ${variant.name}.`, "success");
           CatalogView.render(document.getElementById("viewport-root"));
           Events.emit("fundsChanged");
         };
       }
 
-      // Bind Batch Assembly trigger
       const batchBtn = card.querySelector(".btn-start-batch");
       batchBtn.onclick = () => {
-        // Check warehouse components
         const missing = [];
         for (const slotKey in variant.slots) {
           const compId = variant.slots[slotKey];
@@ -121,11 +117,10 @@ class CatalogView {
         }
 
         if (missing.length > 0) {
-          UI.toast(`Cannot assemble: Missing in warehouse: ${missing.slice(0, 2).join(", ")}`, "danger");
+          UI.toast(`Missing components in warehouse: ${missing.slice(0, 2).join(", ")}`, "danger");
           return;
         }
 
-        // Deduct 1 set of components
         for (const slotKey in variant.slots) {
           const compId = variant.slots[slotKey];
           if (!compId || compId === "bat_none") continue;
@@ -142,7 +137,7 @@ class CatalogView {
           laborRate: 15
         });
 
-        UI.toast(`Assembly line started for 1 unit of ${variant.name}!`, "success");
+        UI.toast(`Assembly line started for ${variant.name}.`, "success");
         Events.emit("inventoryChanged");
         CatalogView.render(document.getElementById("viewport-root"));
       };

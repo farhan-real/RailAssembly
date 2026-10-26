@@ -1,29 +1,28 @@
 :root {
-  --bg-darkest: #070b12;
-  --bg-darker: #0c121e;
-  --bg-surface: #121c2e;
-  --bg-surface-elevated: #18253d;
-  --bg-surface-hover: #1f304e;
-  --border-subtle: #1e304f;
-  --border-strong: #2f4975;
-  --border-focus: #00d2ff;
-  --accent-electric: #00e5ff;
-  --accent-green: #00e676;
-  --accent-amber: #ffab00;
-  --accent-red: #ff3d71;
-  --accent-purple: #7c4dff;
-  --text-primary: #e6edf8;
-  --text-secondary: #90a4cb;
-  --text-muted: #536b94;
-  --font-mono: "SF Mono", "Consolas", "Liberation Mono", "Menlo", monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --bg-app: #0b0f17;
+  --bg-sidebar: #0f1622;
+  --bg-panel: #131c2b;
+  --bg-surface: #182335;
+  --bg-surface-hover: #1f2d42;
+  --border-subtle: #1f2c40;
+  --border-strong: #2c3e5a;
+  --border-focus: #3b82f6;
+  --color-primary: #2563eb;
+  --color-primary-hover: #3b82f6;
+  --color-blue: #60a5fa;
+  --color-positive: #10b981;
+  --color-warning: #f59e0b;
+  --color-negative: #ef4444;
+  --text-main: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
   --radius-xs: 3px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 16px rgba(0, 229, 255, 0.25);
-  --trans-fast: 0.16s ease-in-out;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --trans-fast: 0.15s ease-out;
 }
 
 *, *::before, *::after {
@@ -38,11 +37,12 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-darkest);
-  color: var(--text-primary);
+  background-color: var(--bg-app);
+  color: var(--text-main);
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
 }
 
 input, button, select, textarea {
@@ -53,13 +53,12 @@ input, button, select, textarea {
   outline: none;
 }
 
-/* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-darkest);
+  background: var(--bg-app);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border-subtle);
@@ -69,10 +68,10 @@ input, button, select, textarea {
   background: var(--border-strong);
 }
 
-.text-accent { color: var(--accent-green); }
-.text-cyan { color: var(--accent-electric); }
-.text-amber { color: var(--accent-amber); }
-.text-red { color: var(--accent-red); }
+.text-positive { color: var(--color-positive); }
+.text-warning { color: var(--color-warning); }
+.text-negative { color: var(--color-negative); }
+.text-blue { color: var(--color-blue); }
 .text-muted { color: var(--text-muted); }
 .font-mono { font-family: var(--font-mono); }
 .hidden { display: none !important; }

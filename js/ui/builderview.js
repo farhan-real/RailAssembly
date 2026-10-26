@@ -1,4 +1,4 @@
-// Train Customizer, Parametric Preview, Slot Selector, and Dynamic Testing Bench
+// Industrial Engineering CAD View with Accurate Subsystem Integration
 class BuilderView {
   static currentSlots = {
     pantograph: "panto_std",
@@ -14,55 +14,55 @@ class BuilderView {
 
   static trainName = "VoltMaster 1000";
   static trainType = "locomotive";
-  static marginPercent = 25;
+  static marginPercent = 22;
 
   static render(container) {
     const stats = TrainModelCalc.calculateTrainStats(this.currentSlots);
 
     container.innerHTML = `
-      <div class="blueprint-card">
+      <div class="cad-container">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div>
-            <h2 class="text-cyan font-mono" style="font-size:18px;">ELECTRIC INTEGRATION CAD</h2>
-            <span class="text-muted" style="font-size:11px;">100% Zero-Emission High Voltage Rolling Stock Architecture</span>
+            <h2 style="font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Engineering CAD &bull; Electric Rolling Stock Integration</h2>
+            <span class="text-muted" style="font-size:11px;">Configure high-voltage traction, bogies, carbody structure and control units</span>
           </div>
-          <button class="c-btn btn-primary" id="btn-save-variant">Save &amp; Commission Model</button>
+          <button class="c-btn btn-primary" id="btn-save-variant">Save &amp; Commission Blueprint</button>
         </div>
 
         <div class="train-schematic-wrap" id="schematic-viewport">
           ${TrainSVGBuilder.renderParametricTrain(this.currentSlots)}
         </div>
 
-        <div class="view-grid-three" style="margin-top:14px;">
-          <div style="background:var(--bg-darker); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:11px;">ESTIMATED TOP SPEED</span>
-            <div class="font-mono text-cyan" style="font-size:16px; margin:4px 0;">
-              ${stats.roughSpeedMin} ~ ${stats.roughSpeedMax} km/h
+        <div class="view-grid-three">
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Estimated Speed Rating</span>
+            <div class="font-mono text-blue" style="font-size:15px; margin:2px 0;">
+              ${stats.roughSpeedMin} &sim; ${stats.roughSpeedMax} km/h
             </div>
-            <span class="text-muted" style="font-size:10px;">Requires Test Track Run for Certification</span>
+            <span class="text-muted" style="font-size:10px;">Requires dynamic test bench for certification</span>
           </div>
 
-          <div style="background:var(--bg-darker); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:11px;">AXLE LOAD &amp; LIMIT</span>
-            <div class="font-mono ${stats.axleOverloaded ? "text-red" : "text-accent"}" style="font-size:16px; margin:4px 0;">
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Axle Load Verification</span>
+            <div class="font-mono ${stats.axleOverloaded ? "text-negative" : "text-positive"}" style="font-size:15px; margin:2px 0;">
               ${stats.axleLoad} t / axle
             </div>
-            <span class="text-muted" style="font-size:10px;">Max Allowed: ${stats.maxAllowedAxleLoad} t (${stats.axles} Axles)</span>
+            <span class="text-muted" style="font-size:10px;">Bogie Max: ${stats.maxAllowedAxleLoad} t (${stats.axles} Axles)</span>
           </div>
 
-          <div style="background:var(--bg-darker); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <span class="text-muted" style="font-size:11px;">BILL OF MATERIALS (BOM)</span>
-            <div class="font-mono text-amber" style="font-size:16px; margin:4px 0;">
+          <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+            <span class="text-muted" style="font-size:10px; text-transform:uppercase;">Hardware BOM Cost</span>
+            <div class="font-mono text-warning" style="font-size:15px; margin:2px 0;">
               $${stats.bomCost.toLocaleString()}
             </div>
-            <span class="text-muted" style="font-size:10px;">Hardware component acquisition sum</span>
+            <span class="text-muted" style="font-size:10px;">Total procurement cost per unit</span>
           </div>
         </div>
       </div>
 
-      <div class="c-card" style="margin-top:16px;">
+      <div class="c-card">
         <div class="card-header">
-          <span class="card-title text-cyan">Subsystem Component Configuration</span>
+          <span class="card-title">Component Subsystem Architecture</span>
         </div>
         <div class="slot-grid" id="slots-selector-container"></div>
       </div>
@@ -72,12 +72,12 @@ class BuilderView {
 
     document.getElementById("btn-save-variant").onclick = () => {
       if (stats.axleOverloaded) {
-        UI.toast("AXLE OVERLOAD: Train weight exceeds bogie load capacity! Reduce weight or pick heavy bogie.", "danger");
+        UI.toast("AXLE OVERLOAD: Train tare weight exceeds bogie structural limit.", "danger");
         return;
       }
       const newVar = TrainModelCalc.createVariant(this.trainName, this.trainType, this.currentSlots, this.marginPercent);
       state.variants.push(newVar);
-      UI.toast(`Model "${newVar.name}" created and added to Train Catalog!`, "success");
+      UI.toast(`Model "${newVar.name}" commissioned to Fleet Catalog.`, "success");
       Events.emit("navTo", "catalog");
     };
   }
@@ -87,15 +87,15 @@ class BuilderView {
     container.innerHTML = "";
 
     const categories = [
-      { key: "pantograph", label: "Pantograph & Collector" },
-      { key: "transformer", label: "Main Traction Transformer" },
-      { key: "inverter", label: "Traction Inverter / Converter" },
-      { key: "motor", label: "Traction Motor Type" },
-      { key: "bogie", label: "Bogie & Wheelsets" },
-      { key: "carbody", label: "Carbody & Aerodynamics" },
-      { key: "brakes", label: "Braking & Energy Recovery" },
-      { key: "battery", label: "Battery Buffer Pack" },
-      { key: "tcms", label: "TCMS & Train Automation" }
+      { key: "pantograph", label: "Pantograph" },
+      { key: "transformer", label: "Traction Transformer" },
+      { key: "inverter", label: "Inverter / Converter" },
+      { key: "motor", label: "Traction Motors" },
+      { key: "bogie", label: "Bogie / Axles" },
+      { key: "carbody", label: "Carbody Structure" },
+      { key: "brakes", label: "Braking System" },
+      { key: "battery", label: "Battery Pack" },
+      { key: "tcms", label: "TCMS Control" }
     ];
 
     categories.forEach(cat => {
@@ -122,7 +122,7 @@ class BuilderView {
         optBtn.style.width = "100%";
         if (!isUnlocked) {
           optBtn.disabled = true;
-          optBtn.title = "Locked: Research required in R&D Tree";
+          optBtn.title = "Requires research in R&D Directorate";
         }
 
         optBtn.innerHTML = `

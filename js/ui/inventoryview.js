@@ -1,28 +1,27 @@
-// Supply Chain: Warehouse vs Long Storage, Supplier Lead Times, and In-House Fabrication
+// Supply Chain: Warehouse vs Long Storage & Component Procurement
 class InventoryView {
   static render(container) {
     const whCount = state.getWarehouseCount();
 
     container.innerHTML = `
       <div class="view-grid-two">
-        <!-- Active Warehouse -->
         <div class="c-card">
           <div class="card-header">
-            <span class="card-title text-cyan">${ICONS.storage} Active Warehouse Inventory</span>
+            <span class="card-title">Active Warehouse Ledger</span>
             <span class="c-badge ${whCount > (state.warehouseCapacity * 0.9) ? "badge-red" : "badge-green"}">
-              ${whCount} / ${state.warehouseCapacity} Slots Used
+              ${whCount} / ${state.warehouseCapacity} Used
             </span>
           </div>
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
-            Components ready for train assembly lines. Keep tidy by stashing excess in Long Storage.
+            Readily accessible parts for assembly lines. Stash bulk reserve into Long Storage to prevent clutter.
           </div>
-          <div style="max-height:260px; overflow-y:auto;">
+          <div style="max-height:240px; overflow-y:auto;">
             <table class="inv-table">
               <thead>
                 <tr>
                   <th>Component</th>
                   <th>Stock</th>
-                  <th>Actions</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="active-wh-tbody"></tbody>
@@ -30,21 +29,20 @@ class InventoryView {
           </div>
         </div>
 
-        <!-- Long Storage -->
         <div class="c-card">
           <div class="card-header">
-            <span class="card-title text-cyan">Long-Term Inactive Depot</span>
-            <span class="c-badge badge-cyan">UNLIMITED SPACE</span>
+            <span class="card-title">Long-Term Inactive Storage</span>
+            <span class="c-badge badge-blue">Unlimited Space</span>
           </div>
           <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
-            Unlimited storage. Move back to active warehouse anytime for instant assembly access.
+            Reserve storage depot. Transfer back to active warehouse instantly when needed.
           </div>
-          <div style="max-height:260px; overflow-y:auto;">
+          <div style="max-height:240px; overflow-y:auto;">
             <table class="inv-table">
               <thead>
                 <tr>
                   <th>Component</th>
-                  <th>Stored</th>
+                  <th>Quantity</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -54,19 +52,18 @@ class InventoryView {
         </div>
       </div>
 
-      <!-- Supplier Procurement & In-House Fabrication Shop -->
-      <div class="c-card" style="margin-top:16px;">
+      <div class="c-card" style="margin-top:14px;">
         <div class="card-header">
-          <span class="card-title text-cyan">Procurement Catalog &amp; Bulk Supplier Orders</span>
-          <span class="text-muted" style="font-size:11px;">Bulk Discounts: 5+ (8% off), 15+ (15% off), 30+ (25% off)</span>
+          <span class="card-title">Supplier Procurement Catalog</span>
+          <span class="text-muted" style="font-size:11px;">Bulk Tiers: 5+ (8% off), 15+ (15% off), 30+ (25% off)</span>
         </div>
-        <div style="max-height:360px; overflow-y:auto;">
+        <div style="max-height:340px; overflow-y:auto;">
           <table class="inv-table">
             <thead>
               <tr>
                 <th>Component &amp; Supplier</th>
-                <th>Base Price</th>
-                <th>Delivery Lag</th>
+                <th>Unit Cost</th>
+                <th>Lead Time</th>
                 <th>In-House Fab</th>
                 <th>Order Quantity</th>
               </tr>
@@ -88,7 +85,7 @@ class InventoryView {
     const entries = Object.entries(state.warehouse);
 
     if (entries.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" class="text-muted" style="text-align:center;">Warehouse is empty.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3" class="text-muted" style="text-align:center;">Warehouse empty.</td></tr>`;
       return;
     }
 
@@ -99,11 +96,11 @@ class InventoryView {
       tr.innerHTML = `
         <td>
           <div style="font-weight:600;">${comp.name}</div>
-          <div class="text-muted font-mono" style="font-size:10px;">${comp.type.toUpperCase()}</div>
+          <div class="text-muted font-mono" style="font-size:9px;">${comp.type.toUpperCase()}</div>
         </td>
-        <td class="font-mono text-cyan">${qty}</td>
+        <td class="font-mono text-blue">${qty}</td>
         <td>
-          <button class="c-btn btn-ghost btn-sm btn-stash" data-id="${id}">Stash to Long Storage</button>
+          <button class="c-btn btn-ghost btn-sm btn-stash" data-id="${id}">Stash</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -133,18 +130,18 @@ class InventoryView {
       tr.innerHTML = `
         <td>
           <div style="font-weight:600;">${comp.name}</div>
-          <div class="text-muted font-mono" style="font-size:10px;">${comp.type.toUpperCase()}</div>
+          <div class="text-muted font-mono" style="font-size:9px;">${comp.type.toUpperCase()}</div>
         </td>
-        <td class="font-mono text-amber">${qty}</td>
+        <td class="font-mono text-warning">${qty}</td>
         <td>
-          <button class="c-btn btn-ghost btn-sm btn-pull" data-id="${id}">Move to Warehouse</button>
+          <button class="c-btn btn-ghost btn-sm btn-pull" data-id="${id}">Retrieve</button>
         </td>
       `;
       tbody.appendChild(tr);
 
       tr.querySelector(".btn-pull").onclick = () => {
         if (!state.moveToWarehouse(id, 1)) {
-          UI.toast("Cannot retrieve: Active warehouse capacity exceeded!", "danger");
+          UI.toast("Cannot retrieve: Active warehouse capacity reached.", "danger");
           return;
         }
         InventoryView.render(document.getElementById("viewport-root"));
@@ -166,19 +163,19 @@ class InventoryView {
         tr.innerHTML = `
           <td>
             <div style="font-weight:600;">${comp.name}</div>
-            <div class="text-muted" style="font-size:10px;">${comp.supplier} (${comp.type})</div>
+            <div class="text-muted" style="font-size:10px;">${comp.supplier} &bull; ${comp.type}</div>
           </td>
-          <td class="font-mono text-cyan">$${comp.cost.toLocaleString()}</td>
-          <td class="font-mono">${comp.leadDays} days</td>
+          <td class="font-mono text-blue">$${comp.cost.toLocaleString()}</td>
+          <td class="font-mono">${comp.leadDays}d</td>
           <td>
             ${comp.inHouseTech
               ? (hasTech
-                  ? `<span class="c-badge badge-green">UNLOCKED</span>`
-                  : `<span class="c-badge badge-amber">TECH REQ</span>`)
-              : `<span class="c-badge badge-cyan">PRIMITIVE FAB</span>`
+                  ? `<span class="c-badge badge-green">Unlocked</span>`
+                  : `<span class="c-badge badge-amber">Tech Req</span>`)
+              : `<span class="c-badge badge-blue">Primitive</span>`
             }
           </td>
-          <td style="display:flex; align-items:center; gap:8px;">
+          <td style="display:flex; align-items:center; gap:6px;">
             <div class="stepper-slot" id="stepper-${comp.id}"></div>
             <button class="c-btn btn-primary btn-sm btn-buy" data-id="${comp.id}">Order</button>
           </td>
@@ -205,12 +202,12 @@ class InventoryView {
           const totalCost = Math.round(comp.cost * buyCount * discount);
 
           if (state.funds < totalCost) {
-            UI.toast(`Insufficient funds. Total order cost is $${totalCost.toLocaleString()}`, "danger");
+            UI.toast(`Insufficient capital. Order total: $${totalCost.toLocaleString()}`, "danger");
             return;
           }
 
           if (state.getWarehouseCount() + buyCount > state.warehouseCapacity) {
-            UI.toast(`Warehouse capacity full! Clean up active inventory or upgrade.`, "danger");
+            UI.toast(`Warehouse capacity exceeded.`, "danger");
             return;
           }
 
@@ -223,7 +220,7 @@ class InventoryView {
             totalDays: comp.leadDays
           });
 
-          UI.toast(`Procured ${buyCount}x ${comp.name}. Lead delivery time: ${comp.leadDays} days.`, "success");
+          UI.toast(`Procured ${buyCount}x ${comp.name}. Lead time: ${comp.leadDays} days.`, "success");
           Events.emit("fundsChanged");
         };
       });

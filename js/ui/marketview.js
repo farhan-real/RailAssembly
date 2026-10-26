@@ -1,59 +1,57 @@
-// Ministry Tender Bidding Board & Rival Competitor Analytics
+// Ministry Tender Bidding Board and Competitor Intelligence
 class MarketView {
   static render(container) {
     const hasTender = state.marketTenders.length > 0;
 
     container.innerHTML = `
       <div class="view-grid-two">
-        <!-- Scarce Ministry Tenders Board -->
         <div class="c-card">
           <div class="card-header">
-            <span class="card-title text-cyan">${ICONS.train} National Railway Procurement Board</span>
+            <span class="card-title">National Railway Procurement Board</span>
             <span class="c-badge ${hasTender ? "badge-green" : "badge-amber"}">
-              ${hasTender ? "1 EXCLUSIVE TENDER OPEN" : "IN REVIEW / CLOSED"}
+              ${hasTender ? "1 Open Tender" : "Review Period"}
             </span>
           </div>
 
-          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">
-            The Ministry awards multi-year megaprojects rarely. Production deliveries proceed slowly across quarters with strictly monitored delay limits.
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
+            Government bodies place massive rolling stock orders slowly over multi-year quarters. Delays past tolerance trigger competitor transfers.
           </div>
 
           <div id="tender-slot-area">
             ${hasTender ? "" : `
-              <div style="background:var(--bg-darker); border:1px dashed var(--border-subtle); border-radius:var(--radius-sm); padding:24px; text-align:center;">
-                <div class="text-amber font-mono" style="font-size:14px; margin-bottom:6px;">NO OPEN TENDERS CURRENTLY GAZETTED</div>
-                <p class="text-muted" style="font-size:12px; margin-bottom:14px;">
-                  The Ministry of Transportation is reviewing capital budgets and corridor route electrification.
+              <div style="background:var(--bg-surface); border:1px dashed var(--border-subtle); border-radius:var(--radius-xs); padding:20px; text-align:center;">
+                <div class="text-warning font-mono" style="font-size:12px; margin-bottom:4px;">NO CURRENTLY OPEN TENDERS</div>
+                <p class="text-muted" style="font-size:11px; margin-bottom:10px;">
+                  The Ministry is conducting corridor traffic and budget studies.
                 </p>
-                <div class="stat-badge font-mono text-cyan" style="display:inline-block; background:rgba(0,229,255,0.08); padding:6px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-strong);">
-                  Next Tender Notice in approx: <strong>${Math.max(1, state.nextTenderCountdown)} days</strong>
+                <div class="font-mono text-blue" style="font-size:11px;">
+                  Next Gazette Notice in approx: <strong>${Math.max(1, state.nextTenderCountdown)} days</strong>
                 </div>
               </div>
             `}
           </div>
         </div>
 
-        <!-- Competitor Intelligence & Market Share -->
         <div class="c-card">
           <div class="card-header">
-            <span class="card-title text-cyan">${ICONS.rep} Rival Rolling Stock Manufacturers</span>
-            <span class="c-badge badge-cyan">GLOBAL SYNDICATE</span>
+            <span class="card-title">Competitor Intelligence</span>
+            <span class="c-badge badge-blue">Rolling Stock Rivals</span>
           </div>
-          <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
-            Rivals bid aggressively on government tenders and will absorb your contracted batches if your assembly lines fall behind.
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
+            Rivals bid aggressively and absorb contracted batches if your assembly line falls behind.
           </div>
-          <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; flex-direction:column; gap:8px;">
             ${COMPETITORS_DATA.map(comp => `
-              <div style="background:var(--bg-darker); padding:10px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                  <span style="font-weight:700; font-size:13px;">${comp.name}</span>
-                  <span class="font-mono text-cyan">${comp.marketShare}% Market Share</span>
+              <div style="background:var(--bg-surface); padding:8px 10px; border-radius:var(--radius-xs); border:1px solid var(--border-subtle);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                  <span style="font-weight:600; font-size:12px;">${comp.name}</span>
+                  <span class="font-mono text-blue">${comp.marketShare}% Share</span>
                 </div>
-                <div class="text-muted" style="font-size:11px; margin-bottom:6px;">${comp.specialty} &bull; ${comp.country}</div>
-                <div style="display:flex; gap:16px; font-size:11px;">
-                  <span>Reliability: <strong class="text-accent">${comp.reliabilityScore}%</strong></span>
-                  <span>Avg Markup: <strong class="text-amber">+${comp.avgMarkup}%</strong></span>
-                  <span>Speed Rating: <strong class="text-cyan">${comp.speedScore}</strong></span>
+                <div class="text-muted" style="font-size:10px; margin-bottom:4px;">${comp.specialty} &bull; ${comp.country}</div>
+                <div style="display:flex; gap:14px; font-size:10px;">
+                  <span>Reliability: <strong class="text-positive">${comp.reliabilityScore}%</strong></span>
+                  <span>Avg Markup: <strong class="text-warning">+${comp.avgMarkup}%</strong></span>
+                  <span>Speed: <strong class="text-blue">${comp.speedScore}</strong></span>
                 </div>
               </div>
             `).join("")}
@@ -69,62 +67,62 @@ class MarketView {
 
   static renderActiveTender(container, t) {
     const card = document.createElement("div");
-    card.style.background = "var(--bg-darker)";
-    card.style.padding = "16px";
-    card.style.borderRadius = "var(--radius-sm)";
+    card.style.background = "var(--bg-surface)";
+    card.style.padding = "12px";
+    card.style.borderRadius = "var(--radius-xs)";
     card.style.border = "1px solid var(--border-strong)";
 
     const daysRemaining = Math.max(0, t.expiresDay - state.day);
 
     card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
         <div>
-          <h4 style="font-size:14px; font-weight:700; color:var(--text-primary);">${t.title}</h4>
-          <span class="text-cyan font-mono" style="font-size:11px;">${t.agency}</span>
+          <h4 style="font-size:13px; font-weight:700; color:var(--text-main);">${t.title}</h4>
+          <span class="text-blue font-mono" style="font-size:10px;">${t.agency}</span>
         </div>
         <span class="c-badge badge-amber font-mono">${daysRemaining}d to Bid</span>
       </div>
 
-      <p class="text-muted" style="font-size:12px; line-height:1.4; margin-bottom:12px;">${t.description}</p>
+      <p class="text-muted" style="font-size:11px; margin-bottom:10px;">${t.description}</p>
 
-      <div class="view-grid-two" style="gap:8px; font-size:12px; margin-bottom:14px; background:rgba(0,0,0,0.25); padding:10px; border-radius:var(--radius-xs);">
-        <div><span class="text-muted">Total Fleet Order:</span> <strong class="font-mono">${t.unitsRequired} Trainsets</strong></div>
-        <div><span class="text-muted">Quarterly Delivery Quota:</span> <strong class="font-mono text-cyan">${t.batchSizePerQuarter} units/Q</strong></div>
-        <div><span class="text-muted">Max Budget / Unit:</span> <strong class="font-mono text-accent">$${t.budgetPerUnit.toLocaleString()}</strong></div>
-        <div><span class="text-muted">Delay Tolerance:</span> <strong class="font-mono text-red">Max ${t.delayToleranceDays} days late</strong></div>
-        <div><span class="text-muted">Required Top Speed:</span> <strong class="font-mono">${t.minSpeed} km/h</strong></div>
-        <div><span class="text-muted">Min Seating:</span> <strong class="font-mono">${t.minPassengerCap > 0 ? t.minPassengerCap + " passengers" : "Freight (N/A)"}</strong></div>
+      <div class="view-grid-two" style="gap:6px; font-size:11px; margin-bottom:12px; background:rgba(0,0,0,0.2); padding:8px; border-radius:var(--radius-xs);">
+        <div><span class="text-muted">Fleet Size:</span> <strong class="font-mono">${t.unitsRequired} Units</strong></div>
+        <div><span class="text-muted">Quarterly Quota:</span> <strong class="font-mono text-blue">${t.batchSizePerQuarter} units/Q</strong></div>
+        <div><span class="text-muted">Budget / Unit:</span> <strong class="font-mono text-positive">$${t.budgetPerUnit.toLocaleString()}</strong></div>
+        <div><span class="text-muted">Delay Tolerance:</span> <strong class="font-mono text-negative">Max ${t.delayToleranceDays}d late</strong></div>
+        <div><span class="text-muted">Min Speed:</span> <strong class="font-mono">${t.minSpeed} km/h</strong></div>
+        <div><span class="text-muted">Min Seating:</span> <strong class="font-mono">${t.minPassengerCap > 0 ? t.minPassengerCap + " pax" : "Freight (N/A)"}</strong></div>
       </div>
 
       <div style="display:flex; justify-content:flex-end;">
-        <button class="c-btn btn-primary btn-submit-bid">Submit Tender Bid Proposal</button>
+        <button class="c-btn btn-primary btn-sm btn-submit-bid">Submit Tender Bid</button>
       </div>
     `;
 
     card.querySelector(".btn-submit-bid").onclick = () => {
       if (state.variants.length === 0) {
-        UI.toast("Design and certify a train in 'Train Builder' before bidding.", "danger");
+        UI.toast("Design and certify a model in Engineering CAD first.", "danger");
         return;
       }
 
       const picker = document.createElement("div");
       picker.innerHTML = `
-        <p class="text-muted" style="font-size:12px; margin-bottom:12px;">Select certified train model to enter into formal government competition:</p>
-        <div style="display:flex; flex-direction:column; gap:8px;">
+        <p class="text-muted" style="font-size:11px; margin-bottom:10px;">Select certified train model to enter into formal government competition:</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
           ${state.variants.map(v => `
             <button class="c-btn btn-ghost btn-select-model" data-var="${v.id}" style="justify-content:space-between;">
               <div style="display:flex; flex-direction:column; align-items:flex-start;">
                 <strong>${v.name}</strong>
-                <span class="text-muted" style="font-size:10px;">${v.certified ? `${v.testedStats.exactTopSpeed} km/h (Certified)` : `Rough Estimates (Uncertified)`}</span>
+                <span class="text-muted" style="font-size:9px;">${v.certified ? `${v.testedStats.exactTopSpeed} km/h (Certified)` : `Uncertified CAD`}</span>
               </div>
-              <span class="font-mono text-cyan">$${v.salePrice.toLocaleString()} / unit</span>
+              <span class="font-mono text-blue">$${v.salePrice.toLocaleString()} / unit</span>
             </button>
           `).join("")}
         </div>
       `;
 
       UI.showModal({
-        title: `Bid: ${t.title}`,
+        title: `Submit Bid: ${t.title}`,
         contentNode: picker,
         actions: []
       });
@@ -136,7 +134,7 @@ class MarketView {
           UI.closeModal();
 
           if (res.success) {
-            UI.toast(`CONTRACT AWARDED! ${t.title} won. Keep production on pace to avoid competitor reallocation!`, "success");
+            UI.toast(`CONTRACT AWARDED: ${t.title} secured. Maintain batch schedule to avoid delay breach.`, "success");
             Events.emit("marketChanged");
             MarketView.render(document.getElementById("viewport-root"));
           } else {

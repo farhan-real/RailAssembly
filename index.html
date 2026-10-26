@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RailAssembly - Electric Locomotive & Trainset Manufacturing</title>
+  <title>RailAssembly &mdash; Electric Rolling Stock OEM Management</title>
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
@@ -13,92 +13,71 @@
   <div id="app" class="app-container">
     <header class="app-header">
       <div class="brand-section">
-        <div class="brand-logo" id="brand-logo-slot"></div>
         <div>
           <h1 class="brand-title">RailAssembly</h1>
-          <span class="brand-subtitle">Electric Traction Industries</span>
+          <span class="brand-subtitle">Electric Traction &bull; Enterprise Operations</span>
         </div>
       </div>
 
       <div class="metrics-bar" id="top-metrics">
-        <div class="metric-chip" title="Total Liquid Capital">
-          <span class="metric-icon" id="icon-capital"></span>
-          <div class="metric-details">
-            <span class="metric-label">Capital</span>
-            <span class="metric-value" id="val-funds">$12,500,000</span>
-          </div>
+        <div class="metric-chip">
+          <span class="metric-label">Capital Reserve</span>
+          <span class="metric-value" id="val-funds">$14,500,000</span>
         </div>
 
-        <div class="metric-chip" title="Quarterly Projected Profit">
-          <span class="metric-icon" id="icon-profit"></span>
-          <div class="metric-details">
-            <span class="metric-label">Q-Profit (Est)</span>
-            <span class="metric-value text-accent" id="val-profit">+$1,450,000</span>
-          </div>
+        <div class="metric-chip">
+          <span class="metric-label">Quarterly Profit (Est)</span>
+          <span class="metric-value text-positive" id="val-profit">+$1,450,000</span>
         </div>
 
-        <div class="metric-chip" title="Corporate Reputation with Railway Board">
-          <span class="metric-icon" id="icon-rep"></span>
-          <div class="metric-details">
-            <span class="metric-label">Reputation</span>
-            <span class="metric-value text-cyan" id="val-rep">74%</span>
-          </div>
+        <div class="metric-chip">
+          <span class="metric-label">Board Standing</span>
+          <span class="metric-value text-blue" id="val-rep">72%</span>
         </div>
 
-        <div class="metric-chip" title="Active Warehouse Stock / Total Capacity">
-          <span class="metric-icon" id="icon-storage"></span>
-          <div class="metric-details">
-            <span class="metric-label">Warehouse</span>
-            <span class="metric-value" id="val-wh">24 / 200</span>
-          </div>
+        <div class="metric-chip">
+          <span class="metric-label">Active Warehouse</span>
+          <span class="metric-value" id="val-wh">24 / 200</span>
         </div>
 
         <div class="metric-chip calendar-chip">
-          <span class="metric-icon" id="icon-time"></span>
-          <div class="metric-details">
-            <span class="metric-label" id="val-date">Oct 12, 2026</span>
-            <span class="metric-sub" id="val-quarter">Q4 Year 1</span>
-          </div>
+          <span class="metric-label" id="val-date">Oct 26, Y1</span>
+          <span class="metric-sub" id="val-quarter">Q4 Year 1</span>
         </div>
       </div>
 
       <div class="time-controls">
-        <button class="c-btn btn-ghost btn-sm" id="btn-pause" title="Pause Simulation"></button>
-        <button class="c-btn btn-primary btn-sm" id="btn-play-1" title="Normal Speed (1x)"></button>
-        <button class="c-btn btn-ghost btn-sm" id="btn-play-2" title="Fast Speed (3x)"></button>
+        <button class="c-btn btn-ghost btn-sm" id="btn-pause" title="Pause">II</button>
+        <button class="c-btn btn-primary btn-sm" id="btn-play-1" title="1x Speed">1x</button>
+        <button class="c-btn btn-ghost btn-sm" id="btn-play-2" title="3x Speed">3x</button>
       </div>
     </header>
 
     <div class="main-body">
       <nav class="side-navigation" id="main-nav">
+        <div class="nav-section-title">Navigation</div>
         <button class="nav-tab active" data-tab="dashboard">
-          <span class="nav-icon" id="nav-icon-dash"></span>
-          <span class="nav-label">Dashboard</span>
+          <span class="nav-label">Executive Overview</span>
         </button>
         <button class="nav-tab" data-tab="builder">
-          <span class="nav-icon" id="nav-icon-build"></span>
-          <span class="nav-label">Train Builder</span>
+          <span class="nav-label">Engineering CAD</span>
         </button>
         <button class="nav-tab" data-tab="catalog">
-          <span class="nav-icon" id="nav-icon-cat"></span>
-          <span class="nav-label">Train Variants</span>
+          <span class="nav-label">Fleet Catalog</span>
         </button>
         <button class="nav-tab" data-tab="inventory">
-          <span class="nav-icon" id="nav-icon-inv"></span>
-          <span class="nav-label">Inventory &amp; Supply</span>
+          <span class="nav-label">Supply &amp; Inventory</span>
         </button>
         <button class="nav-tab" data-tab="research">
-          <span class="nav-icon" id="nav-icon-res"></span>
-          <span class="nav-label">R&amp;D Tree</span>
+          <span class="nav-label">R&amp;D Directorate</span>
         </button>
         <button class="nav-tab" data-tab="market">
-          <span class="nav-icon" id="nav-icon-mkt"></span>
-          <span class="nav-label">Govt &amp; Market</span>
+          <span class="nav-label">Ministry Tenders</span>
         </button>
       </nav>
 
       <main class="content-viewport" id="viewport-root">
-        <!-- Modular views dynamically mounted here -->
+        <!-- Modular dashboard views rendered here -->
       </main>
     </div>
 

@@ -1,42 +1,16 @@
-// Main App Orchestration, Routing, and Header Updates
+// Main Application Routing, Simulation Runner & Executive Dashboard Binder
 class App {
   static currentTab = "dashboard";
 
   static init() {
-    this.mountBrandIcons();
     this.bindNavigation();
     this.bindTimeControls();
     this.bindEvents();
 
-    // Spawn 1 initial tender
     OrderEngine.evaluateGovernmentBids();
-
-    // Render initial view
     this.switchTab("dashboard");
-
-    // Launch simulation
     SimulationRunner.start();
     this.updateHeaderMetrics();
-  }
-
-  static mountBrandIcons() {
-    document.getElementById("brand-logo-slot").innerHTML = ICONS.train;
-    document.getElementById("icon-capital").innerHTML = ICONS.money;
-    document.getElementById("icon-profit").innerHTML = ICONS.rep;
-    document.getElementById("icon-rep").innerHTML = ICONS.rep;
-    document.getElementById("icon-storage").innerHTML = ICONS.storage;
-    document.getElementById("icon-time").innerHTML = ICONS.time;
-
-    document.getElementById("btn-pause").innerHTML = ICONS.pause;
-    document.getElementById("btn-play-1").innerHTML = ICONS.play;
-    document.getElementById("btn-play-2").innerHTML = ICONS.fast;
-
-    document.getElementById("nav-icon-dash").innerHTML = ICONS.motor;
-    document.getElementById("nav-icon-build").innerHTML = ICONS.pantograph;
-    document.getElementById("nav-icon-cat").innerHTML = ICONS.train;
-    document.getElementById("nav-icon-inv").innerHTML = ICONS.storage;
-    document.getElementById("nav-icon-res").innerHTML = ICONS.inverter;
-    document.getElementById("nav-icon-mkt").innerHTML = ICONS.money;
   }
 
   static bindNavigation() {
@@ -113,7 +87,7 @@ class App {
     const qEst = OrderEngine.calculateQuarterlyEstimate();
     const profitEl = document.getElementById("val-profit");
     profitEl.textContent = `${qEst.netProfitEst >= 0 ? "+" : ""}$${qEst.netProfitEst.toLocaleString()}`;
-    profitEl.className = `metric-value ${qEst.netProfitEst < 0 ? "text-red" : "text-accent"}`;
+    profitEl.className = `metric-value ${qEst.netProfitEst < 0 ? "text-negative" : "text-positive"}`;
 
     document.getElementById("val-rep").textContent = `${state.reputation}%`;
     document.getElementById("val-wh").textContent = `${state.getWarehouseCount()} / ${state.warehouseCapacity}`;
